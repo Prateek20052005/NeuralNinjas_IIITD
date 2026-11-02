@@ -1,0 +1,17 @@
+# secrets never go into the image: the key is given at run time
+.env
+.env.*
+!.env.example
+
+.venv/
+**/__pycache__/
+.pytest_cache/
+frontend/node_modules/
+frontend/dist/
+analysis/
+scripts/
+tests/
+docs/
+data/kyc_documents/
+*.log
+.git/

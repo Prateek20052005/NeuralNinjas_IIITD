@@ -1,0 +1,13 @@
+applicant,lead_id,expected_decision,expected_issues,evidence
+K01,L00045,REJECT,gstin_cancelled;udyam_number_blank,"Registry status of 37IHKXV5167L1ZS is Cancelled; Udyam certificate number field is empty (lead has_udyam=N)"
+K02,L01287,PASS,,"GST certificate photo is tilted ~7 degrees; after straightening all fields match registry (OCR 0->O repair on GSTIN)"
+K03,L03571,PASS,,"All fields match GST and Udyam registries"
+K04,L01014,RETAKE,gst_certificate_unreadable,"GST certificate is blurred (sharpness 1.0); GSTIN cannot be read"
+K05,L04014,INCOMPLETE,udyam_certificate_missing,"No Udyam certificate uploaded; lead record has UDYAM-KL-00-5521886, so a number lookup can replace the upload"
+K06,L00115,REJECT,gstin_checksum_fail,"Certificate prints 08YKZXS8189L1Z0 (fails checksum, not in registry); registry has 08YKZXS5189L1ZO"
+K07,L03349,REJECT,gst_legal_name_mismatch,"Certificate legal name says 'Shri Physio Clinic', registry says 'Neelgiri Physio Clinic' - document altered"
+K08,L03473,PASS,,"All fields match (OCR 0->O repair on GSTIN)"
+K09,L04779,PASS,,"All fields match"
+K10,L04525,REVIEW,signatory_not_authorised,"ID belongs to Nisha Arora; owner on record for this LLP is Fatima Menon - needs authorisation letter"
+K11,L03485,RETAKE,address_proof_too_old,"Electricity bill dated 2025-10-31 is 257 days before 2026-07-15 (limit 90)"
+K12,L03558,PASS,,"All fields match"

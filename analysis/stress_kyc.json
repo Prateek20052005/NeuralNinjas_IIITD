@@ -1,0 +1,1348 @@
+[
+ {
+  "doc": "K03_address_proof",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 426.3,
+  "tilt": -5.0,
+  "seconds": 5.12,
+  "diff": {}
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 371.3,
+  "tilt": -12.1,
+  "seconds": 5.62,
+  "diff": {}
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 973.4,
+  "tilt": 0.0,
+  "seconds": 4.4,
+  "diff": {}
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 973.4,
+  "tilt": 0.0,
+  "seconds": 4.25,
+  "diff": {}
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 848.9,
+  "tilt": 0.0,
+  "seconds": 2.41,
+  "diff": {
+   "amount": [
+    "33,615",
+    "NOTA VALID DOCUM"
+   ]
+  }
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1479.0,
+  "tilt": 0.0,
+  "seconds": 1.57,
+  "diff": {}
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 865.5,
+  "tilt": 0.0,
+  "seconds": 2.63,
+  "diff": {
+   "supply_address": [
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra - 411231",
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra- 411231"
+   ]
+  }
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 601.2,
+  "tilt": 0.0,
+  "seconds": 2.13,
+  "diff": {}
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 524.5,
+  "tilt": -2.1,
+  "seconds": 4.21,
+  "diff": {}
+ },
+ {
+  "doc": "K03_address_proof",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 297.6,
+  "tilt": -3.6,
+  "seconds": 5.9,
+  "diff": {
+   "amount": [
+    "33,615",
+    "NOT A VALID DOCUM"
+   ]
+  }
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 535.6,
+  "tilt": -5.0,
+  "seconds": 4.73,
+  "diff": {
+   "address": [
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra - 411231",
+    "Shop/Unit 80, Civil Lines, Nagpur,Maharashtra - 411231"
+   ]
+  }
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 465.4,
+  "tilt": -12.0,
+  "seconds": 5.43,
+  "diff": {
+   "address": [
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra - 411231",
+    "Shop/Unit 80, Civil Lines, Nagpur,Maharashtra - 411231"
+   ]
+  }
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1221.3,
+  "tilt": 0.0,
+  "seconds": 6.21,
+  "diff": {}
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1221.3,
+  "tilt": 0.0,
+  "seconds": 6.59,
+  "diff": {}
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1056.2,
+  "tilt": 0.0,
+  "seconds": 3.91,
+  "diff": {
+   "legal_name": [
+    "Joseph Singh (Prop. Ganesh Woodcraft)",
+    "Joseph Singh (Prop.GaneshWoodcraft)"
+   ],
+   "address": [
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra - 411231",
+    "Shop/Unit80, Civil Lines, Nagpur, Maharashtra - 411231"
+   ]
+  }
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1879.0,
+  "tilt": 0.0,
+  "seconds": 1.44,
+  "diff": {}
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 939.3,
+  "tilt": 0.0,
+  "seconds": 2.67,
+  "diff": {
+   "address": [
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra - 411231",
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra-411231"
+   ]
+  }
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 737.2,
+  "tilt": 0.0,
+  "seconds": 2.16,
+  "diff": {}
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 658.7,
+  "tilt": -1.9,
+  "seconds": 4.15,
+  "diff": {
+   "address": [
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra - 411231",
+    "Shop/Unit 80, Civil Lines, Nagpur,Maharashtra - 411231"
+   ]
+  }
+ },
+ {
+  "doc": "K03_gst_certificate",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 364.4,
+  "tilt": -3.2,
+  "seconds": 5.37,
+  "diff": {
+   "address": [
+    "Shop/Unit 80, Civil Lines, Nagpur, Maharashtra - 411231",
+    "Shop/Unit 80, Civil Lines, Nagpur,Maharashtra - 411231"
+   ]
+  }
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 752.0,
+  "tilt": -4.9,
+  "seconds": 2.0,
+  "diff": {}
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 658.1,
+  "tilt": -11.9,
+  "seconds": 2.28,
+  "diff": {}
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1785.5,
+  "tilt": 0.0,
+  "seconds": 2.08,
+  "diff": {}
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1785.5,
+  "tilt": 0.0,
+  "seconds": 2.03,
+  "diff": {}
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1667.6,
+  "tilt": 0.0,
+  "seconds": 1.33,
+  "diff": {
+   "business": [
+    "Ganesh Woodcraft",
+    "GaneshWoodcraft"
+   ]
+  }
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1042.5,
+  "tilt": 0.0,
+  "seconds": 1.02,
+  "diff": {}
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1112.9,
+  "tilt": 0.0,
+  "seconds": 1.35,
+  "diff": {}
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1056.0,
+  "tilt": 0.0,
+  "seconds": 1.06,
+  "diff": {
+   "business": [
+    "Ganesh Woodcraft",
+    "GaneshWoodcraft"
+   ]
+  }
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 910.2,
+  "tilt": 0.0,
+  "seconds": 1.13,
+  "diff": {}
+ },
+ {
+  "doc": "K03_signatory_id",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 571.5,
+  "tilt": -2.9,
+  "seconds": 3.27,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 427.3,
+  "tilt": -5.0,
+  "seconds": 4.37,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 372.6,
+  "tilt": -12.0,
+  "seconds": 5.2,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 980.5,
+  "tilt": 0.0,
+  "seconds": 4.18,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 980.5,
+  "tilt": 0.0,
+  "seconds": 4.1,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 851.4,
+  "tilt": 0.0,
+  "seconds": 2.36,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1472.1,
+  "tilt": 0.0,
+  "seconds": 1.2,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 867.8,
+  "tilt": 0.0,
+  "seconds": 2.32,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 604.7,
+  "tilt": 0.0,
+  "seconds": 1.99,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 526.4,
+  "tilt": -1.8,
+  "seconds": 4.06,
+  "diff": {}
+ },
+ {
+  "doc": "K03_udyam_certificate",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 298.3,
+  "tilt": -3.1,
+  "seconds": 5.18,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 425.6,
+  "tilt": -5.0,
+  "seconds": 4.52,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 371.4,
+  "tilt": -12.1,
+  "seconds": 4.97,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 973.4,
+  "tilt": 0.0,
+  "seconds": 4.2,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 973.4,
+  "tilt": 0.0,
+  "seconds": 4.17,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 846.4,
+  "tilt": 0.0,
+  "seconds": 2.48,
+  "diff": {
+   "amount": [
+    "10,690",
+    "NOT A VALID DOCUM"
+   ]
+  }
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1482.2,
+  "tilt": 0.0,
+  "seconds": 1.16,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 865.6,
+  "tilt": 0.0,
+  "seconds": 2.44,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 602.7,
+  "tilt": 0.0,
+  "seconds": 2.0,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 524.8,
+  "tilt": -2.2,
+  "seconds": 4.04,
+  "diff": {}
+ },
+ {
+  "doc": "K07_address_proof",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 298.4,
+  "tilt": -3.6,
+  "seconds": 4.81,
+  "diff": {
+   "amount": [
+    "10,690",
+    "NOT A VALID DOCUM"
+   ]
+  }
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 534.5,
+  "tilt": -5.0,
+  "seconds": 4.49,
+  "diff": {
+   "address": [
+    "Shop/Unit 52, Transport Nagar, Delhi, Delhi -334596",
+    "Shop/Unit 52, Transport Nagar,Delhi, Delhi -334596"
+   ]
+  }
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 463.7,
+  "tilt": -12.1,
+  "seconds": 5.11,
+  "diff": {
+   "address": [
+    "Shop/Unit 52, Transport Nagar, Delhi, Delhi -334596",
+    "Shop/Unit 52, Transport Nagar,Delhi, Delhi -334596"
+   ]
+  }
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1215.2,
+  "tilt": 0.0,
+  "seconds": 4.32,
+  "diff": {}
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1215.2,
+  "tilt": 0.0,
+  "seconds": 4.6,
+  "diff": {}
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1051.1,
+  "tilt": 0.0,
+  "seconds": 2.62,
+  "diff": {
+   "legal_name": [
+    "Neha Banerjee (Prop. Shri Physio Clinic)",
+    "Neha Banerjee(Prop. Shri Physio Clinic)"
+   ],
+   "address": [
+    "Shop/Unit 52, Transport Nagar, Delhi, Delhi -334596",
+    "Shop/Unit 52, Transport Nagar,Delhi, Delhi -334596"
+   ]
+  }
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1866.7,
+  "tilt": 0.0,
+  "seconds": 1.34,
+  "diff": {}
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 937.6,
+  "tilt": 0.0,
+  "seconds": 2.35,
+  "diff": {}
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 736.1,
+  "tilt": 0.0,
+  "seconds": 2.3,
+  "diff": {}
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 656.0,
+  "tilt": -1.5,
+  "seconds": 4.34,
+  "diff": {
+   "address": [
+    "Shop/Unit 52, Transport Nagar, Delhi, Delhi -334596",
+    "Shop/Unit 52, Transport Nagar,Delhi, Delhi -334596"
+   ]
+  }
+ },
+ {
+  "doc": "K07_gst_certificate",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 363.5,
+  "tilt": -3.2,
+  "seconds": 5.45,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 780.8,
+  "tilt": -4.9,
+  "seconds": 1.88,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 685.8,
+  "tilt": -11.8,
+  "seconds": 1.99,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1852.2,
+  "tilt": 0.0,
+  "seconds": 2.13,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1852.2,
+  "tilt": 0.0,
+  "seconds": 2.09,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1731.9,
+  "tilt": 0.0,
+  "seconds": 1.39,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1076.5,
+  "tilt": 0.0,
+  "seconds": 1.08,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1132.6,
+  "tilt": 0.0,
+  "seconds": 1.23,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1090.7,
+  "tilt": 0.0,
+  "seconds": 1.01,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 946.8,
+  "tilt": 0.0,
+  "seconds": 1.0,
+  "diff": {}
+ },
+ {
+  "doc": "K07_signatory_id",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 584.2,
+  "tilt": -2.8,
+  "seconds": 2.77,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 407.5,
+  "tilt": -5.0,
+  "seconds": 4.23,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 355.7,
+  "tilt": -12.0,
+  "seconds": 4.98,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 937.1,
+  "tilt": 0.0,
+  "seconds": 4.11,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 937.1,
+  "tilt": 0.0,
+  "seconds": 4.12,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 813.8,
+  "tilt": 0.0,
+  "seconds": 2.32,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1411.1,
+  "tilt": 0.0,
+  "seconds": 1.19,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 854.9,
+  "tilt": 0.0,
+  "seconds": 2.19,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 582.3,
+  "tilt": 0.0,
+  "seconds": 1.93,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 501.3,
+  "tilt": -2.0,
+  "seconds": 3.94,
+  "diff": {}
+ },
+ {
+  "doc": "K07_udyam_certificate",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 287.0,
+  "tilt": -3.1,
+  "seconds": 4.99,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 421.5,
+  "tilt": -4.9,
+  "seconds": 4.28,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 368.7,
+  "tilt": -11.9,
+  "seconds": 5.06,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 966.8,
+  "tilt": 0.0,
+  "seconds": 4.18,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 966.8,
+  "tilt": 0.0,
+  "seconds": 4.09,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 842.5,
+  "tilt": 0.0,
+  "seconds": 2.41,
+  "diff": {
+   "consumer_no": [
+    "6910330901",
+    "69133001"
+   ],
+   "supply_address": [
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra-570043",
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra- 570043"
+   ],
+   "amount": [
+    "23,713",
+    "NOTA VALID DOCUM"
+   ]
+  }
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1469.8,
+  "tilt": 0.0,
+  "seconds": 1.19,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 863.9,
+  "tilt": 0.0,
+  "seconds": 2.31,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 597.7,
+  "tilt": 0.0,
+  "seconds": 2.12,
+  "diff": {}
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 520.2,
+  "tilt": -2.1,
+  "seconds": 4.06,
+  "diff": {
+   "supply_address": [
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra-570043",
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra- 570043"
+   ]
+  }
+ },
+ {
+  "doc": "K10_address_proof",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 295.7,
+  "tilt": -3.2,
+  "seconds": 4.9,
+  "diff": {
+   "amount": [
+    "23,713",
+    "NOT A VALID DOCUM"
+   ]
+  }
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 522.8,
+  "tilt": -4.9,
+  "seconds": 4.37,
+  "diff": {
+   "address": [
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra-570043",
+    "Shop/Unit 21, Sector 14, Mumbai,Maharashtra- 570043"
+   ]
+  }
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 454.2,
+  "tilt": -12.0,
+  "seconds": 5.15,
+  "diff": {
+   "address": [
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra-570043",
+    "Shop/Unit 21, Sector 14, Mumbai,Maharashtra-570043"
+   ]
+  }
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1193.3,
+  "tilt": 0.0,
+  "seconds": 4.17,
+  "diff": {}
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1193.3,
+  "tilt": 0.0,
+  "seconds": 4.22,
+  "diff": {}
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1036.7,
+  "tilt": 0.0,
+  "seconds": 2.53,
+  "diff": {
+   "address": [
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra-570043",
+    "Shop/Unit 21,Sector14, Mumbai, Maharashtra- 570043"
+   ]
+  }
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1811.4,
+  "tilt": 0.0,
+  "seconds": 1.21,
+  "diff": {
+   "address": [
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra-570043",
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra- 570043"
+   ]
+  }
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 931.3,
+  "tilt": 0.0,
+  "seconds": 2.24,
+  "diff": {}
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 727.7,
+  "tilt": 0.0,
+  "seconds": 2.21,
+  "diff": {}
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 642.3,
+  "tilt": -1.6,
+  "seconds": 4.12,
+  "diff": {
+   "address": [
+    "Shop/Unit 21, Sector 14, Mumbai, Maharashtra-570043",
+    "Shop/Unit 21, Sector 14, Mumbai,Maharashtra- 570043"
+   ]
+  }
+ },
+ {
+  "doc": "K10_gst_certificate",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 355.0,
+  "tilt": -3.2,
+  "seconds": 5.13,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 737.3,
+  "tilt": -4.7,
+  "seconds": 1.82,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 648.1,
+  "tilt": -11.8,
+  "seconds": 2.0,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1757.6,
+  "tilt": 0.0,
+  "seconds": 1.99,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1757.6,
+  "tilt": 0.0,
+  "seconds": 1.96,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1643.2,
+  "tilt": 0.0,
+  "seconds": 1.18,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1020.6,
+  "tilt": 0.0,
+  "seconds": 0.95,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1105.4,
+  "tilt": 0.0,
+  "seconds": 1.16,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1043.1,
+  "tilt": 0.0,
+  "seconds": 0.94,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 893.8,
+  "tilt": 0.0,
+  "seconds": 1.02,
+  "diff": {}
+ },
+ {
+  "doc": "K10_signatory_id",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 565.4,
+  "tilt": -2.7,
+  "seconds": 2.82,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "tilt_5",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 415.2,
+  "tilt": -5.0,
+  "seconds": 4.26,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "tilt_12",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 362.9,
+  "tilt": -12.0,
+  "seconds": 4.96,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "sideways",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 955.3,
+  "tilt": 0.0,
+  "seconds": 4.07,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "upside_down",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 955.3,
+  "tilt": 0.0,
+  "seconds": 4.04,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "jpeg_30",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 828.3,
+  "tilt": 0.0,
+  "seconds": 2.2,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "small_900px",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 1426.0,
+  "tilt": 0.0,
+  "seconds": 1.11,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "dark_noisy",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 860.6,
+  "tilt": 0.0,
+  "seconds": 2.15,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "shadow",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 592.7,
+  "tilt": 0.0,
+  "seconds": 1.99,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "keystone",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 512.5,
+  "tilt": -2.0,
+  "seconds": 3.8,
+  "diff": {}
+ },
+ {
+  "doc": "K10_udyam_certificate",
+  "variant": "on_table",
+  "type_ok": true,
+  "blurred": false,
+  "sharpness": 291.1,
+  "tilt": -3.2,
+  "seconds": 4.88,
+  "diff": {
+   "udyam_number": [
+    "UDYAM-MH-00-7183141",
+    "UDYAM-MH-00-7183141NO"
+   ]
+  }
+ }
+]

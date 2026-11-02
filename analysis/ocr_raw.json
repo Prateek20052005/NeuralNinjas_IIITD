@@ -1,0 +1,4628 @@
+{
+ "K01_address_proof.png": {
+  "seconds": 2.78,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.974,
+    "x": 76,
+    "y": 69
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.998,
+    "x": 77,
+    "y": 129
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 1.0,
+    "x": 656,
+    "y": 168
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 87,
+    "y": 250
+   },
+   {
+    "text": "9485717625",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Vindhya Tours & Travels",
+    "score": 0.991,
+    "x": 517,
+    "y": 321
+   },
+   {
+    "text": "M",
+    "score": 0.999,
+    "x": 296,
+    "y": 343
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 1, Tech Park Road, Visakhapatnam, A",
+    "score": 0.988,
+    "x": 517,
+    "y": 390
+   },
+   {
+    "text": "ndhra Pradesh - 118383",
+    "score": 0.988,
+    "x": 518,
+    "y": 460
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-06-26",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "2203",
+    "score": 1.0,
+    "x": 515,
+    "y": 599
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.999,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "27,071",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K01_gst_certificate.png": {
+  "seconds": 2.76,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "37IHKXV5167L1ZS",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Neha Kaur (Prop. Vindhya Tours & Travels)",
+    "score": 0.985,
+    "x": 515,
+    "y": 318
+   },
+   {
+    "text": "Trade name",
+    "score": 0.954,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Vindhya Tours & Travels",
+    "score": 0.984,
+    "x": 517,
+    "y": 391
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 516,
+    "y": 459
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.997,
+    "x": 86,
+    "y": 527
+   },
+   {
+    "text": "Shop/Unit 1, Tech Park Road, Visakhapatnam, A",
+    "score": 0.993,
+    "x": 517,
+    "y": 530
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "ndhra Pradesh - 118383",
+    "score": 0.997,
+    "x": 517,
+    "y": 599
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.998,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2025-06-07",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.992,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 514,
+    "y": 737
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K01_signatory_id.png": {
+  "seconds": 1.12,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.998,
+    "x": 34,
+    "y": 32
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 334,
+    "y": 126
+   },
+   {
+    "text": "Neha Kaur",
+    "score": 1.0,
+    "x": 336,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Office admin",
+    "score": 0.999,
+    "x": 336,
+    "y": 225
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 336,
+    "y": 270
+   },
+   {
+    "text": "Vindhya Tours & Travels",
+    "score": 0.989,
+    "x": 336,
+    "y": 295
+   },
+   {
+    "text": "ID no.",
+    "score": 0.987,
+    "x": 334,
+    "y": 338
+   },
+   {
+    "text": "SYN-ID-346190",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2028-03-26",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K01_udyam_certificate.png": {
+  "seconds": 2.39,
+  "tilt": 0.1,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.996,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Vindhya Tours & Travels",
+    "score": 0.988,
+    "x": 516,
+    "y": 319
+   },
+   {
+    "text": "Major activity",
+    "score": 0.997,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Visakhapatnam",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 526
+   },
+   {
+    "text": "Andhra Pradesh",
+    "score": 0.999,
+    "x": 515,
+    "y": 527
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.998,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2024-03-24",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K02_address_proof.png": {
+  "seconds": 2.35,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.989,
+    "x": 75,
+    "y": 127
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 0.994,
+    "x": 652,
+    "y": 169
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 86,
+    "y": 250
+   },
+   {
+    "text": "9790713533",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Harmony Dental Care",
+    "score": 0.993,
+    "x": 516,
+    "y": 321
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 342
+   },
+   {
+    "text": "Supply address",
+    "score": 0.997,
+    "x": 84,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 199, Station Road, Kolkata, West Be",
+    "score": 0.983,
+    "x": 516,
+    "y": 390
+   },
+   {
+    "text": "ngal - 347550",
+    "score": 0.991,
+    "x": 515,
+    "y": 459
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-05-22",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "992",
+    "score": 1.0,
+    "x": 513,
+    "y": 597
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "7,077",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K02_gst_certificate.png": {
+  "seconds": 5.9,
+  "tilt": 7.1,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.998,
+    "x": 174,
+    "y": 137
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 0.999,
+    "x": 177,
+    "y": 198
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 187,
+    "y": 318
+   },
+   {
+    "text": "19E0GXH4115Y1ZL",
+    "score": 0.999,
+    "x": 618,
+    "y": 319
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 185,
+    "y": 389
+   },
+   {
+    "text": "Joseph Shah (Prop. Harmony Dental Care)",
+    "score": 0.993,
+    "x": 615,
+    "y": 389
+   },
+   {
+    "text": "Trade name",
+    "score": 1.0,
+    "x": 187,
+    "y": 458
+   },
+   {
+    "text": "Harmony Dental Care",
+    "score": 0.999,
+    "x": 617,
+    "y": 458
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 189,
+    "y": 530
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 618,
+    "y": 530
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.999,
+    "x": 189,
+    "y": 600
+   },
+   {
+    "text": "Shop/Unit 199, Station Road, Kolkata, West Be",
+    "score": 0.999,
+    "x": 618,
+    "y": 599
+   },
+   {
+    "text": "place of business",
+    "score": 0.991,
+    "x": 205,
+    "y": 669
+   },
+   {
+    "text": "ngal - 347550",
+    "score": 0.97,
+    "x": 618,
+    "y": 668
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.997,
+    "x": 188,
+    "y": 738
+   },
+   {
+    "text": "2022-04-17",
+    "score": 1.0,
+    "x": 618,
+    "y": 738
+   },
+   {
+    "text": "Type of registration",
+    "score": 1.0,
+    "x": 190,
+    "y": 810
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 617,
+    "y": 809
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata, Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.983,
+    "x": 182,
+    "y": 1727
+   }
+  ]
+ },
+ "K02_signatory_id.png": {
+  "seconds": 1.04,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.998,
+    "x": 34,
+    "y": 32
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 335,
+    "y": 127
+   },
+   {
+    "text": "Joseph Shah",
+    "score": 1.0,
+    "x": 334,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 335,
+    "y": 196
+   },
+   {
+    "text": "Manager",
+    "score": 1.0,
+    "x": 334,
+    "y": 223
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 336,
+    "y": 270
+   },
+   {
+    "text": "Harmony Dental Care",
+    "score": 0.999,
+    "x": 335,
+    "y": 295
+   },
+   {
+    "text": "ID no.",
+    "score": 0.999,
+    "x": 335,
+    "y": 338
+   },
+   {
+    "text": "SYN-ID-816907",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.99,
+    "x": 335,
+    "y": 407
+   },
+   {
+    "text": "2028-09-10",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K02_udyam_certificate.png": {
+  "seconds": 2.0,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-WB-00-5053330",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Harmony Dental Care",
+    "score": 1.0,
+    "x": 516,
+    "y": 321
+   },
+   {
+    "text": "Major activity",
+    "score": 0.976,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 515,
+    "y": 390
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Kolkata",
+    "score": 1.0,
+    "x": 514,
+    "y": 456
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "West Bengal",
+    "score": 1.0,
+    "x": 513,
+    "y": 526
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2023-01-11",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K03_address_proof.png": {
+  "seconds": 2.64,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.989,
+    "x": 75,
+    "y": 127
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 1.0,
+    "x": 656,
+    "y": 168
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 86,
+    "y": 250
+   },
+   {
+    "text": "3438517928",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Ganesh Woodcraft",
+    "score": 1.0,
+    "x": 517,
+    "y": 320
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 342
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 80, Civil Lines, Nagpur, Maharashtr",
+    "score": 0.999,
+    "x": 517,
+    "y": 390
+   },
+   {
+    "text": "a - 411231",
+    "score": 0.964,
+    "x": 516,
+    "y": 458
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-05-30",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 0.997,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "231",
+    "score": 1.0,
+    "x": 514,
+    "y": 599
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "33,615",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K03_gst_certificate.png": {
+  "seconds": 2.6,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.992,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "27XUIXG0767D1ZP",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Joseph Singh (Prop. Ganesh Woodcraft)",
+    "score": 0.984,
+    "x": 514,
+    "y": 320
+   },
+   {
+    "text": "Trade name",
+    "score": 1.0,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Ganesh Woodcraft",
+    "score": 0.993,
+    "x": 515,
+    "y": 388
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 516,
+    "y": 459
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.968,
+    "x": 86,
+    "y": 527
+   },
+   {
+    "text": "Shop/Unit 80, Civil Lines, Nagpur, Maharashtr",
+    "score": 0.996,
+    "x": 515,
+    "y": 527
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "a - 411231",
+    "score": 0.939,
+    "x": 516,
+    "y": 599
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.999,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2020-02-10",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.981,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 514,
+    "y": 737
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K03_signatory_id.png": {
+  "seconds": 1.14,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.994,
+    "x": 36,
+    "y": 36
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 334,
+    "y": 126
+   },
+   {
+    "text": "Joseph Singh",
+    "score": 1.0,
+    "x": 334,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 198
+   },
+   {
+    "text": "Owner",
+    "score": 1.0,
+    "x": 336,
+    "y": 225
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Ganesh Woodcraft",
+    "score": 0.999,
+    "x": 339,
+    "y": 297
+   },
+   {
+    "text": "ID no.",
+    "score": 0.984,
+    "x": 334,
+    "y": 338
+   },
+   {
+    "text": "SYN-ID-447889",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2028-07-04",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K03_udyam_certificate.png": {
+  "seconds": 1.94,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-MH-00-9516696",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Ganesh Woodcraft",
+    "score": 0.986,
+    "x": 518,
+    "y": 320
+   },
+   {
+    "text": "Major activity",
+    "score": 0.997,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Manufacturing",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Nagpur",
+    "score": 1.0,
+    "x": 514,
+    "y": 458
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Maharashtra",
+    "score": 1.0,
+    "x": 514,
+    "y": 527
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2024-11-21",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K04_address_proof.png": {
+  "seconds": 2.13,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.974,
+    "x": 76,
+    "y": 69
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.998,
+    "x": 77,
+    "y": 129
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 1.0,
+    "x": 656,
+    "y": 168
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 87,
+    "y": 250
+   },
+   {
+    "text": "7397844759",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Saffron Dental Care LLP",
+    "score": 0.985,
+    "x": 516,
+    "y": 320
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 343
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 75, Lake View Colony, Nagpur, Mahar",
+    "score": 1.0,
+    "x": 516,
+    "y": 390
+   },
+   {
+    "text": "ashtra - 137452",
+    "score": 0.983,
+    "x": 518,
+    "y": 460
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-05-28",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "2295",
+    "score": 1.0,
+    "x": 515,
+    "y": 599
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "20,713",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K04_gst_certificate.png": {
+  "seconds": 3.17,
+  "tilt": -24.7,
+  "lines": [
+   {
+    "text": "nen: GST Regist",
+    "score": 0.923,
+    "x": 592,
+    "y": 0
+   },
+   {
+    "text": "SYNTHETIC SPECIMEN· NOT A VALID DOCUN",
+    "score": 0.91,
+    "x": 85,
+    "y": 671
+   },
+   {
+    "text": "SYNTHETIC SPECIMEN· NOT A VALID DOCY",
+    "score": 0.948,
+    "x": 88,
+    "y": 1092
+   }
+  ]
+ },
+ "K04_signatory_id.png": {
+  "seconds": 1.23,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.998,
+    "x": 34,
+    "y": 32
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 335,
+    "y": 127
+   },
+   {
+    "text": "Fatima Pillai",
+    "score": 0.995,
+    "x": 336,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Partner",
+    "score": 1.0,
+    "x": 336,
+    "y": 225
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 336,
+    "y": 270
+   },
+   {
+    "text": "Saffron Dental Care LLP",
+    "score": 0.999,
+    "x": 336,
+    "y": 295
+   },
+   {
+    "text": "ID no.",
+    "score": 0.968,
+    "x": 336,
+    "y": 339
+   },
+   {
+    "text": "SYN-ID-609396",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2028-08-03",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K04_udyam_certificate.png": {
+  "seconds": 2.13,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-MH-00-6131836",
+    "score": 0.995,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Saffron Dental Care LLP",
+    "score": 0.979,
+    "x": 517,
+    "y": 320
+   },
+   {
+    "text": "Major activity",
+    "score": 0.977,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Nagpur",
+    "score": 1.0,
+    "x": 514,
+    "y": 458
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Maharashtra",
+    "score": 1.0,
+    "x": 514,
+    "y": 527
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2025-05-17",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K05_address_proof.png": {
+  "seconds": 2.08,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.989,
+    "x": 75,
+    "y": 127
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 1.0,
+    "x": 656,
+    "y": 168
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 86,
+    "y": 250
+   },
+   {
+    "text": "4294969054",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Balaji Realty LLP",
+    "score": 1.0,
+    "x": 515,
+    "y": 318
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 342
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 38, Civil Lines, Kochi, Kerala - 75",
+    "score": 0.994,
+    "x": 515,
+    "y": 388
+   },
+   {
+    "text": "2083",
+    "score": 1.0,
+    "x": 514,
+    "y": 457
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-06-11",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 0.997,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "996",
+    "score": 1.0,
+    "x": 514,
+    "y": 598
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "22,425",
+    "score": 1.0,
+    "x": 515,
+    "y": 668
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K05_gst_certificate.png": {
+  "seconds": 2.2,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "32TZAXB5481U1Z1",
+    "score": 1.0,
+    "x": 515,
+    "y": 249
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Balaji Realty LLP",
+    "score": 1.0,
+    "x": 515,
+    "y": 318
+   },
+   {
+    "text": "Trade name",
+    "score": 0.954,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Balaji Realty LLP",
+    "score": 0.996,
+    "x": 516,
+    "y": 390
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Limited Liability Partnership",
+    "score": 0.999,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.968,
+    "x": 86,
+    "y": 527
+   },
+   {
+    "text": "Shop/Unit 38, Civil Lines, Kochi, Kerala - 75",
+    "score": 0.997,
+    "x": 517,
+    "y": 529
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "2083",
+    "score": 1.0,
+    "x": 514,
+    "y": 598
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.999,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2020-07-26",
+    "score": 1.0,
+    "x": 514,
+    "y": 668
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.981,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 515,
+    "y": 738
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K05_signatory_id.png": {
+  "seconds": 1.6,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.993,
+    "x": 36,
+    "y": 36
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 334,
+    "y": 126
+   },
+   {
+    "text": "Anita Shah",
+    "score": 0.985,
+    "x": 336,
+    "y": 153
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Owner",
+    "score": 1.0,
+    "x": 336,
+    "y": 226
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Balaji Realty LLP",
+    "score": 0.996,
+    "x": 336,
+    "y": 295
+   },
+   {
+    "text": "ID no.",
+    "score": 0.984,
+    "x": 334,
+    "y": 338
+   },
+   {
+    "text": "SYN-ID-587234",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2029-09-11",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K06_address_proof.png": {
+  "seconds": 2.07,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.998,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 1.0,
+    "x": 656,
+    "y": 168
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 86,
+    "y": 250
+   },
+   {
+    "text": "9566781101",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Saffron Unisex Salon",
+    "score": 0.998,
+    "x": 516,
+    "y": 320
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 344
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 71, Market Yard, Jaipur, Rajasthan",
+    "score": 0.999,
+    "x": 517,
+    "y": 390
+   },
+   {
+    "text": "- 194057",
+    "score": 0.94,
+    "x": 516,
+    "y": 458
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-06-11",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "1280",
+    "score": 1.0,
+    "x": 515,
+    "y": 599
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "27,352",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K06_gst_certificate.png": {
+  "seconds": 2.06,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "08YKZXS8189L1Z0",
+    "score": 0.999,
+    "x": 515,
+    "y": 249
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Pooja Shah (Prop. Saffron Unisex Salon)",
+    "score": 0.99,
+    "x": 517,
+    "y": 321
+   },
+   {
+    "text": "Trade name",
+    "score": 1.0,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Saffron Unisex Salon",
+    "score": 1.0,
+    "x": 516,
+    "y": 391
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 516,
+    "y": 459
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.986,
+    "x": 86,
+    "y": 528
+   },
+   {
+    "text": "Shop/Unit 71, Market Yard, Jaipur, Rajasthan",
+    "score": 0.992,
+    "x": 517,
+    "y": 530
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "- 194057",
+    "score": 0.946,
+    "x": 515,
+    "y": 598
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.999,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2019-09-25",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.993,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 515,
+    "y": 738
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K06_signatory_id.png": {
+  "seconds": 0.88,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.998,
+    "x": 34,
+    "y": 32
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 335,
+    "y": 127
+   },
+   {
+    "text": "Pooja Shah",
+    "score": 1.0,
+    "x": 337,
+    "y": 155
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Owner",
+    "score": 1.0,
+    "x": 336,
+    "y": 226
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Saffron Unisex Salon",
+    "score": 0.999,
+    "x": 338,
+    "y": 296
+   },
+   {
+    "text": "ID no.",
+    "score": 0.984,
+    "x": 334,
+    "y": 338
+   },
+   {
+    "text": "SYN-ID-118354",
+    "score": 1.0,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2028-09-15",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K06_udyam_certificate.png": {
+  "seconds": 1.94,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-RJ-00-6577157",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Saffron Unisex Salon",
+    "score": 0.986,
+    "x": 517,
+    "y": 320
+   },
+   {
+    "text": "Major activity",
+    "score": 0.977,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Jaipur",
+    "score": 1.0,
+    "x": 509,
+    "y": 457
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Rajasthan",
+    "score": 1.0,
+    "x": 514,
+    "y": 528
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2023-01-24",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K07_address_proof.png": {
+  "seconds": 2.25,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.974,
+    "x": 76,
+    "y": 69
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.989,
+    "x": 75,
+    "y": 127
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 0.987,
+    "x": 661,
+    "y": 166
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 87,
+    "y": 250
+   },
+   {
+    "text": "7545812405",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Neelgiri Physio Clinic",
+    "score": 0.997,
+    "x": 518,
+    "y": 321
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 342
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 52, Transport Nagar, Delhi, Delhi -",
+    "score": 0.994,
+    "x": 516,
+    "y": 389
+   },
+   {
+    "text": "334596",
+    "score": 1.0,
+    "x": 523,
+    "y": 457
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-07-05",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "1652",
+    "score": 1.0,
+    "x": 514,
+    "y": 598
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "10,690",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K07_gst_certificate.png": {
+  "seconds": 2.04,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.992,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "07CPCXN0398P1ZT",
+    "score": 1.0,
+    "x": 517,
+    "y": 250
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Neha Banerjee (Prop. Shri Physio Clinic)",
+    "score": 0.999,
+    "x": 515,
+    "y": 318
+   },
+   {
+    "text": "Trade name",
+    "score": 1.0,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Neelgiri Physio Clinic",
+    "score": 1.0,
+    "x": 516,
+    "y": 390
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 516,
+    "y": 459
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.987,
+    "x": 86,
+    "y": 528
+   },
+   {
+    "text": "Shop/Unit 52, Transport Nagar, Delhi, Delhi -",
+    "score": 0.998,
+    "x": 515,
+    "y": 528
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "334596",
+    "score": 1.0,
+    "x": 522,
+    "y": 597
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.999,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2024-01-13",
+    "score": 1.0,
+    "x": 514,
+    "y": 668
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.993,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 515,
+    "y": 738
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K07_signatory_id.png": {
+  "seconds": 0.95,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.993,
+    "x": 36,
+    "y": 36
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 334,
+    "y": 126
+   },
+   {
+    "text": "Neha Banerjee",
+    "score": 0.998,
+    "x": 336,
+    "y": 153
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 335,
+    "y": 196
+   },
+   {
+    "text": "Manager",
+    "score": 1.0,
+    "x": 334,
+    "y": 223
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Neelgiri Physio Clinic",
+    "score": 1.0,
+    "x": 336,
+    "y": 295
+   },
+   {
+    "text": "ID no.",
+    "score": 0.987,
+    "x": 334,
+    "y": 338
+   },
+   {
+    "text": "SYN-ID-178237",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2030-05-05",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K07_udyam_certificate.png": {
+  "seconds": 1.89,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-DL-00-9565547",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Neelgiri Physio Clinic",
+    "score": 0.996,
+    "x": 517,
+    "y": 319
+   },
+   {
+    "text": "Major activity",
+    "score": 0.977,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Delhi",
+    "score": 1.0,
+    "x": 515,
+    "y": 456
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Delhi",
+    "score": 1.0,
+    "x": 514,
+    "y": 526
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2024-07-14",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K08_address_proof.png": {
+  "seconds": 2.06,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.989,
+    "x": 75,
+    "y": 127
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 1.0,
+    "x": 656,
+    "y": 168
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 87,
+    "y": 250
+   },
+   {
+    "text": "2568472785",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Green Leaf Legal Associates",
+    "score": 0.994,
+    "x": 516,
+    "y": 318
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 342
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 238, Ring Road, Vadodara, Gujarat -",
+    "score": 0.997,
+    "x": 516,
+    "y": 389
+   },
+   {
+    "text": "348176",
+    "score": 1.0,
+    "x": 523,
+    "y": 457
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-05-26",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "2219",
+    "score": 1.0,
+    "x": 514,
+    "y": 599
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "33,859",
+    "score": 1.0,
+    "x": 515,
+    "y": 668
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K08_gst_certificate.png": {
+  "seconds": 2.01,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "24X0RXG9365M1Z3",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Joseph Rao (Prop. Green Leaf Legal Associates)",
+    "score": 0.995,
+    "x": 515,
+    "y": 320
+   },
+   {
+    "text": "Trade name",
+    "score": 0.954,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Green Leaf Legal Associates",
+    "score": 0.99,
+    "x": 518,
+    "y": 391
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.963,
+    "x": 86,
+    "y": 527
+   },
+   {
+    "text": "Shop/Unit 238, Ring Road, Vadodara, Gujarat -",
+    "score": 0.998,
+    "x": 517,
+    "y": 530
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "348176",
+    "score": 1.0,
+    "x": 522,
+    "y": 597
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.999,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2018-12-01",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.993,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 515,
+    "y": 738
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K08_signatory_id.png": {
+  "seconds": 0.9,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.994,
+    "x": 36,
+    "y": 36
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 334,
+    "y": 126
+   },
+   {
+    "text": "Joseph Rao",
+    "score": 1.0,
+    "x": 331,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Office admin",
+    "score": 0.999,
+    "x": 336,
+    "y": 225
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Green Leaf Legal Associates",
+    "score": 0.992,
+    "x": 336,
+    "y": 295
+   },
+   {
+    "text": "ID no.",
+    "score": 0.968,
+    "x": 336,
+    "y": 339
+   },
+   {
+    "text": "SYN-ID-393148",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.99,
+    "x": 335,
+    "y": 407
+   },
+   {
+    "text": "2027-09-18",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K08_udyam_certificate.png": {
+  "seconds": 1.9,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-GJ-00-8477445",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Green Leaf Legal Associates",
+    "score": 0.999,
+    "x": 516,
+    "y": 318
+   },
+   {
+    "text": "Major activity",
+    "score": 0.976,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Vadodara",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Gujarat",
+    "score": 1.0,
+    "x": 514,
+    "y": 527
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2022-11-12",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K09_address_proof.png": {
+  "seconds": 2.09,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.974,
+    "x": 76,
+    "y": 69
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.998,
+    "x": 77,
+    "y": 129
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 0.985,
+    "x": 661,
+    "y": 166
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 87,
+    "y": 250
+   },
+   {
+    "text": "9375012581",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Kaveri Insurance Advisors",
+    "score": 0.998,
+    "x": 516,
+    "y": 319
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 344
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 217, Civil Lines, Visakhapatnam, An",
+    "score": 0.99,
+    "x": 517,
+    "y": 390
+   },
+   {
+    "text": "dhra Pradesh - 405337",
+    "score": 0.966,
+    "x": 518,
+    "y": 460
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-07-10",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "2026",
+    "score": 1.0,
+    "x": 515,
+    "y": 599
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.999,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "28,569",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K09_gst_certificate.png": {
+  "seconds": 2.05,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "37LDYXK0296F1ZB",
+    "score": 1.0,
+    "x": 515,
+    "y": 249
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Anita Kulkarni (Prop. Kaveri Insurance Advisors)",
+    "score": 0.99,
+    "x": 515,
+    "y": 318
+   },
+   {
+    "text": "Trade name",
+    "score": 0.954,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Kaveri Insurance Advisors",
+    "score": 1.0,
+    "x": 516,
+    "y": 389
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 516,
+    "y": 459
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.997,
+    "x": 86,
+    "y": 528
+   },
+   {
+    "text": "Shop/Unit 217, Civil Lines, Visakhapatnam, An",
+    "score": 0.999,
+    "x": 516,
+    "y": 529
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "dhra Pradesh - 405337",
+    "score": 0.993,
+    "x": 518,
+    "y": 600
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.998,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2023-09-20",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.991,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 515,
+    "y": 738
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K09_signatory_id.png": {
+  "seconds": 0.87,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.998,
+    "x": 34,
+    "y": 32
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 335,
+    "y": 127
+   },
+   {
+    "text": "Anita Kulkarni",
+    "score": 0.968,
+    "x": 336,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Office admin",
+    "score": 0.999,
+    "x": 336,
+    "y": 225
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Kaveri Insurance Advisors",
+    "score": 0.995,
+    "x": 337,
+    "y": 296
+   },
+   {
+    "text": "ID no.",
+    "score": 0.984,
+    "x": 334,
+    "y": 338
+   },
+   {
+    "text": "SYN-ID-126040",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2027-12-22",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K09_udyam_certificate.png": {
+  "seconds": 1.86,
+  "tilt": 0.3,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 86,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-AP-00-9751562",
+    "score": 1.0,
+    "x": 515,
+    "y": 248
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Kaveri Insurance Advisors",
+    "score": 1.0,
+    "x": 516,
+    "y": 319
+   },
+   {
+    "text": "Major activity",
+    "score": 0.997,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Visakhapatnam",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Andhra Pradesh",
+    "score": 0.999,
+    "x": 516,
+    "y": 528
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2023-07-04",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K10_address_proof.png": {
+  "seconds": 2.03,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.989,
+    "x": 75,
+    "y": 127
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 1.0,
+    "x": 656,
+    "y": 168
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 86,
+    "y": 250
+   },
+   {
+    "text": "6910330901",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Kaveri Stays LLP",
+    "score": 0.99,
+    "x": 515,
+    "y": 318
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 342
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 21, Sector 14, Mumbai, Maharashtra",
+    "score": 0.999,
+    "x": 517,
+    "y": 390
+   },
+   {
+    "text": "-570043",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-06-18",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 0.997,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "675",
+    "score": 1.0,
+    "x": 514,
+    "y": 598
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "23,713",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K10_gst_certificate.png": {
+  "seconds": 1.98,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "27QHJXK0658U1ZL",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Kaveri Stays LLP",
+    "score": 0.988,
+    "x": 516,
+    "y": 319
+   },
+   {
+    "text": "Trade name",
+    "score": 0.954,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Kaveri Stays LLP",
+    "score": 0.991,
+    "x": 516,
+    "y": 390
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Limited Liability Partnership",
+    "score": 0.999,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.962,
+    "x": 86,
+    "y": 527
+   },
+   {
+    "text": "Shop/Unit 21, Sector 14, Mumbai, Maharashtra",
+    "score": 0.998,
+    "x": 517,
+    "y": 529
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "-570043",
+    "score": 1.0,
+    "x": 515,
+    "y": 598
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.999,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2022-07-13",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.978,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 515,
+    "y": 738
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K10_signatory_id.png": {
+  "seconds": 0.87,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.993,
+    "x": 36,
+    "y": 36
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 335,
+    "y": 127
+   },
+   {
+    "text": "Nisha Arora",
+    "score": 0.986,
+    "x": 336,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Owner",
+    "score": 1.0,
+    "x": 336,
+    "y": 226
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Kaveri Stays LLP",
+    "score": 0.942,
+    "x": 337,
+    "y": 296
+   },
+   {
+    "text": "ID no.",
+    "score": 0.968,
+    "x": 336,
+    "y": 339
+   },
+   {
+    "text": "SYN-ID-247542",
+    "score": 0.999,
+    "x": 338,
+    "y": 368
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2029-06-01",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K10_udyam_certificate.png": {
+  "seconds": 1.82,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-MH-00-7183141",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Kaveri Stays LLP",
+    "score": 0.982,
+    "x": 515,
+    "y": 318
+   },
+   {
+    "text": "Major activity",
+    "score": 0.98,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 514,
+    "y": 388
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Mumbai",
+    "score": 1.0,
+    "x": 515,
+    "y": 457
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Maharashtra",
+    "score": 1.0,
+    "x": 514,
+    "y": 527
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2024-01-09",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K11_address_proof.png": {
+  "seconds": 2.03,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.989,
+    "x": 75,
+    "y": 127
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 0.985,
+    "x": 661,
+    "y": 166
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 87,
+    "y": 250
+   },
+   {
+    "text": "2710511786",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Trinity Bake House Pvt Ltd",
+    "score": 0.976,
+    "x": 517,
+    "y": 319
+   },
+   {
+    "text": "M",
+    "score": 0.999,
+    "x": 296,
+    "y": 343
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 188, Industrial Area Phase 2, Ludhi",
+    "score": 0.998,
+    "x": 517,
+    "y": 390
+   },
+   {
+    "text": "ana, Punjab - 541498",
+    "score": 0.962,
+    "x": 516,
+    "y": 459
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2025-10-31",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "981",
+    "score": 1.0,
+    "x": 514,
+    "y": 598
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.999,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "2,768",
+    "score": 1.0,
+    "x": 512,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K11_gst_certificate.png": {
+  "seconds": 2.02,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "03KGZXT1320R1ZZ",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Trinity Bake House Pvt Ltd",
+    "score": 0.996,
+    "x": 517,
+    "y": 320
+   },
+   {
+    "text": "Trade name",
+    "score": 0.954,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Trinity Bake House Pvt Ltd",
+    "score": 0.999,
+    "x": 518,
+    "y": 391
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Private Limited Company",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.997,
+    "x": 86,
+    "y": 527
+   },
+   {
+    "text": "Shop/Unit 188, Industrial Area Phase 2, Ludhi",
+    "score": 0.999,
+    "x": 517,
+    "y": 529
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "ana, Punjab - 541498",
+    "score": 0.98,
+    "x": 516,
+    "y": 599
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.998,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2019-08-19",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.992,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 514,
+    "y": 737
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K11_signatory_id.png": {
+  "seconds": 0.93,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.993,
+    "x": 36,
+    "y": 36
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 335,
+    "y": 127
+   },
+   {
+    "text": "Vikram Pillai",
+    "score": 0.998,
+    "x": 336,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Owner",
+    "score": 1.0,
+    "x": 336,
+    "y": 226
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Trinity Bake House Pvt Ltd",
+    "score": 0.989,
+    "x": 337,
+    "y": 296
+   },
+   {
+    "text": "ID no.",
+    "score": 0.968,
+    "x": 336,
+    "y": 339
+   },
+   {
+    "text": "SYN-ID-440312",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2028-12-23",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K11_udyam_certificate.png": {
+  "seconds": 1.78,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-PB-00-9719478",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Trinity Bake House Pvt Ltd",
+    "score": 0.996,
+    "x": 517,
+    "y": 319
+   },
+   {
+    "text": "Major activity",
+    "score": 0.977,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 515,
+    "y": 390
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Ludhiana",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Punjab",
+    "score": 1.0,
+    "x": 513,
+    "y": 526
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2025-09-15",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K12_address_proof.png": {
+  "seconds": 2.04,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Electricity Bill",
+    "score": 0.972,
+    "x": 76,
+    "y": 70
+   },
+   {
+    "text": "Fictional utility - address proof for OCR testing",
+    "score": 0.998,
+    "x": 77,
+    "y": 129
+   },
+   {
+    "text": "LID DOCUM",
+    "score": 0.999,
+    "x": 661,
+    "y": 165
+   },
+   {
+    "text": "Consumer no.",
+    "score": 1.0,
+    "x": 87,
+    "y": 250
+   },
+   {
+    "text": "6982457282",
+    "score": 1.0,
+    "x": 516,
+    "y": 250
+   },
+   {
+    "text": "Billed to",
+    "score": 1.0,
+    "x": 85,
+    "y": 317
+   },
+   {
+    "text": "Star Electronics",
+    "score": 1.0,
+    "x": 516,
+    "y": 320
+   },
+   {
+    "text": "M",
+    "score": 1.0,
+    "x": 296,
+    "y": 342
+   },
+   {
+    "text": "Supply address",
+    "score": 1.0,
+    "x": 85,
+    "y": 389
+   },
+   {
+    "text": "Shop/Unit 216, Nehru Nagar, Visakhapatnam, An",
+    "score": 0.991,
+    "x": 517,
+    "y": 390
+   },
+   {
+    "text": "dhra Pradesh - 762071",
+    "score": 0.978,
+    "x": 518,
+    "y": 460
+   },
+   {
+    "text": "Bill date",
+    "score": 0.999,
+    "x": 85,
+    "y": 528
+   },
+   {
+    "text": "2026-07-06",
+    "score": 1.0,
+    "x": 516,
+    "y": 530
+   },
+   {
+    "text": "Units consumed",
+    "score": 1.0,
+    "x": 86,
+    "y": 600
+   },
+   {
+    "text": "492",
+    "score": 1.0,
+    "x": 515,
+    "y": 598
+   },
+   {
+    "text": "Amount due (INR)",
+    "score": 0.974,
+    "x": 86,
+    "y": 668
+   },
+   {
+    "text": "25,639",
+    "score": 1.0,
+    "x": 513,
+    "y": 669
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K12_gst_certificate.png": {
+  "seconds": 2.36,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: GST Registration Certificate",
+    "score": 0.999,
+    "x": 75,
+    "y": 70
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "GSTIN",
+    "score": 1.0,
+    "x": 85,
+    "y": 248
+   },
+   {
+    "text": "37NBLXS1145E1ZU",
+    "score": 1.0,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Legal name",
+    "score": 1.0,
+    "x": 85,
+    "y": 319
+   },
+   {
+    "text": "Pooja Agarwal (Prop. Star Electronics)",
+    "score": 0.988,
+    "x": 516,
+    "y": 320
+   },
+   {
+    "text": "Trade name",
+    "score": 0.954,
+    "x": 85,
+    "y": 390
+   },
+   {
+    "text": "Star Electronics",
+    "score": 0.999,
+    "x": 515,
+    "y": 389
+   },
+   {
+    "text": "Constitution",
+    "score": 1.0,
+    "x": 87,
+    "y": 460
+   },
+   {
+    "text": "Proprietorship",
+    "score": 1.0,
+    "x": 516,
+    "y": 459
+   },
+   {
+    "text": "Address of principal",
+    "score": 0.984,
+    "x": 86,
+    "y": 528
+   },
+   {
+    "text": "Shop/Unit 216, Nehru Nagar, Visakhapatnam, An",
+    "score": 0.992,
+    "x": 517,
+    "y": 530
+   },
+   {
+    "text": "place of business",
+    "score": 1.0,
+    "x": 103,
+    "y": 600
+   },
+   {
+    "text": "dhra Pradesh - 762071",
+    "score": 0.991,
+    "x": 518,
+    "y": 600
+   },
+   {
+    "text": "Date of liability",
+    "score": 0.999,
+    "x": 85,
+    "y": 669
+   },
+   {
+    "text": "2017-01-08",
+    "score": 1.0,
+    "x": 515,
+    "y": 669
+   },
+   {
+    "text": "Type of registration",
+    "score": 0.993,
+    "x": 85,
+    "y": 739
+   },
+   {
+    "text": "Regular",
+    "score": 1.0,
+    "x": 515,
+    "y": 738
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ },
+ "K12_signatory_id.png": {
+  "seconds": 0.99,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Authorised Signatory ID",
+    "score": 0.998,
+    "x": 34,
+    "y": 32
+   },
+   {
+    "text": "Name",
+    "score": 1.0,
+    "x": 335,
+    "y": 127
+   },
+   {
+    "text": "Pooja Agarwal",
+    "score": 0.996,
+    "x": 336,
+    "y": 154
+   },
+   {
+    "text": "Designation",
+    "score": 1.0,
+    "x": 336,
+    "y": 199
+   },
+   {
+    "text": "Owner",
+    "score": 1.0,
+    "x": 336,
+    "y": 226
+   },
+   {
+    "text": "For business",
+    "score": 1.0,
+    "x": 337,
+    "y": 270
+   },
+   {
+    "text": "Star Electronics",
+    "score": 1.0,
+    "x": 337,
+    "y": 296
+   },
+   {
+    "text": "ID no.",
+    "score": 0.968,
+    "x": 336,
+    "y": 339
+   },
+   {
+    "text": "SYN-ID-365512",
+    "score": 0.999,
+    "x": 337,
+    "y": 366
+   },
+   {
+    "text": "Valid till",
+    "score": 0.982,
+    "x": 336,
+    "y": 409
+   },
+   {
+    "text": "2029-03-03",
+    "score": 1.0,
+    "x": 337,
+    "y": 436
+   }
+  ]
+ },
+ "K12_udyam_certificate.png": {
+  "seconds": 2.46,
+  "tilt": 0.0,
+  "lines": [
+   {
+    "text": "Specimen: Udyam Registration Certificate",
+    "score": 0.999,
+    "x": 72,
+    "y": 69
+   },
+   {
+    "text": "Format for hackathon OCR testing only",
+    "score": 1.0,
+    "x": 75,
+    "y": 126
+   },
+   {
+    "text": "Udyam reg. number",
+    "score": 0.999,
+    "x": 85,
+    "y": 247
+   },
+   {
+    "text": "UDYAM-AP-00-5186772",
+    "score": 0.999,
+    "x": 517,
+    "y": 251
+   },
+   {
+    "text": "Enterprise name",
+    "score": 1.0,
+    "x": 85,
+    "y": 318
+   },
+   {
+    "text": "Star Electronics",
+    "score": 1.0,
+    "x": 516,
+    "y": 320
+   },
+   {
+    "text": "Major activity",
+    "score": 0.997,
+    "x": 85,
+    "y": 387
+   },
+   {
+    "text": "Services",
+    "score": 1.0,
+    "x": 515,
+    "y": 390
+   },
+   {
+    "text": "City",
+    "score": 1.0,
+    "x": 85,
+    "y": 454
+   },
+   {
+    "text": "Visakhapatnam",
+    "score": 1.0,
+    "x": 515,
+    "y": 458
+   },
+   {
+    "text": "State",
+    "score": 1.0,
+    "x": 84,
+    "y": 528
+   },
+   {
+    "text": "Andhra Pradesh",
+    "score": 0.999,
+    "x": 516,
+    "y": 528
+   },
+   {
+    "text": "Date of registration",
+    "score": 0.999,
+    "x": 86,
+    "y": 599
+   },
+   {
+    "text": "2024-02-03",
+    "score": 1.0,
+    "x": 516,
+    "y": 600
+   },
+   {
+    "text": "Accel YTL Hackathor - Track A test oata. Fictioral busiress, persor aro ioertiiers.",
+    "score": 0.978,
+    "x": 77,
+    "y": 1656
+   }
+  ]
+ }
+}
