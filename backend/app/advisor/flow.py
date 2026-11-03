@@ -2,7 +2,8 @@
 
 Both modes fill the same Profile and ask about the same next missing slot, so the AI never changes what
 is asked or decided; questions are always worded from the i18n files. Order: GSTIN first (it pre-fills
-name and city), then business kind, city, staff, sites, and 2-3 needs questions for that kind of business.
+name and city), then business kind, city, staff, sites, what internet they need (fibre, 5G wireless, not sure,
+or mobile lines only), and 2-3 needs questions for that kind of business.
 """
 from __future__ import annotations
 
@@ -11,9 +12,9 @@ from dataclasses import dataclass, field
 from ..catalogue import Business, load_catalogue
 from ..i18n import t
 from ..kyc.lookups import find_gstin_in_text, lookup_gstin, mask
-from ..recommend import Needs, Recommendation, recommend
+from ..recommend import NEED_PRODUCT, Needs, Recommendation, recommend
 from ..reference import canonical_city, city_tier, find_city
-from .parse import kind_of_business, number, yes_no
+from .parse import internet_choice, kind_of_business, number, yes_no
 
 NEED_QUESTIONS = {
     "micro": ["billing_pos", "whatsapp", "cctv"],
@@ -22,6 +23,7 @@ NEED_QUESTIONS = {
     "mfg": ["machines", "vehicles", "firewall"],
 }
 COUNT_NEEDS = {"machines", "vehicles"}  # asked as numbers, not yes/no
+INTERNET_OPTIONS = ("fibre", "wireless", "unsure", "mobile")
 CITY_BUTTONS = ["Mumbai", "Delhi", "Bengaluru", "Pune", "Hyderabad", "Chennai", "Kolkata", "Ahmedabad", "Jaipur",
                 "Lucknow", "Nagpur", "Surat"]
 
@@ -52,6 +54,16 @@ class Profile:
                 "city": self.city, "employees": self.employees, "sites": self.sites,
                 "needs": {k: getattr(self.needs, k) for k in self.needs_answered}}
 
+    def ai_view(self) -> dict:
+        """What the chat AI may see: no GST number and no business name (it needs neither to suggest a plan)."""
+        return {k: v for k, v in self.safe_view().items() if k not in ("gstin", "business_name")}
+
+
+def _needs_internet_line(p: Profile, need: str) -> bool:
+    """Mobile-only owners are not asked about products that only work with an internet line."""
+    pid = NEED_PRODUCT.get(need)
+    return p.needs.internet is False and bool(pid and load_catalogue()[pid].requires_one_of)
+
 
 def next_slot(p: Profile) -> str | None:
     if p.gstin_status is None:
@@ -66,8 +78,10 @@ def next_slot(p: Profile) -> str | None:
         return "employees"
     if p.sites is None:
         return "sites"
+    if "internet" not in p.needs_answered and p.needs.internet is None and p.needs.fibre_available is None:
+        return "internet"
     for need in NEED_QUESTIONS[p.segment]:
-        if need not in p.needs_answered:
+        if need not in p.needs_answered and not _needs_internet_line(p, need):
             return f"need:{need}"
     return None
 
@@ -97,6 +111,9 @@ def question(p: Profile, slot: str) -> dict:
     if slot == "sites":
         return {"slot": slot, "text": t(lang, "q.sites"), "input": "number",
                 "options": [{"value": v, "label": v} for v in ("1", "2", "3", "5", "10")]}
+    if slot == "internet":
+        return {"slot": slot, "text": t(lang, "q.internet"), "input": "choice",
+                "options": [{"value": o, "label": t(lang, f"opt.internet.{o}")} for o in INTERNET_OPTIONS]}
     need = slot.split(":", 1)[1]
     if need in COUNT_NEEDS:
         return {"slot": slot, "text": t(lang, f"q.{need}"), "input": "number",
@@ -189,6 +206,18 @@ def apply_answer(p: Profile, slot: str, value) -> list[str]:
         if slot == "sites" and n >= 3 and p.segment in ("micro", "prof"):
             p.segment = "multi"
             msgs.append(t(lang, "msg.became_multi", sites=n))
+        return msgs
+
+    if slot == "internet":
+        choice = internet_choice(value)
+        if choice is None:
+            return [t(lang, "msg.pick_option"), question(p, slot)["text"]]
+        p.needs.internet = choice != "mobile"
+        if choice in ("fibre", "wireless"):
+            p.needs.fibre_available = choice == "fibre"
+        if choice != "fibre":
+            msgs.append(t(lang, f"msg.internet.{choice}"))
+        p.needs_answered.add("internet")
         return msgs
 
     need = slot.split(":", 1)[1]

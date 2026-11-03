@@ -13,7 +13,7 @@ import numpy as np
 
 BASE = (sys.argv[1] if len(sys.argv) > 1 else "http://localhost:7860") + "/api"
 DOCS = Path(__file__).resolve().parent.parent / "data" / "kyc_documents"
-TAPS = [("gstin", "27XUIXG0767D1ZP"), ("gst_confirm", "yes"), ("segment", "mfg"), ("employees", "12"), ("sites", "1"),
+TAPS = [("gstin", "27XUIXG0767D1ZP"), ("gst_confirm", "yes"), ("segment", "mfg"), ("employees", "12"), ("sites", "1"), ("internet", "fibre"),
         ("need:machines", "4"), ("need:vehicles", "0"), ("need:firewall", "yes")]
 
 

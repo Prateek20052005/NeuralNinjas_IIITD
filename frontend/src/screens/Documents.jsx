@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api.js";
 
 const DOCS = ["gst_certificate", "udyam_certificate", "address_proof", "signatory_id"];
@@ -29,13 +29,14 @@ async function shrink(file) {
   }
 }
 
-function DocCard({ type, doc, reading, onFile, tr, children }) {
+function DocCard({ type, doc, reading, onFile, tr, optional, children }) {
   const status = reading ? "reading" : doc ? (doc.ok ? "ok" : "bad") : "empty";
   return (
     <li className={`doc ${status}`}>
       <div className="doc-head">
         <span className="doc-icon" aria-hidden="true">{{ ok: "✓", bad: "!", reading: "…", empty: "" }[status]}</span>
         <strong>{tr(`doc.${type}`)}</strong>
+        {optional && <span className="muted small"> · {tr("ui.optional")}</span>}
       </div>
       {reading && <p className="muted">{tr("ui.reading")}</p>}
       {doc && !reading && (
@@ -64,6 +65,15 @@ export default function Documents({ state, update, tr }) {
   const [udyam, setUdyam] = useState("");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
+  // Which documents this owner needs: without GST only address proof and ID (Udyam optional, no GST card)
+  const [required, setRequired] = useState(null);
+  useEffect(() => {
+    api.status(state.id)
+      .then((s) => setRequired(Object.fromEntries(Object.entries(s.documents).map(([k, v]) => [k, v.required]))))
+      .catch(() => setRequired(null));   // unknown: show every document, as before
+  }, [state.id]);
+  const noGst = required && !required.gst_certificate;
+  const shown = DOCS.filter((type) => !(noGst && type === "gst_certificate"));
 
   async function onFile(type, file, event) {
     setReading((r) => ({ ...r, [type]: true }));
@@ -105,9 +115,11 @@ export default function Documents({ state, update, tr }) {
     <main className="page documents">
       <h1>{tr("ui.documents_title")}</h1>
       <p className="muted">{tr("ui.documents_hint")}</p>
+      {noGst && <p className="notice info">{tr("ui.no_gst_docs")}</p>}
       <ul className="doc-list">
-        {DOCS.map((type) => (
-          <DocCard key={type} type={type} doc={docs[type]} reading={reading[type]} onFile={onFile} tr={tr}>
+        {shown.map((type) => (
+          <DocCard key={type} type={type} doc={docs[type]} reading={reading[type]} onFile={onFile} tr={tr}
+                   optional={required ? !required[type] : false}>
             {type === "udyam_certificate" && !docs[type]?.ok && (
               <div className="udyam-number">
                 <label htmlFor="udyam">{tr("ui.or_type_udyam")}</label>

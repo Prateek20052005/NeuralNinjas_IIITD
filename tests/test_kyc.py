@@ -115,3 +115,27 @@ def test_watermark_letters_run_into_an_id_are_dropped_but_extra_digits_are_not()
     assert read_udyam("UDYAM-MH-00-71831415")[0] == "UDYAM-MH-00-71831415"       # stays wrong -> format check fails
     assert read_gstin("27XUIXG0767D1ZPNOT")[0] == "27XUIXG0767D1ZP"
     assert read_gstin("27XUIXG0767D1ZQNOT")[0] == "27XUIXG0767D1ZQNOT"           # bad checksum: nothing is trimmed
+
+
+# ---------- owners without GST (they are only offered products that don't need GST) ----------
+
+def test_owner_without_gst_needs_only_address_proof_and_id():
+    docs = {**docs_for("K03"), "gst_certificate": None, "udyam_certificate": None}
+    res = assess(docs, KycContext(TODAY, gst_registered=False))
+    assert res.decision == "PASS", res.codes
+    res = assess(docs, KycContext(TODAY))   # with GST, both certificates are still required
+    assert res.decision == "INCOMPLETE"
+    assert {"gst_certificate_missing", "udyam_certificate_missing"} <= set(res.codes)
+
+
+def test_owner_without_gst_but_with_udyam_is_checked_against_udyam():
+    docs = {**docs_for("K03"), "gst_certificate": None}
+    assert assess(docs, KycContext(TODAY, gst_registered=False)).decision == "PASS"
+    docs["udyam_certificate"] = docs_for("K07")["udyam_certificate"]   # someone else's Udyam
+    res = assess(docs, KycContext(TODAY, gst_registered=False))
+    assert "address_proof_name_mismatch" in res.codes                 # bill is not in the Udyam business's name
+
+
+def test_owner_without_gst_still_gets_bill_and_id_checks():
+    docs = {**docs_for("K11"), "gst_certificate": None, "udyam_certificate": None}   # K11's bill is too old
+    assert "address_proof_too_old" in assess(docs, KycContext(TODAY, gst_registered=False)).codes

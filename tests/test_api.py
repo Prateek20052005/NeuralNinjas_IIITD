@@ -8,7 +8,7 @@ from backend.app import main
 
 DOCS = Path(__file__).resolve().parent.parent / "data" / "kyc_documents"
 ANSWERS = {"gstin": "27XUIXG0767D1ZP", "gst_confirm": "yes", "segment": "mfg", "employees": "12", "sites": "1",
-           "need:machines": "4", "need:vehicles": "0", "need:firewall": "yes"}
+           "internet": "fibre", "need:machines": "4", "need:vehicles": "0", "need:firewall": "yes"}
 
 
 class NoLLM:
@@ -105,3 +105,32 @@ def test_last_internet_line_cannot_be_switched_off_and_notes_are_translated(clie
     if "P09" in core:   # backup router needs an internet line: switching it off alone is fine
         r = client.post(f"/api/applications/{app_id}/addons", json={"product_id": "P09", "on": False})
         assert r.status_code == 200 and "P09" not in r.json()["items"]
+
+
+def test_owner_without_gst_uploads_only_address_proof_and_id(client):
+    answers = {**ANSWERS, "gstin": "none", "segment": "micro", "city": "Pune", "employees": "3",
+               "need:billing_pos": "no", "need:whatsapp": "no", "need:cctv": "no"}
+    r = client.post("/api/applications", json={"language": "en"}).json()
+    app_id, out = r["id"], r
+    while out.get("question"):
+        out = client.post(f"/api/applications/{app_id}/message", json={"text": answers[out["question"]["slot"]]}).json()
+    client.post(f"/api/applications/{app_id}/accept")
+    client.post(f"/api/applications/{app_id}/consent", json={"purposes": ["kyc"]})
+    docs = client.get(f"/api/applications/{app_id}").json()["documents"]
+    assert {k for k, v in docs.items() if v["required"]} == {"address_proof", "signatory_id"}
+    for doc_type in ("address_proof", "signatory_id"):
+        assert upload(client, app_id, doc_type).json()["ok"]
+    assert client.post(f"/api/applications/{app_id}/kyc").json()["decision"] == "PASS"
+
+
+def test_mobile_only_plan_can_still_switch_extras(client):
+    answers = {**ANSWERS, "gstin": "none", "segment": "micro", "city": "Pune", "employees": "3",
+               "internet": "mobile", "need:billing_pos": "no", "need:whatsapp": "no"}
+    r = client.post("/api/applications", json={"language": "en"}).json()
+    app_id, out = r["id"], r
+    while out.get("question"):
+        out = client.post(f"/api/applications/{app_id}/message", json={"text": answers[out["question"]["slot"]]}).json()
+    rec = out["recommendation"]
+    assert [x["id"] for x in rec["core"]] == ["P07"] and rec["addons"]
+    r = client.post(f"/api/applications/{app_id}/addons", json={"product_id": rec["addons"][0]["id"], "on": True})
+    assert r.status_code == 200 and r.json()["quote"]["valid"]

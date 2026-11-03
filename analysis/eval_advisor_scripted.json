@@ -2,7 +2,7 @@
  {
   "name": "kirana_indore_en",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -23,6 +23,8 @@
    "YOU [employees]: 3 of us, me and 2 helpers",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: just one shop",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes, lots of customers pay by UPI",
    "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
@@ -37,7 +39,7 @@
  {
   "name": "medical_lucknow_hi",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -59,6 +61,8 @@
    "YOU [employees]: ३ लोग",
    "BOT: आपकी कितनी दुकानें, ब्रांच या जगहें हैं?",
    "YOU [sites]: एक दुकान",
+   "BOT: आपके बिज़नेस को कौन-सा इंटरनेट कनेक्शन चाहिए?",
+   "YOU [internet]: fibre",
    "BOT: क्या आप टैबलेट पर GST बिलिंग और UPI/कार्ड पेमेंट चाहेंगे?",
    "YOU [need:billing_pos]: हाँ, UPI से पेमेंट लेते हैं",
    "BOT: क्या आप WhatsApp पर अपने ग्राहकों तक अपना कैटलॉग पहुँचाना चाहते हैं?",
@@ -73,7 +77,7 @@
  {
   "name": "salon_nashik_mr",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -94,6 +98,8 @@
    "YOU [employees]: दोन",
    "BOT: तुमची किती दुकाने, शाखा किंवा ठिकाणे आहेत?",
    "YOU [sites]: एकच",
+   "BOT: तुमच्या व्यवसायाला कोणते इंटरनेट कनेक्शन हवे आहे?",
+   "YOU [internet]: fibre",
    "BOT: टॅबलेटवर GST बिलिंग आणि UPI/कार्ड पेमेंट हवे आहे का?",
    "YOU [need:billing_pos]: हो",
    "BOT: WhatsApp वर ग्राहकांपर्यंत तुमचा कॅटलॉग पोहोचवायचा आहे का?",
@@ -108,7 +114,7 @@
  {
   "name": "parlour_hinglish",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -129,6 +135,8 @@
    "YOU [employees]: 4 ladkiyan kaam karti hain",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: ek hi parlour",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: haan UPI chahiye",
    "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
@@ -143,7 +151,7 @@
  {
   "name": "law_office_pune_gst",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 1,
@@ -167,6 +175,8 @@
    "YOU [employees]: 8",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: one office",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Do you need business phone lines with a welcome menu for callers?",
    "YOU [need:phone_system]: yes we get many client calls",
    "BOT: Do you keep client files that must never be lost?",
@@ -181,7 +191,7 @@
  {
   "name": "pharmacy_mumbai_gst_hi",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -204,6 +214,8 @@
    "YOU [employees]: 5",
    "BOT: आपकी कितनी दुकानें, ब्रांच या जगहें हैं?",
    "YOU [sites]: 1",
+   "BOT: आपके बिज़नेस को कौन-सा इंटरनेट कनेक्शन चाहिए?",
+   "YOU [internet]: fibre",
    "BOT: क्या आप टैबलेट पर GST बिलिंग और UPI/कार्ड पेमेंट चाहेंगे?",
    "YOU [need:billing_pos]: हाँ",
    "BOT: क्या आप WhatsApp पर अपने ग्राहकों तक अपना कैटलॉग पहुँचाना चाहते हैं?",
@@ -218,7 +230,7 @@
  {
   "name": "gst_not_ours",
   "ok": true,
-  "turns": 10,
+  "turns": 11,
   "problems": [],
   "items": {
    "P01": 1,
@@ -245,6 +257,8 @@
    "YOU [employees]: 3",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
    "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
@@ -259,7 +273,7 @@
  {
   "name": "cancelled_gst_store",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -281,6 +295,8 @@
    "YOU [employees]: 2",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
    "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
@@ -295,7 +311,7 @@
  {
   "name": "suspended_gst_factory",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 1,
@@ -318,6 +334,8 @@
    "YOU [employees]: 40",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: How many machines would you like to monitor for uptime and power use? (0 if none)",
    "YOU [need:machines]: 12",
    "BOT: How many delivery or company vehicles would you like to track? (0 if none)",
@@ -332,7 +350,7 @@
  {
   "name": "typo_gstin_then_none",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -356,6 +374,8 @@
    "YOU [employees]: 1",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: no",
    "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
@@ -370,7 +390,7 @@
  {
   "name": "restaurant_chain_hyd",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 4,
@@ -393,6 +413,8 @@
    "YOU [employees]: 35",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 4 outlets",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Do you want to manage the internet at all your sites from one place?",
    "YOU [need:central_management]: yes",
    "BOT: Would you like security cameras you can watch on your phone?",
@@ -407,7 +429,7 @@
  {
   "name": "retail_chain_jaipur_hinglish",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 6,
@@ -430,6 +452,8 @@
    "YOU [employees]: 25 log",
    "BOT: आपकी कितनी दुकानें, ब्रांच या जगहें हैं?",
    "YOU [sites]: 6",
+   "BOT: आपके बिज़नेस को कौन-सा इंटरनेट कनेक्शन चाहिए?",
+   "YOU [internet]: fibre",
    "BOT: क्या आप अपनी सभी जगहों का इंटरनेट एक ही जगह से संभालना चाहते हैं?",
    "YOU [need:central_management]: haan",
    "BOT: क्या आप ऐसे सुरक्षा कैमरे चाहेंगे जिन्हें फ़ोन पर देख सकें?",
@@ -444,7 +468,7 @@
  {
   "name": "autoparts_ludhiana",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 1,
@@ -467,6 +491,8 @@
    "YOU [employees]: 25",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: How many machines would you like to monitor for uptime and power use? (0 if none)",
    "YOU [need:machines]: 6 CNC machines",
    "BOT: How many delivery or company vehicles would you like to track? (0 if none)",
@@ -481,7 +507,7 @@
  {
   "name": "textile_surat_mr",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 2,
@@ -503,6 +529,8 @@
    "YOU [employees]: ६०",
    "BOT: तुमची किती दुकाने, शाखा किंवा ठिकाणे आहेत?",
    "YOU [sites]: २",
+   "BOT: तुमच्या व्यवसायाला कोणते इंटरनेट कनेक्शन हवे आहे?",
+   "YOU [internet]: fibre",
    "BOT: किती मशीनचे चालू राहणे आणि वीज वापर पाहायचा आहे? (एकही नसेल तर 0)",
    "YOU [need:machines]: १०",
    "BOT: किती डिलिव्हरी किंवा कंपनीच्या गाड्या ट्रॅक करायच्या आहेत? (एकही नसेल तर 0)",
@@ -517,7 +545,7 @@
  {
   "name": "asks_question_midway",
   "ok": true,
-  "turns": 10,
+  "turns": 11,
   "problems": [],
   "items": {
    "P01": 1,
@@ -538,6 +566,8 @@
    "YOU [employees]: 2",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
    "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
@@ -558,7 +588,7 @@
  {
   "name": "micro_becomes_multi",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 4,
@@ -582,6 +612,8 @@
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: we have 4 shops",
    "BOT: Since you have 4 sites, I'll plan for a business with several outlets.",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Do you want to manage the internet at all your sites from one place?",
    "YOU [need:central_management]: yes",
    "BOT: Would you like security cameras you can watch on your phone?",
@@ -596,7 +628,7 @@
  {
   "name": "all_in_first_message",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 1,
@@ -620,6 +652,8 @@
    "YOU [employees]: 12",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Do you need business phone lines with a welcome menu for callers?",
    "YOU [need:phone_system]: no",
    "BOT: Do you keep client files that must never be lost?",
@@ -634,7 +668,7 @@
  {
   "name": "unknown_small_town",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -656,6 +690,8 @@
    "YOU [employees]: 3",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
    "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
@@ -670,7 +706,7 @@
  {
   "name": "noise_and_odd_numbers",
   "ok": true,
-  "turns": 13,
+  "turns": 14,
   "problems": [],
   "items": {
    "P02": 1,
@@ -705,6 +741,8 @@
    "BOT: Please enter a number.",
    "BOT: How many shops, branches or sites do you have?",
    "YOU [sites]: 1",
+   "BOT: What internet connection does your business need?",
+   "YOU [internet]: fibre",
    "BOT: Do you need business phone lines with a welcome menu for callers?",
    "YOU [need:phone_system]: maybe",
    "BOT: Please answer yes or no.",
@@ -722,7 +760,7 @@
  {
   "name": "coaching_patna_hi",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 1,
@@ -745,6 +783,8 @@
    "YOU [employees]: १५",
    "BOT: आपकी कितनी दुकानें, ब्रांच या जगहें हैं?",
    "YOU [sites]: १",
+   "BOT: आपके बिज़नेस को कौन-सा इंटरनेट कनेक्शन चाहिए?",
+   "YOU [internet]: fibre",
    "BOT: क्या आपको कॉल करने वालों के लिए वेलकम मेन्यू वाली बिज़नेस फ़ोन लाइनें चाहिए?",
    "YOU [need:phone_system]: हाँ",
    "BOT: क्या आपके पास ग्राहकों की ऐसी फ़ाइलें हैं जो कभी खोनी नहीं चाहिए?",

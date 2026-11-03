@@ -140,7 +140,7 @@ class NoLLM:
 
 
 def reply_for(persona: dict, slot: str, asked: dict) -> str:
-    ans = persona["answers"].get(slot, "no")
+    ans = persona["answers"].get(slot, "fibre" if slot == "internet" else "no")   # owners not scripted for it have fibre
     if isinstance(ans, list):
         i = asked.get(slot, 0)
         ans = ans[min(i, len(ans) - 1)]

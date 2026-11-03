@@ -13,14 +13,14 @@ from dataclasses import asdict, dataclass, field, replace
 
 from ..catalogue import SEGMENTS, load_catalogue
 from ..i18n import LANGUAGES, t
-from ..kyc.lookups import find_gstin_in_text
+from ..kyc.lookups import find_gstin_in_text, redact_ids
 from ..quote import Quote
 from ..recommend import Recommendation
 from .flow import (COUNT_NEEDS, Profile, apply_answer, build_recommendation, explain_scripted,
                    next_slot, question, set_city)
 from ..reference import find_city
 from .llm import LLM, LLMUnavailable
-from .parse import kind_of_business
+from .parse import internet_choice, kind_of_business
 from .parse import number as _number
 from .parse import yes_no as _yes_no
 
@@ -46,13 +46,14 @@ The app asks the questions itself. Your job: understand the owner's latest messa
 You get PROFILE (facts already known), JUST_ASKED (the question the owner is replying to) and OWNER SAYS.
 Return a JSON object: {{"extract": {{...}}, "say": "..."}}
 
-"extract": facts the owner clearly stated, in this message or earlier ones. Leave a key out if unsure.
+"extract": facts the owner clearly stated in this message. Leave a key out if unsure.
 Never decide anything for the owner: asking about a product ("what does CCTV do?") is not wanting it. A short reply ("yes", "haan", "ho", "no", "nahi", a number) answers JUST_ASKED.
 Allowed keys:
   gst_is_theirs: true/false (only when JUST_ASKED is the GST business check; false if they say no,
     "not us", or name a different business)
   no_gstin: true | kind: "micro"|"prof"|"multi"|"mfg" | business_type: short text | city: name in English |
-  employees: integer (people incl. owner) | sites: integer (shops/branches/clinics; "just one shop" = 1) | fibre_available: boolean | mobile_lines: integer |
+  employees: integer (people incl. owner) | sites: integer (shops/branches/clinics; "just one shop" = 1) | fibre_available: boolean |
+  mobile_only: true (owner wants only mobile SIMs, no internet connection) | mobile_lines: integer |
   machines: integer | vehicles: integer | needs: {{flag: true/false}}
 kind: micro = one shop or service (kirana, salon, pharmacy, bakery, boutique); prof = office or clinic
 (CA, doctor, dentist, lawyer, coaching, agency); multi = chain with several outlets; mfg = factory, workshop, unit.
@@ -78,7 +79,6 @@ Return a JSON object:
 @dataclass
 class Session:
     profile: Profile = field(default_factory=Profile)
-    history: list[dict] = field(default_factory=list)   # [{"role": "user"|"assistant", "content": str}]
     recommendation: Recommendation | None = None
     explanation: dict | None = None
     ai_used: bool = False
@@ -93,10 +93,10 @@ class Advisor:
     # ---------- public ----------
     def start(self, language: str = "en") -> tuple[Session, dict]:
         s = Session(Profile(language=language if language in LANGUAGES else "en"))
-        intro = t(s.profile.language, "intro")
+        lang = s.profile.language
         q = question(s.profile, next_slot(s.profile))
-        s.history.append({"role": "assistant", "content": f"{intro} {q['text']}"})
-        return s, {"messages": [intro, q["text"]], "question": q, "mode": self.mode}
+        notice = [t(lang, "msg.ai_notice")] if self.llm.available else []   # owners are told an AI reads replies
+        return s, {"messages": [t(lang, "intro"), *notice, q["text"]], "question": q, "mode": self.mode}
 
     @property
     def mode(self) -> str:
@@ -108,10 +108,8 @@ class Advisor:
         if slot is not None:  # button tap: same in both modes, no AI needed
             if slot == next_slot(s.profile):   # a tap on an old question (double tap, stale screen) changes nothing
                 msgs += apply_answer(s.profile, slot, value)
-                s.history.append({"role": "user", "content": str(value)})
             reply = None
         else:
-            s.history.append({"role": "user", "content": text or ""})
             asked = next_slot(s.profile)  # the question on the owner's screen, before any prefill
             msgs += self._prefill_ids(s, text or "")
             # a short clear "yes"/"no"/number for the question on screen needs no AI: our parser decides
@@ -130,7 +128,6 @@ class Advisor:
             return self._finish(s, msgs)
         if not (msgs and msgs[-1] == q["text"]):  # an unclear answer already repeated the question
             msgs.append(q["text"])
-        s.history.append({"role": "assistant", "content": " ".join(msgs[-2:] if reply else msgs[-1:])})
         return {"messages": msgs, "question": q, "mode": self.mode, "profile": s.profile.safe_view()}
 
     # ---------- AI turn ----------
@@ -148,8 +145,12 @@ class Advisor:
                                     need_flags=", ".join(f"{k} ({v})" for k, v in NEED_HINTS.items()))
         answering = asked if asked == next_slot(p) else None  # a fresh GSTIN lookup raises a question not yet shown
         just_asked = question(replace(p, language="en"), answering)["text"] if answering else "nothing"
-        context = f"PROFILE: {p.safe_view()}\nJUST_ASKED: {just_asked}\nOWNER SAYS: {text}"
-        convo = s.history[-5:-1] + [{"role": "user", "content": context}]
+        # Data minimisation: the AI gets the current message only (no chat history), with ID numbers and the
+        # business name removed, plus the answers so far without GST number or business name.
+        names = (p.business_name or "",)   # also inside JUST_ASKED: "Is this your business: <name>, <city>?"
+        context = (f"PROFILE: {p.ai_view()}\nJUST_ASKED: {redact_ids(just_asked, names)}"
+                   f"\nOWNER SAYS: {redact_ids(text, names)}")
+        convo = [{"role": "user", "content": context}]
         try:
             out = self.llm.chat_json(system, convo)
         except LLMUnavailable as e:
@@ -176,6 +177,9 @@ class Advisor:
                 s.fallbacks.append(f"safety_net:{answering}")
             elif kind == "yes_no" and (yn := _yes_no(text)) is not None:
                 msgs += apply_answer(p, answering, "yes" if yn else "no")
+                s.fallbacks.append(f"safety_net:{answering}")
+            elif answering == "internet" and internet_choice(text):
+                msgs += apply_answer(p, answering, text)
                 s.fallbacks.append(f"safety_net:{answering}")
             elif answering == "city" and find_city(text, known_only=True):
                 msgs += apply_answer(p, answering, text)
@@ -212,6 +216,9 @@ class Advisor:
                 msgs += apply_answer(p, key, n)
         if isinstance(ex.get("fibre_available"), bool):
             p.needs.fibre_available = ex["fibre_available"]
+        if ex.get("mobile_only") is True and p.needs.internet is None and p.needs.fibre_available is None:
+            p.needs.internet = False
+            p.needs_answered.add("internet")
         if _int(ex.get("mobile_lines")):
             p.needs.mobile_lines = min(_int(ex["mobile_lines"]), 50)
         for key in COUNT_NEEDS:
@@ -243,7 +250,7 @@ class Advisor:
     def _ai_explain(self, s: Session, rec: Recommendation, fallback: dict) -> dict:
         p, cat = s.profile, load_catalogue()
         payload = {
-            "business": {k: v for k, v in p.safe_view().items() if k not in ("gstin", "language")},
+            "business": {k: v for k, v in p.ai_view().items() if k != "language"},
             "products": {pk.product_id: f"{cat[pk.product_id].name} x{pk.quantity}: {pk.reason}"
                          for pk in rec.core + rec.addons},
             "notes": rec.notes,
@@ -285,6 +292,8 @@ def _plain_answer(slot: str | None, text: str) -> bool:
         return False
     if slot == "gstin":   # "none", "GST नाही", "nahi hai": the AI missed these, the code never does
         return bool(find_gstin_in_text(text)) or _yes_no(text) is False or text.strip().lower() in ("none", "skip")
+    if slot == "internet":
+        return internet_choice(text) is not None
     kind = _answer_kind(slot)
     return (kind == "number" and _number(text) is not None) or (kind == "yes_no" and _yes_no(text) is not None)
 

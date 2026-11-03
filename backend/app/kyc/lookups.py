@@ -115,3 +115,25 @@ def find_gstin_in_text(text: str) -> str | None:
     """Pull a GSTIN-looking token out of a chat message."""
     m = re.search(r"\b\d{2}[A-Z0-9]{10}[0-9A-Z]Z[0-9A-Z]\b", (text or "").upper())
     return m.group(0) if m else None
+
+
+_DIGIT = r"[0-9०-९]"
+ID_PATTERNS = [
+    re.compile(r"\bUDYAM[\s-]*[A-Z]{2}[\s-]*\d{2}[\s-]*\d{7}\b", re.I),     # Udyam number
+    re.compile(r"\b\d{2}[A-Z0-9]{10}[0-9A-Z]Z[0-9A-Z]\b", re.I),            # GSTIN (also mistyped ones)
+    re.compile(r"\b[A-Z]{5}\d{4}[A-Z]\b", re.I),                            # PAN
+    re.compile(r"[\w.+-]+@[\w-]+\.[\w.]+"),                                 # email
+    re.compile(rf"(?:\+?{_DIGIT}{{1,3}}[\s-]?)?(?:{_DIGIT}[\s-]?){{7,}}{_DIGIT}"),  # phone, Aadhaar, account: 8+ digits
+]
+
+
+def redact_ids(text: str, names: tuple[str, ...] = ()) -> str:
+    """Remove ID numbers (and the given names) from free text before it leaves our server.
+    Small numbers like '12 staff' are kept: only runs of 8+ digits are removed."""
+    out = text or ""
+    for pat in ID_PATTERNS:
+        out = pat.sub("[removed]", out)
+    for name in names:
+        if name and len(name) > 2:
+            out = re.sub(re.escape(name), "[business]", out, flags=re.I)
+    return out

@@ -79,3 +79,39 @@ def yes_no(text) -> bool | None:
     if words & YES:
         return True
     return None
+
+
+# Typed answers to "What internet connection do you need?"
+INTERNET_WORDS = {
+    "unsure": ["not sure", "don't know", "dont know", "no idea", "pata nahi", "pata nahin", "nahi pata", "malum nahi",
+               "पता नहीं", "नहीं पता", "मालूम नहीं", "माहित नाही", "माहीत नाही", "शायद", "maybe"],
+    "wireless": ["5g", "wireless", "airfiber", "air fiber", "वायरलेस", "एयरफाइबर", "एअरफायबर"],
+    "mobile": ["mobile", "sim", "phone line", "मोबाइल", "मोबाईल", "सिम", "फोन लाइन"],
+    "fibre": ["fibre", "fiber", "wired", "broadband", "wifi", "wi-fi", "फाइबर", "फायबर", "ब्रॉडबैंड", "ब्रॉडबँड",
+              "वाईफाई", "वाई-फाई"],
+    "internet": ["internet", "इंटरनेट"],
+}
+
+
+def _has(s: str, stems: list[str]) -> bool:
+    """Devanagari stems anywhere; English words whole (plural allowed), so 'simple' is not 'sim'."""
+    return any((stem in s) if re.search(r"[ऀ-ॿ]", stem) else re.search(rf"(?<![a-z0-9]){re.escape(stem)}s?(?![a-z])", s)
+               for stem in stems)
+
+
+def internet_choice(text) -> str | None:
+    """'fibre' | 'wireless' | 'unsure' | 'mobile', or None if unclear.
+    'no fibre here' -> wireless, 'sirf mobile sim' / 'internet nahi chahiye' -> mobile."""
+    s = f" {str(text).lower()} "
+    if s.strip() in ("fibre", "wireless", "unsure", "mobile"):   # tapped option
+        return s.strip()
+    if _has(s, INTERNET_WORDS["unsure"]):
+        return "unsure"
+    if _has(s, INTERNET_WORDS["wireless"]):
+        return "wireless"
+    fibre, no = _has(s, INTERNET_WORDS["fibre"]), yes_no(text) is False
+    if fibre:
+        return "wireless" if no else "fibre"
+    if _has(s, INTERNET_WORDS["mobile"]) or (no and _has(s, INTERNET_WORDS["internet"])):
+        return "mobile"
+    return None

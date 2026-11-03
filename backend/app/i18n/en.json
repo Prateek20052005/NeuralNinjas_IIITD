@@ -158,5 +158,16 @@
   "msg.also_removed": "{product} was also switched off because it needs {needs}.",
   "msg.cannot_switch_off": "This can't be switched off: your plan needs at least one internet line.",
   "msg.pick_option": "Sorry, I didn't catch that. Please tap the option that fits best, or describe it in a few words.",
-  "msg.yes_no_hint": "Please answer yes or no."
+  "msg.yes_no_hint": "Please answer yes or no.",
+  "q.internet": "What internet connection does your business need?",
+  "opt.internet.fibre": "Wired fibre internet",
+  "opt.internet.wireless": "5G wireless (no fibre here)",
+  "opt.internet.unsure": "Not sure if fibre reaches us",
+  "opt.internet.mobile": "No internet, only mobile SIMs",
+  "msg.internet.wireless": "Got it. 5G AirFiber needs no cable and is usually set up in about 2 days.",
+  "msg.internet.unsure": "No problem. Our team checks this before installation; if fibre can't reach you, we'll set up 5G AirFiber instead.",
+  "msg.internet.mobile": "Okay, just mobile lines. You can add internet any time later.",
+  "msg.ai_notice": "🔒 An AI service helps me understand your replies. ID numbers (like your GST number) are removed before anything is sent to it. Please don't type personal details such as names or home addresses.",
+  "ui.optional": "Optional",
+  "ui.no_gst_docs": "You don't have GST, so we only need your address proof and ID. A Udyam certificate is optional."
 }

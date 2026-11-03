@@ -71,7 +71,7 @@ def run_scripted(lang, answers):
 
 
 def test_scripted_flow_gst_prefills_city_and_finishes():
-    s, out = run_scripted("en", ["37IHKXV5167L1ZS", "yes", "prof", "13", "1", "yes", "no", "yes"])
+    s, out = run_scripted("en", ["37IHKXV5167L1ZS", "yes", "prof", "13", "1", "fibre", "yes", "no", "yes"])
     assert s.profile.city == "Visakhapatnam" and s.profile.gstin_status == "inactive"
     ids = {x["id"] for x in out["recommendation"]["core"]}
     assert "P12" not in ids and "P09" in ids                     # telephony needs active GST; failover wanted
@@ -80,7 +80,7 @@ def test_scripted_flow_gst_prefills_city_and_finishes():
 
 @pytest.mark.parametrize("lang", ["hi", "mr"])
 def test_scripted_flow_in_hindi_and_marathi(lang):
-    s, out = run_scripted(lang, ["none", "micro", "Pune", "दो", "1", "हो", "हो", "नाही"])  # wants WhatsApp, no GST
+    s, out = run_scripted(lang, ["none", "micro", "Pune", "दो", "1", "fibre", "हो", "हो", "नाही"])  # wants WhatsApp, no GST
     rec = out["recommendation"]
     assert all(ord(c) < 128 or "ऀ" <= c <= "ॿ" or not c.isalpha() for c in rec["headline"])
     assert any("ऀ" <= c <= "ॿ" for c in rec["core"][0]["reason"])  # reasons translated
@@ -147,6 +147,7 @@ def test_plain_short_answers_skip_the_ai():
         adv.handle(s, text=a)
     adv.llm = fake
     adv.handle(s, text="just one")                       # sites
+    adv.handle(s, text="fibre")                          # internet
     adv.handle(s, text="nahi")                           # phone system
     assert s.profile.sites == 1 and s.profile.needs.phone_system is False and not s.fallbacks
 
@@ -161,7 +162,7 @@ def test_ai_failure_falls_back_to_scripted_without_error():
 
 
 def test_safety_net_records_plain_answers_the_ai_missed():
-    p_answers = ["none", "prof", "Pune", "8", "1"]
+    p_answers = ["none", "prof", "Pune", "8", "1", "fibre"]
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
     for a in p_answers:
@@ -173,7 +174,7 @@ def test_safety_net_records_plain_answers_the_ai_missed():
 
 
 def test_ai_explanation_cannot_drop_products_or_notes():
-    answers = ["none", "micro", "Pune", "3", "1", "yes", "yes", "no"]
+    answers = ["none", "micro", "Pune", "3", "1", "fibre", "yes", "yes", "no"]
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
     for a in answers[:-1]:
@@ -214,7 +215,7 @@ def test_city_names_in_any_script_get_the_right_tier(typed, city, tier):
 def test_unclear_answer_repeats_the_question_only_once():
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
-    for a in ["none", "prof", "Pune", "8", "1"]:
+    for a in ["none", "prof", "Pune", "8", "1", "fibre"]:
         adv.handle(s, text=a)
     out = adv.handle(s, text="what is that?")
     assert out["messages"] == ["Please answer yes or no.", "Do you need business phone lines with a welcome menu for callers?"]
@@ -241,3 +242,73 @@ def test_kind_of_business_and_city_readers():
     assert {k: kind_of_business(k) for k in cases} == cases
     assert find_city("we are based in poona") == "Pune" and find_city("हम नाशिक में हैं") == "Nashik"
     assert find_city("Sangli") == "Sangli" and find_city("what is SD-WAN?") is None
+
+
+# ---------- internet question: fibre, 5G wireless, not sure, mobile only ----------
+
+def test_mobile_only_owner_gets_no_internet_line_and_no_internet_questions():
+    adv = Advisor(llm=NoLLM(), order_date=TODAY)
+    s, _ = adv.start("en")
+    asked = []
+    out = {}
+    for a in ["none", "micro", "Pune", "3", "1", "sirf mobile sim chahiye", "no", "no", "no"]:
+        out = adv.handle(s, text=a)
+        if out.get("question"):
+            asked.append(out["question"]["slot"])
+        if out.get("recommendation"):
+            break
+    rec = out["recommendation"]
+    core = {x["id"] for x in rec["core"]}
+    assert "need:cctv" not in asked                                  # cameras need an internet line
+    assert core == {"P07"} and rec["quote"]["valid"] and not rec["notes"]
+    assert all(not load_catalogue()[x["id"]].requires_one_of for x in rec["addons"])
+
+
+@pytest.mark.parametrize("typed,line", [("no fibre here", "P04"), ("5G wireless", "P04"), ("fibre", "P01"),
+                                        ("पता नहीं", "P01")])
+def test_internet_answer_picks_the_line(typed, line):
+    s, out = run_scripted("en", ["none", "micro", "Pune", "3", "1", typed, "no", "no", "no"])
+    assert out["recommendation"]["core"][0]["id"] == line
+
+
+def test_not_sure_about_fibre_is_explained():
+    adv = Advisor(llm=NoLLM(), order_date=TODAY)
+    s, _ = adv.start("en")
+    for a in ["none", "micro", "Pune", "3", "1"]:
+        adv.handle(s, text=a)
+    out = adv.handle(s, text="not sure")
+    assert any("5G AirFiber instead" in m for m in out["messages"])
+
+
+# ---------- privacy: what the chat AI receives ----------
+
+class RecordingLLM(FakeLLM):
+    def __init__(self):
+        super().__init__()
+        self.sent = []
+
+    def chat_json(self, system, messages, max_tokens=900):
+        self.sent.append(messages)
+        return {"extract": {}, "say": ""}
+
+
+def test_ai_never_gets_ids_business_name_or_chat_history():
+    llm = RecordingLLM()
+    adv = Advisor(llm=llm, order_date=TODAY)
+    s, start = adv.start("en")
+    assert any("AI service" in m for m in start["messages"])          # owner is told an AI reads replies
+    adv.handle(s, text="my GST is 27XUIXG0767D1ZP and we make furniture, call me on 9876543210")
+    adv.handle(s, text="yes that is Ganesh Woodcraft, our business")
+    adv.handle(s, text="we are a small furniture factory with udyam UDYAM-MH-00-1234567")
+    assert len(llm.sent) == 3
+    for messages in llm.sent:
+        assert len(messages) == 1                                      # current message only, no history
+        sent = str(messages)
+        for secret in ("27XUIXG0767D1ZP", "27XUI", "9876543210", "UDYAM-MH", "Ganesh Woodcraft"):
+            assert secret not in sent, secret
+    assert s.profile.gstin == "27XUIXG0767D1ZP"                       # our own code still read the GST number
+
+
+def test_no_ai_notice_when_the_ai_is_off():
+    _, start = Advisor(llm=NoLLM(), order_date=TODAY).start("en")
+    assert not any("AI service" in m for m in start["messages"])

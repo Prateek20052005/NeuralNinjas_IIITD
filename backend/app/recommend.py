@@ -21,6 +21,7 @@ from .quote import Quote, build_quote
 @dataclass
 class Needs:
     """True = owner wants it, False = owner said no, None = not discussed (segment default applies)."""
+    internet: bool | None = None          # False -> owner wants mobile lines only, no internet connection
     fibre_available: bool | None = None   # False -> use 5G AirFiber
     billing_pos: bool | None = None       # GST billing / UPI & card counter
     whatsapp: bool | None = None          # reach customers on WhatsApp
@@ -203,18 +204,28 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
             if qty > 0:
                 bucket[placed] = Pick(placed, qty, _reason(placed, biz))
 
+    # Mobile-only owners get mobile lines plus what they asked for. Segment defaults become optional extras,
+    # and extras that need an internet line are left out quietly (they did not ask for them).
+    mobile_only = needs.internet is False
+
+    def needs_line(pid):
+        return mobile_only and bool(cat[pid].requires_one_of)
+
     # 1. Internet line (everything else hangs off it) and mobile lines
-    add(_connectivity(biz, needs), core)
+    if not mobile_only:
+        add(_connectivity(biz, needs), core)
     add("P07" if biz.segment == "micro" else "P08", core)
 
     # 2. What the owner asked for, then segment defaults for things not discussed
     defaults = SEGMENT_DEFAULTS[biz.segment]
+    core_defaults = [] if mobile_only else defaults["core"]
+    addon_defaults = defaults["core"] + defaults["addons"] if mobile_only else defaults["addons"]
     for flag, pid in NEED_PRODUCT.items():
         wanted = getattr(needs, flag)
-        if wanted is True or (wanted is None and flag in defaults["core"]):
+        if wanted is True or (wanted is None and flag in core_defaults):
             add(pid, core)
-    for flag in defaults["addons"]:
-        if getattr(needs, flag) is None:
+    for flag in addon_defaults:
+        if getattr(needs, flag) is None and not needs_line(NEED_PRODUCT[flag]):
             add(NEED_PRODUCT[flag], addons)
     if needs.machines:
         add("P24", core)

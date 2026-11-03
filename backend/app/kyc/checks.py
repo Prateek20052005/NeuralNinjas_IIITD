@@ -7,6 +7,10 @@ Decision = the most serious issue found:
   REVIEW     a person at Accel must look (signatory not on record, bill in another name)
   PASS       everything matches
 Notes never change the decision (OCR repairs, known differences in the specimen Udyam data).
+
+Owners without an active GST registration (the advisor only offers them products that don't need GST) are not
+asked for a GST certificate, and Udyam is optional for them: their business name is taken from Udyam if they
+have it, otherwise only the address proof and the signatory ID are checked.
 """
 from __future__ import annotations
 
@@ -53,6 +57,11 @@ class KycContext:
     today: date
     claimed_gstin: str | None = None      # GSTIN the owner typed in the advisor chat, if any
     udyam_number: str | None = None       # typed instead of uploading the Udyam certificate
+    gst_registered: bool = True           # False: owner has no active GST, so GST and Udyam are optional
+
+
+def required_documents(gst_registered: bool) -> list[str]:
+    return list(DOC_TYPES) if gst_registered else ["address_proof", "signatory_id"]
 
 
 def _norm(s) -> str:
@@ -81,11 +90,14 @@ def assess(docs: dict[str, ParsedDoc | None], ctx: KycContext) -> KycResult:
 
     # ---- 1. every document present, readable and of the right type
     usable: dict[str, ParsedDoc] = {}
+    required = required_documents(ctx.gst_registered)
     for t in DOC_TYPES:
         d = docs.get(t)
         if d is None:
             if t == "udyam_certificate" and ctx.udyam_number:
                 continue  # owner typed the number instead: checked against the registry below
+            if t not in required:
+                continue  # optional for owners without GST
             add(f"{t}_missing", "INCOMPLETE", t, f"No {t.replace('_', ' ')} uploaded")
         elif d.wrong_type and not d.blurred:
             add(f"{t}_wrong_document", "RETAKE", t, f"Uploaded a {d.detected_type.replace('_', ' ')} here")
@@ -163,6 +175,7 @@ def assess(docs: dict[str, ParsedDoc | None], ctx: KycContext) -> KycResult:
                 if trade and _norm(u.enterprise_name) != _norm(trade):
                     add("udyam_belongs_to_other_business", "REJECT", doc,
                         f"Udyam is for '{u.enterprise_name}', GST is for '{trade}'")
+                trade = trade or u.enterprise_name   # no GST certificate: Udyam names the business
 
     # ---- 4. address proof: right business, right address, recent
     if bill:

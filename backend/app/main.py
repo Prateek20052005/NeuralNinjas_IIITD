@@ -20,7 +20,7 @@ from .advisor.engine import Advisor, quote_view
 from .advisor.flow import to_business
 from .catalogue import INTERNET_LINES, load_catalogue
 from .i18n import LANGUAGES, _strings, t
-from .kyc.checks import Issue, KycContext, assess
+from .kyc.checks import Issue, KycContext, assess, required_documents
 from .kyc.documents import DOC_TYPES, read_document
 from .kyc.lookups import clean_id, mask
 from .kyc.messages import owner_message, result_view
@@ -88,13 +88,20 @@ def _quote(a: Application) -> dict:
     return quote_view(build_quote(a.items, to_business(a.session.profile), TODAY))
 
 
+def _gst_registered(a: Application) -> bool:
+    """Owners who said they have no GST (or whose GST is cancelled/suspended) need no GST certificate.
+    Not asked yet (no chat) counts as registered, so the full document set is required."""
+    return a.session.profile.gstin_status not in ("none", "inactive")
+
+
 def _status(a: Application) -> dict:
     p = a.session.profile
     return {
         "id": a.id, "language": a.language, "profile": p.safe_view(), "accepted": a.accepted,
         "consent": a.consent.__dict__ if a.consent else None,
         "quote": _quote(a) if a.items else None,
-        "documents": {t_: {"uploaded": t_ in a.docs} for t_ in DOC_TYPES},
+        "documents": {t_: {"uploaded": t_ in a.docs, "required": t_ in required_documents(_gst_registered(a))}
+                      for t_ in DOC_TYPES},
         "udyam_number": mask(a.udyam_number),
         "kyc": result_view(a.kyc, a.language) if a.kyc else None,
         "timeline": a.timeline,
@@ -159,7 +166,10 @@ def switch_addon(app_id: str, body: AddonBody):
     with a.lock:
         items, _ = toggle(a.items, body.product_id, body.on, allowed[body.product_id])
         q = build_quote(items, to_business(a.session.profile), TODAY)
-        if not INTERNET_LINES & set(items) or not q.valid:   # refuse rather than quote a bundle that can't work
+        # refuse rather than quote a bundle that can't work; a plan that has an internet line keeps one
+        # (mobile-only plans are chosen in the chat, so their extras can still be switched)
+        lost_line = INTERNET_LINES & set(a.items) and not INTERNET_LINES & set(items)
+        if lost_line or not items or not q.valid:
             raise HTTPException(422, t(lang, "msg.cannot_switch_off"))
         notes = [t(lang, "msg.also_removed", product=cat[pid].name, needs=cat[body.product_id].name)
                  for pid in a.items if pid not in items and pid != body.product_id]
@@ -245,7 +255,8 @@ def submit_kyc(app_id: str):
     a = _app(app_id)
     _require_consent(a)
     p = a.session.profile
-    a.kyc = assess(dict(a.docs), KycContext(TODAY, claimed_gstin=p.gstin, udyam_number=a.udyam_number))
+    a.kyc = assess(dict(a.docs), KycContext(TODAY, claimed_gstin=p.gstin, udyam_number=a.udyam_number,
+                                                gst_registered=_gst_registered(a)))
     a.mark("kyc_checked", decision=a.kyc.decision, issues=",".join(a.kyc.codes))
     if a.kyc.decision == "PASS" and a.accepted:
         a.mark("installation_booked", expected_live=_quote(a)["expected_live"])
