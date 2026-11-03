@@ -26,10 +26,10 @@ sys.path.insert(0, str(ROOT))
 from backend.app.advisor.engine import Advisor  # noqa: E402
 from backend.app.advisor.flow import NEED_QUESTIONS, to_business  # noqa: E402
 from backend.app.catalogue import check_bundle  # noqa: E402
+from backend.app.i18n import INDIC_RE, script_share  # noqa: E402
 from backend.app.recommend import NEED_PRODUCT  # noqa: E402
 
 MAX_TURNS = 14
-DEVANAGARI = re.compile(r"[ऀ-ॿ]")
 LEAKS = re.compile(r"\bP\d{2}\b|need:|[{}]|\b[a-z]+_[a-z_]+\b|\bNone\b|\bnull\b")
 
 # answers: slot -> reply (a list = replies for repeated asks, the last one repeats). Missing need slots -> "no".
@@ -49,6 +49,36 @@ PERSONAS = [
          answers={"gstin": "GST नाही", "segment": "माझं सलून आहे", "city": "नाशिक", "employees": "दोन",
                   "sites": "एकच", "need:billing_pos": "हो", "need:whatsapp": "हो", "need:cctv": "नाही"},
          expect=dict(segment="micro", city="Nashik", employees=2, sites=1, gstin_status="none")),
+    dict(name="textile_surat_gu", lang="gu",
+         answers={"gstin": "GST નથી", "segment": "અમારી કપડાંની ફેક્ટરી છે", "city": "સુરત", "employees": "૧૨ લોકો",
+                  "sites": "એક", "internet": "ફાઇબર છે", "need:machines": "પાંચ", "need:vehicles": "બે",
+                  "need:firewall": "ના"},
+         expect=dict(segment="mfg", city="Surat", employees=12, sites=1, gstin_status="none")),
+    dict(name="clinic_chennai_ta", lang="ta",
+         answers={"gstin": "GST இல்லை", "segment": "எனக்கு ஒரு கிளினிக் இருக்கு", "city": "சென்னை",
+                  "employees": "ஐந்து பேர்", "sites": "ஒரே இடம்", "internet": "ஃபைபர் இருக்கு",
+                  "need:phone_system": "வேண்டாம்", "need:backup": "ஆமா, வேணும்", "need:failover": "ஆமாம்"},
+         expect=dict(segment="prof", city="Chennai", employees=5, sites=1, gstin_status="none")),
+    dict(name="kirana_mobile_only_te", lang="te",
+         answers={"gstin": "GST లేదు", "segment": "మాది కిరాణా దుకాణం", "city": "హైదరాబాద్", "employees": "ఇద్దరు",
+                  "sites": "ఒక్కటే", "internet": "మొబైల్ సిమ్ మాత్రమే కావాలి", "need:billing_pos": "వద్దు",
+                  "need:whatsapp": "లేదు"},
+         expect=dict(segment="micro", city="Hyderabad", employees=2, sites=1, gstin_status="none")),
+    dict(name="medical_no_fibre_kn", lang="kn",
+         answers={"gstin": "GST ಇಲ್ಲ", "segment": "ನಮ್ಮದು ಮೆಡಿಕಲ್ ಅಂಗಡಿ", "city": "ಬೆಂಗಳೂರಿನಲ್ಲಿ ಇದ್ದೇವೆ",
+                  "employees": "ಮೂರು ಜನ", "sites": "ಒಂದೇ ಅಂಗಡಿ", "internet": "ಇಲ್ಲಿ ಫೈಬರ್ ಇಲ್ಲ",
+                  "need:billing_pos": "ಹೌದು ಬೇಕು", "need:whatsapp": "ಬೇಡ", "need:cctv": "ಹೌದು"},
+         expect=dict(segment="micro", city="Bengaluru", employees=3, sites=1, gstin_status="none")),
+    dict(name="bakery_tanglish_kovai", lang="ta",
+         answers={"gstin": "GST illai", "segment": "naan oru bakery kadai vechirukken", "city": "kovai",
+                  "employees": "naalu peru", "sites": "onnu", "internet": "fibre irukku",
+                  "need:billing_pos": "aama venum", "need:whatsapp": "vendam", "need:cctv": "illa"},
+         expect=dict(segment="micro", city="Coimbatore", employees=4, sites=1, gstin_status="none")),
+    dict(name="tailor_kannada_latin_mysuru", lang="kn",
+         answers={"gstin": "GST illa", "segment": "nammadu tailor angadi", "city": "Mysore", "employees": "eradu",
+                  "sites": "ondu", "internet": "gottilla", "need:billing_pos": "beda", "need:whatsapp": "haudu",
+                  "need:cctv": "beda"},
+         expect=dict(segment="micro", city="Mysuru", employees=2, sites=1, gstin_status="none")),
     dict(name="parlour_hinglish", lang="en",
          answers={"gstin": "bhai GST nahi hai", "segment": "beauty parlour hai", "city": "Jaipur",
                   "employees": "4 ladkiyan kaam karti hain", "sites": "ek hi parlour",
@@ -157,9 +187,10 @@ def bot_texts(out: dict) -> list[str]:
 
 
 def language_ok(text: str, lang: str) -> bool:
+    """English has no Indian script; an Indian language uses its own script (product names may stay English)."""
     if lang == "en":
-        return not DEVANAGARI.search(text)
-    return bool(DEVANAGARI.search(text))
+        return not INDIC_RE.search(text)
+    return script_share(text, lang)[0] > 0
 
 
 def run(persona: dict, adv: Advisor) -> dict:

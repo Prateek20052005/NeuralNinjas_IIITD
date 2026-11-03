@@ -15,7 +15,8 @@
   --bad-soft: #fdecea;
   --info-soft: #eef3fb;
   --radius: 14px;
-  --font: "Noto Sans", "Noto Sans Devanagari", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font: "Noto Sans", "Noto Sans Devanagari", "Noto Sans Gujarati", "Noto Sans Tamil", "Noto Sans Telugu",
+    "Noto Sans Kannada", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: light;
 }
 
@@ -87,13 +88,13 @@ p { margin: 0.5rem 0; }
 /* ---------- language ---------- */
 .language { padding: 32px 16px; }
 .language h1 { font-size: 2rem; margin-bottom: 0.25rem; }
-.lang-buttons { display: grid; gap: 12px; margin-top: 24px; }
+.lang-buttons { display: grid; gap: 10px; margin-top: 24px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 .lang-btn {
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 16px 18px;
   background: var(--card); border: 1.5px solid var(--line); text-align: left;
 }
 .lang-btn strong { font-size: 1.25rem; }
-.lang-btn span { color: var(--muted); }
+.lang-btn span { color: var(--muted); font-size: 0.85rem; overflow-wrap: anywhere; }
 .lang-btn:hover, .lang-btn:active { border-color: var(--brand); }
 
 /* ---------- chat ---------- */

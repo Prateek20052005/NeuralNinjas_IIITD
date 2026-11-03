@@ -12,6 +12,10 @@ const LANGS = [
   { code: "en", name: "English", hello: "Choose your language" },
   { code: "hi", name: "हिंदी", hello: "अपनी भाषा चुनिए" },
   { code: "mr", name: "मराठी", hello: "तुमची भाषा निवडा" },
+  { code: "gu", name: "ગુજરાતી", hello: "તમારી ભાષા પસંદ કરો" },
+  { code: "ta", name: "தமிழ்", hello: "மொழியைத் தேர்வு செய்யுங்கள்" },
+  { code: "te", name: "తెలుగు", hello: "మీ భాషను ఎంచుకోండి" },
+  { code: "kn", name: "ಕನ್ನಡ", hello: "ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ" },
 ];
 
 // Progress lives on the owner's own phone so a refresh doesn't lose the chat. Never required: the app

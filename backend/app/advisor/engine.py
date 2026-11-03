@@ -12,7 +12,8 @@ import re
 from dataclasses import asdict, dataclass, field, replace
 
 from ..catalogue import SEGMENTS, load_catalogue
-from ..i18n import LANGUAGES, t
+from ..i18n import AI_LANGUAGE_NAMES as LANG_NAMES
+from ..i18n import INDIC_RE, LANGUAGES, script_share, t
 from ..kyc.lookups import find_gstin_in_text, redact_ids
 from ..quote import Quote
 from ..recommend import Recommendation
@@ -26,7 +27,6 @@ from .parse import yes_no as _yes_no
 
 log = logging.getLogger("advisor")
 PRICE_TALK = re.compile(r"₹|\brs\.?\s*\d|\brupees?\b|रुपय|रुपए|रुपये|\d+\s*/\s*(month|mo)\b|per month", re.I)
-LANG_NAMES = {"en": "English", "hi": "Hindi (Devanagari script)", "mr": "Marathi (Devanagari script)"}
 NEED_HINTS = {
     "billing_pos": "GST billing / UPI & card payments", "whatsapp": "reach customers on WhatsApp",
     "sms": "bulk SMS", "cctv": "security cameras", "guest_wifi": "Wi-Fi for customers", "website": "website",
@@ -299,10 +299,13 @@ def _plain_answer(slot: str | None, text: str) -> bool:
 
 
 def _in_language(text: str, lang: str) -> bool:
-    """Hindi/Marathi text must be mostly Devanagari (product names stay English); English must have none."""
-    deva = len(re.findall(r"[\u0900-\u097F]", text))
-    latin = len(re.findall(r"[A-Za-z]", text))
-    return deva == 0 if lang == "en" else deva >= latin * 0.5
+    """Indian-language text must be mostly in that language's own script (product names stay English) and not in
+    another Indian script (a Hindi reply for a Tamil owner); English must have no Indian script at all."""
+    if lang == "en":
+        return not INDIC_RE.search(text)
+    own, latin = script_share(text, lang)
+    other = len(INDIC_RE.findall(text)) - own
+    return own > 0 and own >= latin * 0.5 and own > other
 
 
 def _same_text(a: str, b: str) -> bool:

@@ -198,7 +198,8 @@ def adv_business(s):
 def test_reason_exists_for_every_product_in_every_language():
     import json
     from pathlib import Path
-    for lang in ("en", "hi", "mr"):
+    from backend.app.i18n import LANGUAGES
+    for lang in LANGUAGES:
         strings = json.loads((Path("backend/app/i18n") / f"{lang}.json").read_text(encoding="utf-8"))
         assert all(f"reason.{pid}" in strings for pid in load_catalogue())
 
@@ -312,3 +313,71 @@ def test_ai_never_gets_ids_business_name_or_chat_history():
 def test_no_ai_notice_when_the_ai_is_off():
     _, start = Advisor(llm=NoLLM(), order_date=TODAY).start("en")
     assert not any("AI service" in m for m in start["messages"])
+
+
+# ---------- Gujarati, Tamil, Telugu, Kannada ----------
+
+NEW_LANGS = {   # typed answers in the language's own script: GST, kind, city, staff, sites, internet, then needs
+    "gu": ["GST નથી", "મારી કરિયાણાની દુકાન છે", "અમદાવાદ", "ત્રણ", "એક", "ફાઇબર છે", "હા", "ના", "ના"],
+    "ta": ["GST இல்லை", "எனக்கு மளிகை கடை இருக்கு", "சென்னை", "மூணு பேர்", "ஒரே கடை", "ஃபைபர் இருக்கு", "ஆமா", "வேண்டாம்", "இல்லை"],
+    "te": ["GST లేదు", "మాది కిరాణా దుకాణం", "హైదరాబాద్", "మూడు", "ఒక్కటే", "ఫైబర్ ఉంది", "అవును", "వద్దు", "లేదు"],
+    "kn": ["GST ಇಲ್ಲ", "ನಮ್ಮದು ಕಿರಾಣಿ ಅಂಗಡಿ", "ಬೆಂಗಳೂರು", "ಮೂರು ಜನ", "ಒಂದೇ ಅಂಗಡಿ", "ಫೈಬರ್ ಇದೆ", "ಹೌದು", "ಬೇಡ", "ಇಲ್ಲ"],
+}
+
+
+@pytest.mark.parametrize("lang", list(NEW_LANGS))
+def test_scripted_flow_in_new_languages(lang):
+    from backend.app.i18n import script_share
+    s, out = run_scripted(lang, NEW_LANGS[lang])
+    p, rec = s.profile, out["recommendation"]
+    assert (p.segment, p.employees, p.sites, p.gstin_status) == ("micro", 3, 1, "none")
+    assert p.needs.billing_pos is True and p.needs.whatsapp is False
+    assert script_share(rec["headline"], lang)[0] > 0                         # headline in the owner's script
+    assert all(script_share(x["reason"], lang)[0] > 0 for x in rec["core"])    # reasons translated
+    assert rec["quote"]["valid"]
+
+
+@pytest.mark.parametrize("text,lang,ok", [
+    ("ಈ ಪ್ಯಾಕೇಜ್ Biz Fibre 100 ಒಳಗೊಂಡಿದೆ", "kn", True),
+    ("यह पैकेज आपके लिए अच्छा है", "ta", False),        # Hindi reply for a Tamil owner
+    ("இந்த தொகுப்பு Biz Fibre தருகிறது", "ta", True),
+    ("This plan suits your shop.", "gu", False),         # English reply for a Gujarati owner
+    ("ok ಸರಿ", "en", False),
+])
+def test_ai_text_must_be_in_the_owners_script(text, lang, ok):
+    from backend.app.advisor.engine import _in_language
+    assert _in_language(text, lang) is ok
+
+
+@pytest.mark.parametrize("text,n", [("೪ ಜನ", 4), ("௫", 5), ("૧૨ લોકો", 12), ("ఇద్దరు", 2), ("மூணு பேர்", 3),
+                                    ("ಇಪ್ಪತ್ತು ಐದು", 25), ("naalu peru", 4)])
+def test_numbers_in_new_scripts(text, n):
+    assert number(text) == n
+
+
+@pytest.mark.parametrize("text,city", [("ನಾವು ಬೆಂಗಳೂರಿನಲ್ಲಿ ಇದ್ದೇವೆ", "Bengaluru"), ("சென்னையில் இருக்கிறோம்", "Chennai"),
+                                       ("మేము హైదరాబాద్‌లో ఉన్నాము", "Hyderabad"), ("અમે અમદાવાદમાં છીએ", "Ahmedabad"),
+                                       ("kovai", "Coimbatore")])
+def test_cities_in_new_scripts(text, city):
+    from backend.app.reference import find_city
+    assert find_city(text) == city
+
+
+def test_every_language_file_is_complete_with_the_same_placeholders():
+    import json
+    import re
+    from pathlib import Path
+    from backend.app.i18n import LANGUAGES
+    folder = Path("backend/app/i18n")
+    en = json.loads((folder / "en.json").read_text(encoding="utf-8"))
+    for lang in LANGUAGES:
+        strings = json.loads((folder / f"{lang}.json").read_text(encoding="utf-8"))
+        assert set(strings) == set(en), lang
+        for key, text in en.items():
+            assert set(re.findall(r"{\w+}", strings[key])) == set(re.findall(r"{\w+}", text)), (lang, key)
+
+
+@pytest.mark.parametrize("text,yn", [("GST ಇನ್ನೂ ಮಾಡಿಸಿಲ್ಲ", False), ("GST இன்னும் எடுக்கவில்லை", False),
+                                     ("GST చేయించలేదు", False), ("ಎಲ್ಲ ಬೇಕು", True), ("ಬೇಕಾಗಿಲ್ಲ", False)])
+def test_no_inside_the_verb_ending(text, yn):
+    assert yes_no(text) is yn

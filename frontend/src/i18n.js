@@ -21,7 +21,7 @@ export function useStrings(lang) {
   };
 }
 
-const LOCALE = { en: "en-IN", hi: "hi-IN", mr: "mr-IN" };
+const LOCALE = { en: "en-IN", hi: "hi-IN", mr: "mr-IN", gu: "gu-IN", ta: "ta-IN", te: "te-IN", kn: "kn-IN" };
 
 export const rupees = (n) => new Intl.NumberFormat("en-IN").format(n);
 

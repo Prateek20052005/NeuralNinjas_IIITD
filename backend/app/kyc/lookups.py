@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from ..catalogue import DATA_DIR
+from ..i18n import INDIC_DIGITS
 
 CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 GSTIN_RE = re.compile(r"^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$")
@@ -117,7 +118,7 @@ def find_gstin_in_text(text: str) -> str | None:
     return m.group(0) if m else None
 
 
-_DIGIT = r"[0-9०-९]"
+_DIGIT = f"[0-9{INDIC_DIGITS}]"   # digits typed in any supported script
 ID_PATTERNS = [
     re.compile(r"\bUDYAM[\s-]*[A-Z]{2}[\s-]*\d{2}[\s-]*\d{7}\b", re.I),     # Udyam number
     re.compile(r"\b\d{2}[A-Z0-9]{10}[0-9A-Z]Z[0-9A-Z]\b", re.I),            # GSTIN (also mistyped ones)

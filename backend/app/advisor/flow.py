@@ -144,7 +144,8 @@ def apply_answer(p: Profile, slot: str, value) -> list[str]:
 
     if slot == "gstin":
         found = find_gstin_in_text(value)
-        skip = {"skip", "later", "baad", "बाद", "नंतर"} & set(value.lower().replace(",", " ").split())
+        skip = {"skip", "later", "baad", "बाद", "नंतर", "પછી", "pachi", "பிறகு", "அப்புறம்", "apparam",
+                "తర్వాత", "తరువాత", "taruvata", "ನಂತರ"} & set(value.lower().replace(",", " ").split())
         if not found and (value.lower() in ("none", "") or yes_no(value) is False or skip):
             p.gstin_status = "none"
             return [t(lang, "msg.no_gst")]

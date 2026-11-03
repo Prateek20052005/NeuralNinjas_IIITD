@@ -11,6 +11,8 @@ import re
 from functools import lru_cache
 from pathlib import Path
 
+from .i18n import ascii_digits
+
 SETTINGS_FILE = Path(__file__).with_name("pricing_settings.json")
 
 
@@ -44,8 +46,8 @@ def is_last_offer(asks: int, room: float, current: float) -> bool:
 
 
 def clean_phone(raw: str) -> str | None:
-    """Indian mobile number as 10 digits: '+91 98765-43210', '०९८७६५४३२१०' -> '9876543210'. None if not valid."""
-    s = re.sub(r"[\s()-]", "", str(raw or "").translate(str.maketrans("०१२३४५६७८९", "0123456789")))
+    """Indian mobile number as 10 digits: '+91 98765-43210', '०९८७६५४३२१०', '೯೮೭...' -> '9876543210'. None if not valid."""
+    s = re.sub(r"[\s()-]", "", ascii_digits(raw or ""))
     s = re.sub(r"^(\+?91|0)(?=\d{10}$)", "", s)
     return s if re.fullmatch(r"[6-9]\d{9}", s) else None
 
