@@ -167,7 +167,7 @@
   "msg.internet.wireless": "Got it. 5G AirFiber needs no cable and is usually set up in about 2 days.",
   "msg.internet.unsure": "No problem. Our team checks this before installation; if fibre can't reach you, we'll set up 5G AirFiber instead.",
   "msg.internet.mobile": "Okay, just mobile lines. You can add internet any time later.",
-  "msg.ai_notice": "🔒 An AI service helps me understand your replies. ID numbers (like your GST number) are removed before anything is sent to it. Please don't type personal details such as names or home addresses.",
+  "msg.ai_notice": "🔒 An AI service helps me understand your replies. ID numbers (like your GST number) are removed from typed text before anything is sent to it. If you speak, your recording goes to the same service, so please don't type or say personal details such as names or home addresses.",
   "ui.optional": "Optional",
   "ui.no_gst_docs": "You don't have GST, so we only need your address proof and ID. A Udyam certificate is optional.",
   "ui.choose_plan": "Choose your plan",
@@ -203,5 +203,18 @@
   "ui.discount_line": "Discount {pct}%: −₹{amount} per month",
   "ui.phone_label": "Mobile number",
   "ui.target_label": "What monthly price would work for you? (optional)",
-  "ui.request_call": "Request a call"
+  "ui.request_call": "Request a call",
+  "ui.mic_start": "Speak your answer",
+  "ui.mic_stop": "Stop recording",
+  "ui.listening": "Listening… tap ■ when you're done",
+  "ui.transcribing": "Turning your voice into text…",
+  "ui.voice_warning": "🎙️ Your recording is sent to an AI service to turn it into text. Please don't say private details such as ID numbers, names or addresses.",
+  "ui.voice_ok": "OK, start recording",
+  "ui.voice_check": "Check the text, correct it if needed, then tap send.",
+  "ui.mute": "Stop reading replies aloud",
+  "ui.unmute": "Read replies aloud",
+  "msg.voice_type_gst": "Please type your GST number: for your privacy, it can't be spoken.",
+  "msg.voice_failed": "Sorry, I couldn't hear that clearly. Please try again, or type your answer.",
+  "msg.voice_too_long": "That recording is too long. Please give a short answer.",
+  "msg.mic_blocked": "The microphone is blocked. Allow it in your browser settings, or type your answer."
 }

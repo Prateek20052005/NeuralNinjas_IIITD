@@ -30,6 +30,13 @@ async function call(method, path, body) {
 
 export const api = {
   strings: (lang) => call("GET", `/i18n/${lang}`),
+  health: () => call("GET", "/health"),
+  voice: (id, audio) => {   // a spoken answer -> its text, for the owner to check before sending
+    const form = new FormData();
+    const ext = (audio.type.split(";")[0].split("/")[1] || "webm").replace("x-", "");
+    form.append("file", audio, `answer.${ext}`);
+    return call("POST", `/applications/${id}/voice`, form);
+  },
   consentText: (lang) => call("GET", `/consent/${lang}`),
   catalogue: () => call("GET", "/catalogue"),
   start: (language) => call("POST", "/applications", { language }),

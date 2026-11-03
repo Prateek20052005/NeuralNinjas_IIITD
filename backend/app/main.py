@@ -27,6 +27,7 @@ from .kyc.messages import owner_message, result_view
 from .kyc.ocr import NotAnImage
 from .negotiate import clean_phone, is_last_offer, next_offer, room_pct, rupees, settings as price_settings
 from .quote import build_quote, price_position, toggle, unit_price
+from .voice import MAX_AUDIO_BYTES, VOICE_LANGUAGES, Transcriber, VoiceUnavailable
 from .store import CONSENT_PURPOSES, Application, Consent, Store, masked_fields
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(name)s %(levelname)s %(message)s")
@@ -50,6 +51,7 @@ app = FastAPI(title="Accel Business - Udyam Digital", version="0.4")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
                    allow_methods=["*"], allow_headers=["*"])
 advisor = Advisor(order_date=TODAY)
+transcriber = Transcriber(advisor.llm.client)   # voice answers use the same Groq key as the chat
 store = Store()
 
 
@@ -144,7 +146,8 @@ def _status(a: Application) -> dict:
 # ---------- general ----------
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "advisor_mode": advisor.mode, "today": TODAY.isoformat(), "languages": LANGUAGES}
+    return {"status": "ok", "advisor_mode": advisor.mode, "today": TODAY.isoformat(), "languages": LANGUAGES,
+            "voice_languages": list(VOICE_LANGUAGES) if transcriber.available else []}
 
 
 @app.get("/api/i18n/{lang}")
@@ -184,6 +187,33 @@ def message(app_id: str, body: MessageBody):
             a.items = a.session.recommendation.items()
             a.mark("quote_ready", monthly=out["recommendation"]["quote"]["monthly_with_gst"])
     return out
+
+
+@app.post("/api/applications/{app_id}/voice")
+def voice_answer(app_id: str, file: UploadFile = File(...)):
+    """A spoken answer -> text, returned to the owner's screen to check before sending (see voice.py on privacy)."""
+    a = _app(app_id)
+    lang = a.language
+    if lang not in VOICE_LANGUAGES or not transcriber.available:
+        raise HTTPException(404, "Voice is not available in this language")
+    if a.session.recommendation:
+        raise HTTPException(409, "Advice is finished; switch add-ons or accept the quote")
+    if a.session.profile.gstin_status is None:   # the GST number is always typed, never spoken
+        raise HTTPException(409, t(lang, "msg.voice_type_gst"))
+    data = file.file.read(MAX_AUDIO_BYTES + 1)
+    try:
+        if len(data) > MAX_AUDIO_BYTES:
+            raise HTTPException(413, t(lang, "msg.voice_too_long"))
+        if len(data) < 1000:   # a tap without speech
+            raise HTTPException(422, t(lang, "msg.voice_failed"))
+        text = transcriber.transcribe(data, file.content_type or "", lang)
+    except VoiceUnavailable:
+        raise HTTPException(503, t(lang, "msg.voice_failed"))
+    finally:
+        del data   # the recording is never stored
+    if not text:
+        raise HTTPException(422, t(lang, "msg.voice_failed"))
+    return {"text": text[:MAX_MESSAGE_CHARS]}
 
 
 @app.post("/api/applications/{app_id}/addons")
