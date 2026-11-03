@@ -58,9 +58,17 @@ class Recommendation:
     notes: list[str] = field(default_factory=list)  # swaps and things we could not offer, in plain English
     note_items: list[dict] = field(default_factory=list)  # same notes, structured for translation
     quote: Quote | None = None
+    essential: set[str] = field(default_factory=set)      # internet, mobile lines and what the owner asked for
 
     def items(self) -> dict[str, int]:
         return {p.product_id: p.quantity for p in self.core}
+
+    def tiers(self) -> dict[str, dict[str, int]]:
+        """Basic = only the essentials; Recommended = our suggestion; Full = with every suggested extra.
+        Same prices in every tier: only the products change."""
+        return {"basic": {p.product_id: p.quantity for p in self.core if p.product_id in self.essential},
+                "recommended": self.items(),
+                "full": {**self.items(), **{p.product_id: p.quantity for p in self.addons}}}
 
 
 # Need flag -> product. Quantity is worked out in _quantity().
@@ -189,8 +197,9 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
     note_items: list[dict] = []
     core: dict[str, Pick] = {}
     addons: dict[str, Pick] = {}
+    essential: set[str] = set()
 
-    def add(pid, bucket):
+    def add(pid, bucket, must=False):
         placed = _place(pid, biz, notes, note_items)
         needs_one_of = cat[placed].requires_one_of if placed else frozenset()
         if needs_one_of and not needs_one_of & set(core):
@@ -203,6 +212,8 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
             qty = _quantity(placed, biz, needs)
             if qty > 0:
                 bucket[placed] = Pick(placed, qty, _reason(placed, biz))
+                if must:
+                    essential.add(placed)
 
     # Mobile-only owners get mobile lines plus what they asked for. Segment defaults become optional extras,
     # and extras that need an internet line are left out quietly (they did not ask for them).
@@ -213,8 +224,8 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
 
     # 1. Internet line (everything else hangs off it) and mobile lines
     if not mobile_only:
-        add(_connectivity(biz, needs), core)
-    add("P07" if biz.segment == "micro" else "P08", core)
+        add(_connectivity(biz, needs), core, must=True)
+    add("P07" if biz.segment == "micro" else "P08", core, must=True)
 
     # 2. What the owner asked for, then segment defaults for things not discussed
     defaults = SEGMENT_DEFAULTS[biz.segment]
@@ -223,14 +234,14 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
     for flag, pid in NEED_PRODUCT.items():
         wanted = getattr(needs, flag)
         if wanted is True or (wanted is None and flag in core_defaults):
-            add(pid, core)
+            add(pid, core, must=wanted is True)
     for flag in addon_defaults:
         if getattr(needs, flag) is None and not needs_line(NEED_PRODUCT[flag]):
             add(NEED_PRODUCT[flag], addons)
     if needs.machines:
-        add("P24", core)
+        add("P24", core, must=True)
     if needs.vehicles:
-        add("P25", core)
+        add("P25", core, must=True)
 
     # 3. Safety net: drop anything whose companion product is missing (should not happen, but never quote it)
     for pid, check in check_bundle({**{p: 1 for p in core}}, biz).items():
@@ -238,6 +249,6 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
             notes.append(f"{check.reasons[0]}, so it is not included.")
             note_items.append({"type": "drop", "product": pid, "code": check.codes[0][0], "params": check.codes[0][1]})
             core.pop(pid)
-    rec = Recommendation(list(core.values()), list(addons.values()), notes, note_items)
+    rec = Recommendation(list(core.values()), list(addons.values()), notes, note_items, essential=essential)
     rec.quote = build_quote(rec.items(), biz, order_date)
     return rec

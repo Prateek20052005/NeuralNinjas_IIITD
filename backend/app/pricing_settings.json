@@ -1,0 +1,6 @@
+{
+  "_about": "Price negotiation on the plan screen. Offers come from these numbers, never from the AI. A discount never takes a price below the catalogue minimum, whatever these say.",
+  "first_offer_pct": 5,
+  "max_discount_pct": 10,
+  "sales_callback_hours": 24
+}

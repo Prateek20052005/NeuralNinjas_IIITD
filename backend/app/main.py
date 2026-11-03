@@ -25,7 +25,8 @@ from .kyc.documents import DOC_TYPES, read_document
 from .kyc.lookups import clean_id, mask
 from .kyc.messages import owner_message, result_view
 from .kyc.ocr import NotAnImage
-from .quote import build_quote, toggle
+from .negotiate import clean_phone, is_last_offer, next_offer, room_pct, rupees, settings as price_settings
+from .quote import build_quote, price_position, toggle, unit_price
 from .store import CONSENT_PURPOSES, Application, Consent, Store, masked_fields
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(name)s %(levelname)s %(message)s")
@@ -63,6 +64,18 @@ class MessageBody(BaseModel):
     value: str | int | None = None
 
 
+class PlanBody(BaseModel):
+    tier: str | None = None               # basic / recommended / full
+    contract_months: int | None = None
+    setup_months: int | None = None       # 1 = pay setup at once, 6 or 12 = spread
+
+
+class CallbackBody(BaseModel):
+    phone: str
+    consent: bool                         # "call me about the price of this plan"
+    target_monthly: int | None = None     # price that would work for the owner, if they said
+
+
 class AddonBody(BaseModel):
     product_id: str
     on: bool          # switched on at the suggested quantity
@@ -84,8 +97,28 @@ def _app(app_id: str) -> Application:
     return a
 
 
+def _build(a: Application, items: dict[str, int] | None = None):
+    return build_quote(a.items if items is None else items, to_business(a.session.profile), TODAY,
+                       a.contract_months, a.setup_months, a.discount_pct)
+
+
 def _quote(a: Application) -> dict:
-    return quote_view(build_quote(a.items, to_business(a.session.profile), TODAY))
+    return quote_view(_build(a))
+
+
+def _plan_view(a: Application) -> dict:
+    """Quote for the owner's current choices, plus the price of each tier and of every suggested product."""
+    q, cat, rec = _build(a), load_catalogue(), a.session.recommendation
+    pos = price_position(q.contract_months, q.min_contract_months)
+    tiers, seen = [], set()
+    for name, items in rec.tiers().items():
+        key = frozenset(items.items())
+        if key not in seen:   # Basic is often the same as Recommended: show it once
+            seen.add(key)
+            tiers.append({"id": name, "count": len(items), "monthly_with_gst": _build(a, items).monthly_with_gst})
+    return {"quote": quote_view(q), "items": a.items, "tier": a.tier, "tiers": tiers,
+            "callback_requested": a.callback is not None,
+            "unit_prices": {pk.product_id: unit_price(cat[pk.product_id], pos) for pk in rec.core + rec.addons}}
 
 
 def _gst_registered(a: Application) -> bool:
@@ -173,8 +206,77 @@ def switch_addon(app_id: str, body: AddonBody):
             raise HTTPException(422, t(lang, "msg.cannot_switch_off"))
         notes = [t(lang, "msg.also_removed", product=cat[pid].name, needs=cat[body.product_id].name)
                  for pid in a.items if pid not in items and pid != body.product_id]
-        a.items = items
-    return {"quote": quote_view(q), "notes": notes, "items": items}
+        a.items, a.tier = items, "custom"
+    return {**_plan_view(a), "notes": notes}
+
+
+@app.post("/api/applications/{app_id}/price-request")
+def price_request(app_id: str):
+    """Owner taps 'Ask for a lower price'. Offers come from pricing_settings.json, never from the AI, and never go
+    below the catalogue minimum. When there is nothing more to offer, the owner is offered a salesperson's call."""
+    a = _app(app_id)
+    if not a.session.recommendation or a.accepted:
+        raise HTTPException(409, "No open quote to change")
+    lang, hours = a.language, price_settings()["sales_callback_hours"]
+    with a.lock:
+        before = build_quote(a.items, to_business(a.session.profile), TODAY, a.contract_months, a.setup_months)
+        room = room_pct(before.list_total, before.floor_total)
+        a.price_asks += 1
+        offer = next_offer(a.price_asks, room, a.discount_pct)
+        if offer is None:
+            a.mark("price_handoff", asks=a.price_asks, best_pct=a.discount_pct)
+            key = "msg.price.floor" if a.discount_pct == 0 and room < 0.5 else "msg.price.handoff"
+            return {**_plan_view(a), "status": "handoff", "message": t(lang, key, hours=hours)}
+        a.discount_pct = offer
+        q = _build(a)
+        last = is_last_offer(a.price_asks, room, a.discount_pct)
+        a.mark("price_offer", pct=q.discount_pct, monthly=q.monthly_with_gst)
+        message = t(lang, "msg.price.final" if last else "msg.price.offer",
+                    pct=f"{q.discount_pct:g}", total=rupees(q.monthly_with_gst))
+        return {**_plan_view(a), "status": "final" if last else "offer", "message": message}
+
+
+@app.post("/api/applications/{app_id}/sales-callback")
+def sales_callback(app_id: str, body: CallbackBody):
+    """The owner wants a lower price than the chatbot may give: a salesperson calls them. The phone number is used
+    only for that call, shown only in the back office, masked everywhere else, and erased with the application."""
+    a = _app(app_id)
+    lang, hours = a.language, price_settings()["sales_callback_hours"]
+    if not body.consent:
+        raise HTTPException(422, t(lang, "msg.callback_consent_required"))
+    phone = clean_phone(body.phone)
+    if not phone:
+        raise HTTPException(422, t(lang, "msg.phone_invalid"))
+    target = body.target_monthly if body.target_monthly and 0 < body.target_monthly < 10_000_000 else None
+    q = _quote(a) if a.items else None
+    a.callback = {"phone": phone, "target_monthly": target, "language": lang,
+                  "offered_monthly": q["monthly_with_gst"] if q else None, "discount_pct": a.discount_pct,
+                  "consent": t(lang, "ui.callback_consent"), "requested_at": date.today().isoformat()}
+    a.mark("sales_callback_requested", phone=mask(phone), target_monthly=target)
+    ref = a.id[:6].upper()
+    return {"ok": True, "reference": ref, "message": t(lang, "msg.callback_ok", hours=hours, ref=ref)}
+
+
+@app.post("/api/applications/{app_id}/plan")
+def choose_plan(app_id: str, body: PlanBody):
+    """Pick a tier, a contract length and how to pay the setup fee. An empty body returns the current plan."""
+    a = _app(app_id)
+    rec = a.session.recommendation
+    if not rec:
+        raise HTTPException(409, "No quote yet")
+    if a.accepted and (body.tier or body.contract_months or body.setup_months):
+        raise HTTPException(409, "No open quote to change")
+    with a.lock:
+        if body.tier:
+            tiers = rec.tiers()
+            if body.tier not in tiers:
+                raise HTTPException(422, "Unknown plan")
+            a.items, a.tier = tiers[body.tier], body.tier
+        if body.contract_months is not None:
+            a.contract_months = body.contract_months   # raised to the bundle's minimum when priced
+        if body.setup_months is not None:
+            a.setup_months = body.setup_months         # ignored unless 1, 6 or 12 and within the contract
+        return _plan_view(a)
 
 
 @app.post("/api/applications/{app_id}/accept")
@@ -184,7 +286,8 @@ def accept(app_id: str):
         raise HTTPException(409, "No quote yet")
     a.accepted = True
     q = _quote(a)
-    a.mark("quote_accepted", monthly=q["monthly_with_gst"], expected_live=q["expected_live"])
+    a.mark("quote_accepted", monthly=q["monthly_with_gst"], expected_live=q["expected_live"], tier=a.tier,
+           contract_months=q["contract_months"], setup_months=q["setup_months"], discount_pct=q["discount_pct"])
     return _status(a)
 
 
@@ -291,8 +394,11 @@ def backoffice(x_admin_key: str | None = Header(default=None)):
                     "monthly": _quote(a)["monthly_with_gst"] if a.items else None,
                     "documents": {k: masked_fields(d) for k, d in a.docs.items()},
                     "kyc": result_view(a.kyc, "en", back_office=True) if a.kyc else None,
+                    "price": {"asks": a.price_asks, "discount_pct": a.discount_pct, "tier": a.tier},
+                    # leads the chatbot could not close: the full number is shown here only, so sales can call
+                    "sales_callback": {**a.callback, "reference": a.id[:6].upper()} if a.callback else None,
                     "timeline": a.timeline})
-    return out
+    return sorted(out, key=lambda x: x["sales_callback"] is None)   # calls to make come first
 
 
 # ---------- the built phone app (frontend/dist), served from the same address ----------

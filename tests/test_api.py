@@ -134,3 +134,30 @@ def test_mobile_only_plan_can_still_switch_extras(client):
     assert [x["id"] for x in rec["core"]] == ["P07"] and rec["addons"]
     r = client.post(f"/api/applications/{app_id}/addons", json={"product_id": rec["addons"][0]["id"], "on": True})
     assert r.status_code == 200 and r.json()["quote"]["valid"]
+
+
+def test_plan_tiers_contract_and_setup_choices(client):
+    answers = {**ANSWERS, "segment": "prof", "need:phone_system": "no", "need:backup": "no", "need:failover": "yes"}
+    r = client.post("/api/applications", json={"language": "en"}).json()
+    app_id, out = r["id"], r
+    while out.get("question"):
+        out = client.post(f"/api/applications/{app_id}/message", json={"text": answers[out["question"]["slot"]]}).json()
+    plan = client.post(f"/api/applications/{app_id}/plan", json={}).json()
+    prices = {t["id"]: t["monthly_with_gst"] for t in plan["tiers"]}
+    assert plan["tier"] == "recommended" and prices["basic"] < prices["recommended"] < prices["full"]
+
+    basic = client.post(f"/api/applications/{app_id}/plan", json={"tier": "basic"}).json()
+    assert basic["quote"]["monthly_with_gst"] == prices["basic"]
+    longer = client.post(f"/api/applications/{app_id}/plan", json={"contract_months": 24}).json()
+    assert longer["quote"]["contract_months"] == 24
+    assert longer["quote"]["monthly_with_gst"] < basic["quote"]["monthly_with_gst"]
+    assert all(longer["unit_prices"][pid] == main.load_catalogue()[pid].price_min for pid in longer["unit_prices"])
+    spread = client.post(f"/api/applications/{app_id}/plan", json={"setup_months": 12}).json()["quote"]
+    assert spread["setup_months"] == 12 and spread["setup_monthly"] * 12 >= spread["setup_total"]
+
+    accepted = client.post(f"/api/applications/{app_id}/accept").json()
+    assert accepted["quote"]["contract_months"] == 24 and accepted["quote"]["setup_months"] == 12
+    step = next(s for s in accepted["timeline"] if s["step"] == "quote_accepted")
+    assert step["tier"] == "basic" and step["contract_months"] == 24
+    assert client.post(f"/api/applications/{app_id}/plan", json={"tier": "full"}).status_code == 409
+    assert client.post(f"/api/applications/{app_id}/plan", json={"tier": "gold"}).status_code == 409

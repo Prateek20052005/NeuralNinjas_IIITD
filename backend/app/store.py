@@ -44,6 +44,12 @@ class Application:
     id: str
     session: Session
     items: dict[str, int] = field(default_factory=dict)       # bundle after the owner's add-on switches
+    tier: str = "recommended"                                   # basic / recommended / full / custom
+    contract_months: int | None = None                          # owner's choice; None = bundle minimum
+    setup_months: int = 1                                       # setup fee paid at once (1) or spread
+    discount_pct: float = 0.0                                   # negotiated on the plan screen (negotiate.py)
+    price_asks: int = 0                                         # times the owner asked for a lower price
+    callback: dict | None = None                                # salesperson call: phone kept only for that call
     accepted: bool = False
     consent: Consent | None = None
     docs: dict[str, ParsedDoc] = field(default_factory=dict)

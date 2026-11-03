@@ -150,3 +150,50 @@ def test_reference_tables():
     assert business_types()["Dental clinic"] == "prof"
     assert city_tier("Nagpur") == 2 and city_tier("pune") == 1
     assert city_tier("Unknown town") == 2
+
+
+# ---------- our pricing rule: contract length, setup fee instalments, plan tiers ----------
+
+def test_default_price_is_unchanged_middle_of_range_on_the_minimum_contract():
+    q = build_quote({"P01": 1, "P07": 2, "P19": 1}, biz("micro"), TODAY)
+    assert q.contract_months == 12 and q.monthly_total == 1099 + 2 * 349 + 749
+    assert [o["months"] for o in q.contract_options] == [12, 24]
+
+
+@pytest.mark.parametrize("pid", list(load_catalogue()))
+@pytest.mark.parametrize("months", [1, 6, 12, 24, 36])
+def test_price_never_leaves_the_catalogue_range(pid, months):
+    q = build_quote({pid: 1}, biz("mfg", employees=200, sites=5), TODAY, contract_months=months)
+    line = q.lines[0]
+    assert line.price_range[0] <= line.unit_price <= line.price_range[1]
+    assert q.contract_months >= load_catalogue()[pid].min_contract_months   # never shorter than allowed
+
+
+def test_longer_contract_is_cheaper_and_24_months_is_the_catalogue_minimum():
+    items = {"P04": 1, "P07": 2}   # AirFiber allows 6 months, mobile lines 1
+    six, twelve, two_years = (build_quote(items, biz("micro"), TODAY, contract_months=m) for m in (6, 12, 24))
+    assert six.monthly_total > twelve.monthly_total > two_years.monthly_total
+    assert two_years.monthly_total == 899 + 2 * 299
+    assert six.monthly_total == 999 + 2 * 349                                # shortest contract: today's price
+
+
+def test_setup_fee_spread_keeps_the_total_and_stays_within_the_contract():
+    q = build_quote({"P01": 1, "P19": 1, "P23": 1}, biz("micro"), TODAY, setup_months=12)
+    assert q.setup_total == 2500 + 1800 and q.setup_months == 12 and q.setup_monthly == 359   # ceil(4300 / 12)
+    q = build_quote({"P01": 1, "P19": 1}, biz("micro"), TODAY, setup_months=7)             # not an offered choice
+    assert q.setup_months == 1 and q.setup_monthly == 0
+    q = build_quote({"P01": 1, "P19": 1}, biz("micro"), TODAY, contract_months=12, setup_months=24)
+    assert q.setup_months == 1                                                            # longer than the contract
+    q = build_quote({"P01": 1}, biz("micro"), TODAY, setup_months=6)                       # no setup fee
+    assert q.setup_months == 1
+
+
+@pytest.mark.parametrize("segment,needs", [("micro", Needs(billing_pos=True)), ("prof", Needs(failover=True)),
+                                           ("multi", Needs()), ("mfg", Needs(machines=4)),
+                                           ("micro", Needs(internet=False))])
+def test_tiers_are_nested_and_all_pass_the_rules(segment, needs):
+    b = biz(segment, sites=4 if segment == "multi" else 1)
+    tiers = recommend(b, needs, TODAY).tiers()
+    assert set(tiers["basic"]) <= set(tiers["recommended"]) <= set(tiers["full"])
+    for items in tiers.values():
+        assert items and all(c.ok for c in check_bundle(items, b).values())

@@ -35,6 +35,9 @@ export const api = {
   start: (language) => call("POST", "/applications", { language }),
   send: (id, msg) => call("POST", `/applications/${id}/message`, msg),
   switchProduct: (id, product_id, on) => call("POST", `/applications/${id}/addons`, { product_id, on }),
+  plan: (id, choice = {}) => call("POST", `/applications/${id}/plan`, choice),   // tier, contract, setup spread
+  priceRequest: (id) => call("POST", `/applications/${id}/price-request`),
+  salesCallback: (id, body) => call("POST", `/applications/${id}/sales-callback`, body),
   accept: (id) => call("POST", `/applications/${id}/accept`),
   consent: (id, purposes) => call("POST", `/applications/${id}/consent`, { purposes }),
   upload: (id, docType, file) => {
