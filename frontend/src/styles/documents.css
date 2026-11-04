@@ -1,0 +1,9 @@
+.ab-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.ab-retake { display: flex; flex-direction: column; gap: 12px; border: 1.5px solid var(--color-warning); box-shadow: var(--shadow-2); }
+.ab-retake .ab-badge { align-self: flex-start; }
+.ab-docs-bar { position: sticky; bottom: 0; padding: 14px var(--gutter) calc(18px + env(safe-area-inset-bottom)); background: var(--color-glass-solid); border-top: 1px solid var(--color-hairline); }
+
+/* At 200% text the two-up grid becomes one column */
+@media (max-width: 22rem) {
+  .ab-tiles { grid-template-columns: minmax(0, 1fr); }
+}

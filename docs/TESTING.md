@@ -3,11 +3,11 @@
 The judges run 15 live advisor scenarios and a KYC answer key. We built our own versions of both, plus
 tests for phone photos and failures. Everything below can be re-run with one command.
 
-| What | Command | Result (2 Nov 2026) |
+| What | Command | Result (4 Nov 2026) |
 |---|---|---|
-| Unit and API tests (rules, quotes, KYC answer key, consent, privacy, failures) | `.venv/Scripts/python -m pytest -q` | 98 passed |
-| 20 owner personas, AI switched off (backup mode) | `python scripts/eval_advisor.py scripted` | 20 / 20 |
-| 11 hardest personas with the real AI (Groq, free tier) | `python scripts/eval_advisor.py ai <names>` | 11 / 11, ~4.1K tokens per chat |
+| Unit and API tests (rules, quotes, KYC answer key, consent, privacy, failures, negotiation, voice) | `.venv/Scripts/python -m pytest -q` | 314 passed |
+| 26 owner personas in 7 languages, AI switched off (backup mode) | `python scripts/eval_advisor.py scripted` | 26 / 26 |
+| 11 hardest personas with the real AI (Groq, free tier) | `python scripts/eval_advisor.py ai <names>` | 11 / 11, ~4.1K tokens per chat (2 Nov, before the new languages) |
 | Phone-like photos of 12 KYC documents | `python scripts/stress_kyc.py K03 K07 K10` | see below |
 | Whole journey against the running server or Docker container | `python scripts/smoke_http.py` | chat -> quote -> consent -> 4 photos -> PASS -> delete |
 
@@ -76,3 +76,18 @@ Fixes from this test:
 AI failing mid-chat, AI returning junk, AI stating a price or asking its own question, empty and giant messages,
 unknown slots, double taps, empty / huge / non-image uploads, KYC with nothing uploaded, and 20 owners chatting
 at the same time. The owner never sees an error from the AI: the chat carries on in backup mode.
+
+## Review of the new features (4 Nov 2026)
+
+After price negotiation, plan tiers, four more languages and voice were added, we checked them by running the
+code, not just reading it. What we found and changed:
+
+| Found | Fix |
+|---|---|
+| "haan na", "chahiye na" (Hinglish for "yes, of course") were read as **no**, because "na" is also Gujarati for no | "na" means no only when the answer starts with it ("na", "na bhai"); "chahiye", "pahije", "zaroor" count as yes |
+| An owner without GST passed KYC with a bill for one business and an ID for another | Without GST or Udyam, the bill names the business and the ID must match it, otherwise a person reviews it |
+| The GST certificate tile was hidden for owners with no GST or a cancelled GST, so K01's "GST cancelled" could not be shown | The tile is always shown: optional when the owner has no GST, required (and checked against the registry) when the GSTIN is cancelled or suspended |
+| Any contract length was accepted (1000 months was saved and accepted) | Only the lengths shown on screen (and setup over 1, 6 or 12 months) are accepted |
+| A salesperson callback could be requested after accepting, dated with the real date instead of the app's date; "Accept" twice was recorded twice | Callback only for an open quote, dated like the rest of the app; a second "Accept" changes nothing |
+| The AI's price filter knew "rupee" only in English, Hindi and Marathi | Rupee words and short forms added for Gujarati, Tamil, Telugu and Kannada |
+| With no AI key, voice said "not available in this language" | It now says voice is switched off (the mic button is hidden anyway) |

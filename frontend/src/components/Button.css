@@ -1,0 +1,36 @@
+.ab-btn {
+  appearance: none;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 3.25rem; /* 52 */
+  padding: 0 1.25rem;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--duration-1) var(--ease-spring), background-color var(--duration-1) var(--ease-spring);
+}
+.ab-btn:active:not(:disabled) { transform: scale(0.98); }
+.ab-btn--block { width: 100%; }
+.ab-btn--sm { min-height: 2.25rem; padding: 0 0.75rem; border-radius: 10px; font-size: 0.875rem; }
+
+.ab-btn--primary { background: var(--color-brand); color: var(--color-on-brand); }
+.ab-btn--primary:hover { background: var(--color-brand-press); }
+.ab-btn--secondary { background: var(--color-fill); color: var(--color-ink); }
+.ab-btn--plain { background: transparent; color: var(--color-brand-ink); }
+.ab-btn--destructive { background: var(--color-danger-tint); color: var(--color-danger); }
+.ab-btn--trust { background: var(--color-trust); color: var(--color-on-trust); }
+.ab-btn--trust:hover { background: var(--color-trust-press); }
+
+.ab-btn:disabled, .ab-btn[aria-disabled="true"] {
+  background: var(--color-fill);
+  color: var(--color-ink-3);
+  cursor: not-allowed;
+}

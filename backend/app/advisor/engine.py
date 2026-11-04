@@ -26,7 +26,9 @@ from .parse import number as _number
 from .parse import yes_no as _yes_no
 
 log = logging.getLogger("advisor")
-PRICE_TALK = re.compile(r"₹|\brs\.?\s*\d|\brupees?\b|रुपय|रुपए|रुपये|\d+\s*/\s*(month|mo)\b|per month", re.I)
+# rupee words and short forms in all 7 languages (Hindi/Marathi, Gujarati, Tamil, Telugu, Kannada)
+PRICE_TALK = re.compile(r"₹|\brs\.?\s*\d|\brupees?\b|रुपय|रुपए|रुपये|रु\.?\s*\d|રૂપિય|રૂ\.?\s*\d|ரூபாய|ரூ\.?\s*\d"
+                        r"|రూపాయ|రూ\.?\s*\d|ರೂಪಾಯ|ರೂ\.?\s*\d|\d+\s*/\s*(month|mo)\b|per month", re.I)
 NEED_HINTS = {
     "billing_pos": "GST billing / UPI & card payments", "whatsapp": "reach customers on WhatsApp",
     "sms": "bulk SMS", "cctv": "security cameras", "guest_wifi": "Wi-Fi for customers", "website": "website",

@@ -1,89 +1,115 @@
-import { useEffect, useState } from "react";
-import { api } from "../api.js";
-import { longDate } from "../i18n.js";
-
-const DECISION_STYLE = { PASS: "ok", REVIEW: "warn", INCOMPLETE: "bad", RETAKE: "bad", REJECT: "bad" };
+import { useEffect, useState } from 'react';
+import { FileText, Shield, Trash2 } from 'lucide-react';
+import { api } from '../api.js';
+import { longDate } from '../i18n.js';
+import { OUTCOME, shortTime } from '../lib/ui.js';
+import AppHeader from '../components/AppHeader.jsx';
+import BottomSheet from '../components/BottomSheet.jsx';
+import Button from '../components/Button.jsx';
+import DecisionCard from '../components/DecisionCard.jsx';
+import Note from '../components/Note.jsx';
+import Timeline from '../components/Timeline.jsx';
 
 function steps(status, tr, lang) {
-  const done = new Set(status.timeline.map((s) => s.step));
+  const at = (step) => status.timeline.filter((s) => s.step === step).pop()?.at;
   const decision = status.kyc?.decision;
   const live = status.quote?.expected_live;
-  return [
-    { label: tr("ui.step.quote_accepted"), state: done.has("quote_accepted") ? "done" : "todo" },
-    { label: tr("ui.step.consent_given"), state: done.has("consent_given") ? "done" : "todo" },
-    { label: tr("ui.step.documents"), state: done.has("document_read") ? "done" : "todo" },
-    {
-      label: tr("ui.step.kyc"),
-      state: decision === "PASS" ? "done" : decision === "REVIEW" ? "warn" : decision ? "bad" : "todo",
-      note: decision === "REVIEW" ? tr("ui.step.review") : decision && decision !== "PASS" ? status.kyc.headline : "",
-    },
-    {
-      label: tr("ui.step.installation"),
-      state: done.has("installation_booked") ? "current" : "todo",
-      note: done.has("installation_booked") && live ? tr("ui.step.installation_on", { date: longDate(live, lang) }) : "",
-    },
+  const booked = at('installation_booked');
+  const list = [
+    { title: tr('ui.step.quote_accepted'), at: at('quote_accepted') },
+    { title: tr('ui.step.consent_given'), at: at('consent_given') },
+    { title: tr('ui.step.documents'), at: at('document_read') },
+    { title: tr('ui.step.kyc'), at: decision === 'PASS' ? at('kyc_checked') : null,
+      detail: decision && decision !== 'PASS' ? status.kyc.headline : null },
+    { title: tr('ui.step.installation'), at: booked,
+      detail: live ? tr('ui.step.installation_on', { date: longDate(live, lang) }) : null },
   ];
+  const now = list.findIndex((s) => !s.at);
+  return list.map((s, i) => ({
+    title: s.title,
+    detail: s.detail || (s.at ? shortTime(s.at, lang) : null),
+    state: booked && i === list.length - 1 ? 'now' : s.at ? 'done' : i === now ? 'now' : 'todo',
+  }));
 }
 
-export default function Tracker({ state, update, tr, onErased }) {
+export default function Tracker({ state, update, tr, actions, go, onHome, onErased }) {
   const [status, setStatus] = useState(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [confirm, setConfirm] = useState(false);
+  const [erasing, setErasing] = useState(false);
+  const lang = state.lang;
 
   useEffect(() => {
-    api.status(state.id).then(setStatus).catch((e) => setError(e.status === 404 ? "" : tr("ui.offline")));
+    api.status(state.id).then(setStatus).catch((e) => setError(e.status === 404 ? '' : tr('ui.offline')));
   }, [state.id, state.kyc]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function erase() {
-    if (!window.confirm(tr("ui.delete_confirm"))) return;
+    setErasing(true);
     try {
       const out = await api.erase(state.id);
       onErased(out.message);
     } catch {
-      setError(tr("ui.error"));
+      setError(tr('ui.error'));
+      setErasing(false);
+      setConfirm(false);
     }
   }
 
-  if (!status) return <main className="page">{error && <p className="notice bad">{error}</p>}</main>;
+  const kyc = status?.kyc;
+  const live = status?.quote?.expected_live;
+  const fixable = kyc && ['RETAKE', 'INCOMPLETE'].includes(kyc.decision);
 
-  const kyc = status.kyc;
-  const next = !status.consent ? "consent" : !kyc || kyc.decision !== "PASS" ? "documents" : null;
   return (
-    <main className="page tracker">
-      <h1>{tr("ui.tracker_title")}</h1>
+    <div className="app-shell" lang={lang}>
+      <AppHeader title={tr('ui.tracker_title')} onBack={onHome} backLabel={tr('ui.back')} actions={actions} />
+      <main className="page screen-in">
+        {!status ? (
+          <>
+            <div className="skeleton" style={{ height: 150 }} />
+            <div className="skeleton" style={{ height: 260 }} />
+            {error && <Note tone="warn">{error}</Note>}
+          </>
+        ) : (
+          <>
+            {kyc ? (
+              <DecisionCard
+                outcome={OUTCOME[kyc.decision]}
+                title={kyc.headline}
+                body={kyc.issues.length > 0 ? (
+                  <ul className="issue-list">{kyc.issues.map((i, n) => <li key={n}>{i.message}</li>)}</ul>
+                ) : null}
+                next={tr(`ui.next.${kyc.decision}`, { date: live ? longDate(live, lang) : '' })}
+                action={fixable ? <Button block icon={FileText} onClick={() => update({ screen: 'documents' })}>{tr('ui.fix_docs')}</Button> : null}
+              />
+            ) : (
+              <section className="card stack">
+                <p className="t-headline">{tr('ui.next.NONE')}</p>
+                <Button block onClick={() => update({ screen: status.consent ? 'documents' : 'consent' })}>
+                  {status.consent ? tr('ui.documents_title') : tr('ui.consent_continue')}
+                </Button>
+              </section>
+            )}
 
-      {kyc && (
-        <section className={`result ${DECISION_STYLE[kyc.decision]}`}>
-          <p className="lead">{kyc.headline}</p>
-          {kyc.issues.length > 0 && (
-            <ul>
-              {kyc.issues.map((i, n) => <li key={n}>{i.message}</li>)}
-            </ul>
-          )}
-          {["RETAKE", "INCOMPLETE", "REJECT"].includes(kyc.decision) && (
-            <p className="muted small">{tr("ui.fix_and_resubmit")}</p>
-          )}
-        </section>
-      )}
+            <section className="card">
+              <h2 className="section-label" style={{ margin: '0 0 16px' }}>{tr('ui.progress')}</h2>
+              <Timeline steps={steps(status, tr, lang)} label={tr('ui.progress')} />
+            </section>
 
-      <ol className="steps">
-        {steps(status, tr, state.lang).map((s, i) => (
-          <li key={i} className={s.state}>
-            <span className="dot" aria-hidden="true">{{ done: "✓", warn: "!", bad: "!", current: "●" }[s.state] || i + 1}</span>
-            <div>
-              <div>{s.label}</div>
-              {s.note && <div className="muted small">{s.note}</div>}
-            </div>
-          </li>
-        ))}
-      </ol>
+            {error && <Note tone="warn">{error}</Note>}
+            <Button variant="plain" block icon={Shield} onClick={() => go('privacy')}>{tr('ui.privacy_open')}</Button>
+            <Button variant="plain" block icon={Trash2} className="danger-btn" onClick={() => setConfirm(true)}>
+              {tr('ui.delete_data')}
+            </Button>
+            <p className="foot-note">{tr('ui.delete_hint')}</p>
+          </>
+        )}
+      </main>
 
-      {next && (
-        <button className="primary" onClick={() => update({ screen: next })}>
-          {next === "consent" ? tr("ui.consent_continue") : tr("ui.documents_title")}
-        </button>
-      )}
-      {error && <p className="notice bad">{error}</p>}
-      <button className="danger-link" onClick={erase}>{tr("ui.delete_data")}</button>
-    </main>
+      <BottomSheet open={confirm} onClose={() => setConfirm(false)} title={tr('ui.delete_title')} closeLabel={tr('ui.cancel')}>
+        <p className="t-body t-secondary">{tr('ui.delete_confirm')}</p>
+        <Button variant="destructive" block icon={Trash2} onClick={erase} disabled={erasing}>{tr('ui.delete_data')}</Button>
+        <Button variant="secondary" block onClick={() => setConfirm(false)}>{tr('ui.cancel')}</Button>
+      </BottomSheet>
+    </div>
   );
 }

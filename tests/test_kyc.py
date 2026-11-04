@@ -139,3 +139,12 @@ def test_owner_without_gst_but_with_udyam_is_checked_against_udyam():
 def test_owner_without_gst_still_gets_bill_and_id_checks():
     docs = {**docs_for("K11"), "gst_certificate": None, "udyam_certificate": None}   # K11's bill is too old
     assert "address_proof_too_old" in assess(docs, KycContext(TODAY, gst_registered=False)).codes
+
+
+def test_owner_without_gst_cannot_pass_with_someone_elses_id():
+    # the bill is the only proof of the business: an ID for another business must go to a person
+    docs = {**docs_for("K03"), "gst_certificate": None, "udyam_certificate": None,
+            "signatory_id": docs_for("K07")["signatory_id"]}                    # Ganesh Woodcraft bill, clinic ID
+    res = assess(docs, KycContext(TODAY, gst_registered=False))
+    assert res.decision == "REVIEW" and "signatory_business_mismatch" in res.codes
+    assert any("bill is for" in i.evidence for i in res.issues)

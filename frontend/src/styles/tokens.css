@@ -1,0 +1,139 @@
+/* Accel Business – Udyam Digital · design tokens
+   Light is the default. Dark follows the OS unless data-theme="light"|"dark" is set on <html>. */
+
+:root {
+  /* Colour · roles */
+  --color-brand: #D23B32;          /* Vermilion, darkened from #E0443A so white text passes AA */
+  --color-brand-press: #B8322A;
+  --color-brand-ink: #B8322A;      /* brand as text on light surfaces */
+  --color-on-brand: #FFFFFF;
+  --color-brand-tint: #FDECEA;
+  --color-accent: #F2A900;         /* Marigold: fills only */
+  --color-accent-ink: #7A4E00;     /* Marigold as text */
+  --color-accent-tint: #FFF4D6;
+  --color-trust: #1E2A5A;          /* Deep indigo: consent, KYC, privacy */
+  --color-trust-press: #141D42;
+  --color-on-trust: #FFFFFF;
+  --color-trust-tint: #ECEFF8;
+  --color-trust-ink: #1E2A5A;
+  --color-ink: #1D1D1F;
+  --color-ink-2: #6E6E73;
+  --color-ink-3: #AEAEB2;          /* disabled text, decoration only */
+  --color-canvas: #F5F5F7;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #FAFAFB;
+  --color-fill: rgba(118, 118, 128, 0.12);
+  --color-fill-2: rgba(118, 118, 128, 0.22);
+  --color-hairline: #E5E5EA;
+  --color-success: #157F4A;  --color-success-tint: #E6F4EC;
+  --color-warning: #915800;  --color-warning-tint: #FFF2D9;
+  --color-info: #2563D9;     --color-info-tint: #E9F0FD;
+  --color-danger: #B4183D;   --color-danger-tint: #FCE8EC;
+  --color-glass: rgba(255, 255, 255, 0.74);
+  --color-glass-solid: #FFFFFF;
+  --color-scrim: rgba(0, 0, 0, 0.34);
+
+  /* Type */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
+  --font-deva: "Noto Sans Devanagari", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --text-large-title: 2.125rem;  /* 34 */
+  --text-title: 1.375rem;        /* 22 */
+  --text-headline: 1.0625rem;    /* 17 semibold */
+  --text-body: 1.0625rem;        /* 17 */
+  --text-callout: 0.9375rem;     /* 15 */
+  --text-footnote: 0.8125rem;    /* 13 */
+  --leading-tight: 1.15;
+  --leading-body: 1.45;
+  --leading-deva: 1.6;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Spacing · 8 px grid */
+  --space-0: 0.25rem;  /* 4 */
+  --space-1: 0.5rem;   /* 8 */
+  --space-2: 1rem;     /* 16 */
+  --space-3: 1.5rem;   /* 24 */
+  --space-4: 2rem;     /* 32 */
+  --space-5: 2.5rem;   /* 40 */
+  --space-6: 3rem;     /* 48 */
+  --tap-min: 3rem;     /* 48 px minimum target */
+
+  /* Radius */
+  --radius-xs: 8px;
+  --radius-s: 12px;    /* fields */
+  --radius-m: 16px;    /* grouped lists */
+  --radius-l: 20px;    /* cards */
+  --radius-xl: 28px;   /* sheets */
+  --radius-pill: 999px;
+
+  /* Depth */
+  --shadow-1: 0 1px 2px rgba(29, 29, 31, 0.05), 0 1px 1px rgba(29, 29, 31, 0.03);
+  --shadow-2: 0 8px 24px rgba(29, 29, 31, 0.07), 0 1px 3px rgba(29, 29, 31, 0.05);
+  --shadow-3: 0 20px 56px rgba(29, 29, 31, 0.18), 0 2px 8px rgba(29, 29, 31, 0.06);
+  --blur-glass: saturate(180%) blur(20px);
+
+  /* Motion */
+  --duration-1: 200ms;   /* press, toggle */
+  --duration-2: 240ms;   /* switch, expand */
+  --duration-3: 300ms;   /* sheet, screen */
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Focus */
+  --focus-ring: 0 0 0 3px var(--color-surface), 0 0 0 6px var(--color-info);
+
+  /* Layout */
+  --app-max: 480px;
+  --gutter: 1rem;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --color-brand: #FF6B5E; --color-brand-press: #FF8478; --color-brand-ink: #FF8A7F; --color-on-brand: #2A0906; --color-brand-tint: #3A1714;
+  --color-accent: #FFC233; --color-accent-ink: #FFC94D; --color-accent-tint: #33270A;
+  --color-trust: #9DB0FF; --color-trust-press: #B6C4FF; --color-on-trust: #0B1230; --color-trust-tint: #1A2140; --color-trust-ink: #B8C6FF;
+  --color-ink: #F5F5F7; --color-ink-2: #A1A1A6; --color-ink-3: #636366;
+  --color-canvas: #000000; --color-surface: #1C1C1E; --color-surface-2: #2C2C2E;
+  --color-fill: rgba(118, 118, 128, 0.24); --color-fill-2: rgba(118, 118, 128, 0.36); --color-hairline: #38383A;
+  --color-success: #4CD08A; --color-success-tint: #0F2E1D;
+  --color-warning: #FFB547; --color-warning-tint: #33240A;
+  --color-info: #7AA7FF;    --color-info-tint: #12213F;
+  --color-danger: #FF7B9A;  --color-danger-tint: #3A1220;
+  --color-glass: rgba(28, 28, 30, 0.72); --color-glass-solid: #1C1C1E;
+  --shadow-1: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  --shadow-2: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-3: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 20px 56px rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-brand: #FF6B5E; --color-brand-press: #FF8478; --color-brand-ink: #FF8A7F; --color-on-brand: #2A0906; --color-brand-tint: #3A1714;
+    --color-accent: #FFC233; --color-accent-ink: #FFC94D; --color-accent-tint: #33270A;
+    --color-trust: #9DB0FF; --color-trust-press: #B6C4FF; --color-on-trust: #0B1230; --color-trust-tint: #1A2140; --color-trust-ink: #B8C6FF;
+    --color-ink: #F5F5F7; --color-ink-2: #A1A1A6; --color-ink-3: #636366;
+    --color-canvas: #000000; --color-surface: #1C1C1E; --color-surface-2: #2C2C2E;
+    --color-fill: rgba(118, 118, 128, 0.24); --color-fill-2: rgba(118, 118, 128, 0.36); --color-hairline: #38383A;
+    --color-success: #4CD08A; --color-success-tint: #0F2E1D;
+    --color-warning: #FFB547; --color-warning-tint: #33240A;
+    --color-info: #7AA7FF;    --color-info-tint: #12213F;
+    --color-danger: #FF7B9A;  --color-danger-tint: #3A1220;
+    --color-glass: rgba(28, 28, 30, 0.72); --color-glass-solid: #1C1C1E;
+    --shadow-1: 0 0 0 1px rgba(255, 255, 255, 0.04);
+    --shadow-2: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-3: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 20px 56px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-1: 0ms;
+    --duration-2: 0ms;
+    --duration-3: 0ms;
+  }
+}

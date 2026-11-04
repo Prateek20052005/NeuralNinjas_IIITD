@@ -1,0 +1,11 @@
+.ab-hdr { position: sticky; top: 0; z-index: 5; background: var(--color-glass-solid); border-bottom: 1px solid var(--color-hairline); }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ab-hdr { background: var(--color-glass); -webkit-backdrop-filter: var(--blur-glass); backdrop-filter: var(--blur-glass); }
+}
+.ab-hdr__row { display: grid; grid-template-columns: minmax(48px, auto) 1fr minmax(48px, auto); align-items: center; gap: 4px; min-height: 3.5rem; padding: 4px 8px; }
+.ab-hdr__title { text-align: center; font-size: var(--text-headline); font-weight: var(--weight-semibold); line-height: 1.2; }
+.ab-hdr__sub { display: block; font-size: 0.75rem; font-weight: var(--weight-medium); color: var(--color-ink-2); }
+.ab-hdr__end { display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+
+.ab-icon-btn { width: var(--tap-min); height: var(--tap-min); display: inline-grid; place-items: center; padding: 0; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--color-ink); cursor: pointer; transition: background-color var(--duration-1) var(--ease-spring); }
+.ab-icon-btn:hover { background: var(--color-fill); }

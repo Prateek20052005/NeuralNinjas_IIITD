@@ -1,0 +1,26 @@
+.ab-chips { display: flex; flex-wrap: wrap; gap: var(--space-1); }
+.ab-chips--scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+
+.ab-chip {
+  appearance: none;
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 0 1.125rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-1);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition: background-color var(--duration-1) var(--ease-spring), transform var(--duration-1) var(--ease-spring);
+}
+.ab-chip:active { transform: scale(0.97); }
+.ab-chip.is-on { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-surface); }
+.ab-chip--num { min-width: 3.5rem; padding: 0 0.875rem; font-variant-numeric: tabular-nums; }

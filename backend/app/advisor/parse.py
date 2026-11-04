@@ -14,10 +14,13 @@ YES = {"yes", "y", "yeah", "yep", "sure", "true", "haan", "han", "ha", "ho", "ho
        # Telugu
        "అవును", "అవునండి", "సరే", "కావాలి", "avunu", "avnu", "sare", "kavali", "kaavali",
        # Kannada
-       "ಹೌದು", "ಹೂಂ", "ಸರಿ", "ಬೇಕು", "ಅಗತ್ಯ", "haudu", "howdu", "beku"}
+       "ಹೌದು", "ಹೂಂ", "ಸರಿ", "ಬೇಕು", "ಅಗತ್ಯ", "haudu", "howdu", "beku",
+       # Hindi / Marathi / Hinglish "want it", "of course"
+       "chahiye", "chahie", "chaiye", "चाहिए", "चाहिये", "pahije", "पाहिजे", "zaroor", "zarur", "jarur", "जरूर",
+       "ज़रूर", "bilkul", "बिल्कुल", "ok", "okay"}
 NO = {"no", "n", "nope", "not", "don't", "dont", "without", "false", "nahi", "nahin", "nai", "naahi",
       "नहीं", "नही", "नाही", "नको",
-      "ના", "નહીં", "નહિ", "નથી", "na", "nathi",
+      "ના", "નહીં", "નહિ", "નથી", "nathi",
       "இல்லை", "இல்ல", "வேண்டாம்", "வேணாம்", "தேவையில்லை", "illai", "illa", "vendam", "venam", "vendaam",
       "లేదు", "కాదు", "వద్దు", "లేవు", "అక్కర్లేదు", "ledu", "kaadu", "vaddu",
       "ಇಲ್ಲ", "ಬೇಡ", "ಅಲ್ಲ", "ಬೇಕಾಗಿಲ್ಲ", "ಅಗತ್ಯವಿಲ್ಲ", "beda", "alla"}
@@ -124,10 +127,16 @@ def kind_of_business(text) -> str | None:
 NO_ENDINGS = ("ಿಲ್ಲ", "ில்லை", "ில்ல", "లేదు")
 
 
+# "na" is Gujarati (and Hindi) for no, but in Hinglish it is also a tag after a verb: "haan na", "chahiye na",
+# "lagwa do na" all mean yes. So it means no only when the answer starts with it ("na", "na bhai", "na, nahi").
+TAG_NO = {"na", "naa", "ना"}
+
+
 def yes_no(text) -> bool | None:
     """True / False for a clear yes or no; None if unclear. 'No' wins if both appear."""
-    words = _words(text)
-    if words & NO or any(w.endswith(NO_ENDINGS) for w in words):
+    order = [w.strip(".,!?।") for w in str(text).lower().split()]
+    words = set(order)
+    if words & NO or any(w.endswith(NO_ENDINGS) for w in words) or (order and order[0] in TAG_NO):
         return False
     if words & YES:
         return True

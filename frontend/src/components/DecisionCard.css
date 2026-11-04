@@ -1,0 +1,11 @@
+.ab-dcard { display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: var(--radius-l); background: var(--color-surface); box-shadow: var(--shadow-2); }
+.ab-dcard__head { display: flex; gap: 14px; align-items: center; }
+.ab-dcard__title { margin: 0; font-size: 1.25rem; font-weight: var(--weight-semibold); line-height: 1.3; }
+.ab-dcard__ic { width: 52px; height: 52px; flex: none; border-radius: 16px; display: grid; place-items: center; }
+.ab-dcard__ic--approved { background: var(--color-success-tint); color: var(--color-success); }
+.ab-dcard__ic--retake { background: var(--color-warning-tint); color: var(--color-warning); }
+.ab-dcard__ic--review { background: var(--color-info-tint); color: var(--color-info); }
+.ab-dcard__ic--rejected { background: var(--color-danger-tint); color: var(--color-danger); }
+.ab-dcard__next { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: var(--color-surface-2); border: 1px solid var(--color-hairline); font-size: var(--text-callout); }
+.ab-dcard__next svg { flex: none; margin-top: 2px; color: var(--color-brand-ink); }
+.ab-dcard__ic--incomplete { background: var(--color-warning-tint); color: var(--color-warning); }

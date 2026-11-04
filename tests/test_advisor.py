@@ -381,3 +381,19 @@ def test_every_language_file_is_complete_with_the_same_placeholders():
                                      ("GST చేయించలేదు", False), ("ಎಲ್ಲ ಬೇಕು", True), ("ಬೇಕಾಗಿಲ್ಲ", False)])
 def test_no_inside_the_verb_ending(text, yn):
     assert yes_no(text) is yn
+
+
+@pytest.mark.parametrize("text,yn", [("haan na", True), ("chahiye na", True), ("हाँ ना", True), ("चाहिए ना", True),
+                                     ("na", False), ("na bhai", False), ("Na, nahi chahiye", False), ("ना", False),
+                                     ("ના", False), ("nahi chahiye", False), ("bilkul nahi", False), ("zaroor", True)])
+def test_na_after_a_verb_is_a_hinglish_tag_not_a_no(text, yn):
+    # "na" means no only when the answer starts with it; "haan na" / "chahiye na" are emphatic yeses
+    assert yes_no(text) is yn
+
+
+@pytest.mark.parametrize("sentence", ["இதன் விலை மாதம் 599 ரூபாய்", "ఇది నెలకు 599 రూపాయలు", "ಇದಕ್ಕೆ ತಿಂಗಳಿಗೆ 599 ರೂಪಾಯಿ",
+                                      "આ દર મહિને 599 રૂપિયા", "કિંમત રૂ. 599", "रु. 599 महीना"])
+def test_ai_price_talk_is_caught_in_every_language(sentence):
+    from backend.app.advisor.engine import PRICE_TALK
+    assert PRICE_TALK.search(sentence)
+    assert not PRICE_TALK.search("வாட்ஸ்அப் வாடிக்கையாளர்களை அடைய உதவும்")   # no price: kept

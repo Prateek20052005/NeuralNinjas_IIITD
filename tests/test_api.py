@@ -161,3 +161,73 @@ def test_plan_tiers_contract_and_setup_choices(client):
     assert step["tier"] == "basic" and step["contract_months"] == 24
     assert client.post(f"/api/applications/{app_id}/plan", json={"tier": "full"}).status_code == 409
     assert client.post(f"/api/applications/{app_id}/plan", json={"tier": "gold"}).status_code == 409
+
+
+# ---------- review fixes (Nov 2026) ----------
+
+def test_cancelled_gstin_still_needs_the_certificate_and_is_rejected(client):
+    # K01 types a cancelled GSTIN: the GST certificate stays required and the registry check rejects it
+    app_id = client.post("/api/applications", json={"language": "en"}).json()["id"]
+    client.post(f"/api/applications/{app_id}/message", json={"text": "37IHKXV5167L1ZS"})
+    docs = client.get(f"/api/applications/{app_id}").json()["documents"]
+    assert docs["gst_certificate"]["required"] and docs["udyam_certificate"]["required"]
+    client.post(f"/api/applications/{app_id}/consent", json={"purposes": ["kyc"]})
+    for doc_type in ("gst_certificate", "address_proof", "signatory_id"):
+        assert upload(client, app_id, doc_type, "K01").status_code == 200
+    assert client.post(f"/api/applications/{app_id}/kyc").json()["decision"] == "REJECT"
+    assert "gstin_cancelled" in main.store.get(app_id).kyc.codes
+
+
+def test_only_offered_contract_lengths_and_setup_spreads(client):
+    app_id, rec = chat_to_quote(client)
+    plan = f"/api/applications/{app_id}/plan"
+    offered = [c["months"] for c in rec["quote"]["contract_options"]]
+    for bad in (1000, 36, -5, 0, 7):
+        assert bad in offered or client.post(plan, json={"contract_months": bad}).status_code == 422
+    assert client.post(plan, json={"contract_months": offered[-1]}).json()["quote"]["contract_months"] == offered[-1]
+    assert client.post(plan, json={"setup_months": 7}).status_code == 422
+    assert client.post(plan, json={"setup_months": 6}).status_code == 200
+
+
+def test_accept_twice_and_callback_rules(client):
+    app_id, _ = chat_to_quote(client)
+    cb = f"/api/applications/{app_id}/sales-callback"
+    assert client.post(cb, json={"phone": "98765 43210", "consent": True}).status_code == 200
+    a = main.store.get(app_id)
+    assert a.callback["requested_at"] == main.TODAY.isoformat()          # same calendar as the rest of the app
+    assert client.post(f"/api/applications/{app_id}/accept").status_code == 200
+    assert client.post(f"/api/applications/{app_id}/accept").status_code == 200   # second tap: no error...
+    assert sum(s["step"] == "quote_accepted" for s in a.timeline) == 1             # ...and recorded once
+    assert client.post(cb, json={"phone": "98765 43210", "consent": True}).status_code == 409   # plan already accepted
+    fresh = client.post("/api/applications", json={"language": "en"}).json()["id"]
+    assert client.post(f"/api/applications/{fresh}/sales-callback",
+                       json={"phone": "98765 43210", "consent": True}).status_code == 409   # no quote yet
+    for done in (app_id, fresh):   # leave no callback behind for the back-office tests
+        assert client.delete(f"/api/applications/{done}").json()["deleted"]
+
+
+def test_progress_status_survives_reload_and_uses_the_case_date(client, monkeypatch):
+    monkeypatch.setenv("APP_TODAY", "2026-07-15")
+    r = client.post("/api/applications", json={"language": "en"}).json()
+    app_id, q = r["id"], r["question"]
+    assert (q["step"], q["steps"]) == (1, 9)                  # GST number first; confirm step added once it's known
+    out = client.post(f"/api/applications/{app_id}/message", json={"text": ANSWERS["gstin"]}).json()
+    assert out["question"]["slot"] == "gst_confirm" and out["question"]["step"] == 2
+    while out.get("question"):
+        assert 1 <= out["question"]["step"] <= out["question"]["steps"]
+        out = client.post(f"/api/applications/{app_id}/message", json={"text": ANSWERS[out["question"]["slot"]]}).json()
+    client.post(f"/api/applications/{app_id}/accept")
+    client.post(f"/api/applications/{app_id}/consent", json={"purposes": ["kyc"]})
+    upload(client, app_id, "gst_certificate")
+    with open(DOCS / "K03_signatory_id.png", "rb") as f:     # an ID photo sent as the bill: needs a retake
+        client.post(f"/api/applications/{app_id}/documents/address_proof", files={"file": ("p.png", f, "image/png")})
+    s = client.get(f"/api/applications/{app_id}").json()      # what the documents screen loads after a reload
+    docs = s["documents"]
+    assert docs["gst_certificate"]["ok"] and docs["gst_certificate"]["fields"]
+    assert docs["address_proof"]["uploaded"] and not docs["address_proof"]["ok"]
+    assert "doesn't look like" in docs["address_proof"]["message"]
+    assert "ok" not in docs["signatory_id"]                   # not uploaded yet
+    assert all(step["at"].startswith("2026-07-15") for step in s["timeline"])   # same calendar as prices and dates
+    assert s["consent"]["given_at"].startswith("2026-07-15")
+    assert s["retention_hours"] > 0 and s["delete_after"] >= "2026-07-15"
+    assert client.delete(f"/api/applications/{app_id}").json()["deleted"]

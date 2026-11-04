@@ -1,0 +1,15 @@
+.ab-tl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.ab-tl__step { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; padding-bottom: 22px; }
+.ab-tl__step::before { content: ""; position: absolute; left: 13px; top: 30px; bottom: 2px; width: 2px; border-radius: 1px; background: var(--color-hairline); }
+.ab-tl__step:last-child { padding-bottom: 0; }
+.ab-tl__step:last-child::before { display: none; }
+.ab-tl__step.is-done::before { background: var(--color-success); }
+
+.ab-tl__dot { position: relative; z-index: 1; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--color-surface); border: 2px solid var(--color-hairline); color: var(--color-ink-2); }
+.is-done .ab-tl__dot { background: var(--color-success); border-color: var(--color-success); color: var(--color-surface); }
+.is-now .ab-tl__dot { border-color: var(--color-brand); box-shadow: 0 0 0 5px var(--color-brand-tint); }
+.is-now .ab-tl__dot i { width: 8px; height: 8px; border-radius: 50%; background: var(--color-brand); }
+
+.ab-tl__title { margin: 3px 0 0; font-size: var(--text-body); font-weight: var(--weight-semibold); line-height: 1.3; }
+.is-todo .ab-tl__title { color: var(--color-ink-2); font-weight: var(--weight-medium); }
+.ab-tl__detail { margin: 2px 0 0; font-size: var(--text-footnote); color: var(--color-ink-2); }

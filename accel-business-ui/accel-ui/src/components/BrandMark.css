@@ -1,0 +1,4 @@
+.ab-mark { display: inline-flex; align-items: center; gap: 8px; }
+.ab-mark__tile { display: grid; place-items: center; background: var(--color-brand); }
+.ab-mark__word { font-size: var(--text-headline); font-weight: var(--weight-bold); letter-spacing: -0.02em; }
+.ab-mark__word small { font-size: inherit; font-weight: var(--weight-medium); color: var(--color-ink-2); }

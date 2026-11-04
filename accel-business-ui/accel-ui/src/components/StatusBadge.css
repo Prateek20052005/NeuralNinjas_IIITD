@@ -1,0 +1,17 @@
+.ab-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 3px 10px 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.ab-badge--approved { background: var(--color-success-tint); color: var(--color-success); }
+.ab-badge--retake { background: var(--color-warning-tint); color: var(--color-warning); }
+.ab-badge--review { background: var(--color-info-tint); color: var(--color-info); }
+.ab-badge--rejected { background: var(--color-danger-tint); color: var(--color-danger); }
+.ab-badge--incomplete { background: var(--color-fill); color: var(--color-ink-2); }

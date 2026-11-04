@@ -1,0 +1,24 @@
+@import "./ProductCard.css";
+
+.ab-trow {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 4rem;
+  padding: 14px var(--space-2);
+  cursor: pointer;
+}
+.ab-trow__ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--color-accent-tint);
+  color: var(--color-accent-ink);
+}
+.ab-trow__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ab-trow__end { display: flex; align-items: center; gap: 10px; }
+.ab-trow__price { font-size: var(--text-callout); font-weight: var(--weight-semibold); color: var(--color-ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ab-trow__price.is-on { color: var(--color-ink); }

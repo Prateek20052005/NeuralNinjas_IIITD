@@ -7,8 +7,8 @@ export class ApiError extends Error {
   }
 }
 
-async function call(method, path, body) {
-  const opts = { method, headers: {} };
+async function call(method, path, body, headers = {}) {
+  const opts = { method, headers: { ...headers } };
   if (body instanceof FormData) opts.body = body;
   else if (body !== undefined) {
     opts.headers["Content-Type"] = "application/json";
@@ -56,4 +56,5 @@ export const api = {
   checkKyc: (id) => call("POST", `/applications/${id}/kyc`),
   status: (id) => call("GET", `/applications/${id}`),
   erase: (id) => call("DELETE", `/applications/${id}`),
+  backoffice: (key) => call("GET", "/backoffice/applications", undefined, { "x-admin-key": key }),   // staff only
 };

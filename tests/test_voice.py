@@ -79,7 +79,8 @@ def test_groq_failure_asks_to_try_again_or_type(client, monkeypatch):
 
 def test_no_voice_without_an_ai_key(client, monkeypatch):
     monkeypatch.setattr(main, "transcriber", type("Off", (), {"available": False})())
-    assert say(client, start(client, "hi")).status_code == 404
+    r = say(client, start(client, "hi"))
+    assert r.status_code == 503 and "switched off" in r.json()["detail"]   # off, not "wrong language"
     assert client.get("/api/health").json()["voice_languages"] == []
 
 

@@ -1,0 +1,4 @@
+.ab-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2); padding: var(--space-3) 28px; text-align: center; }
+.ab-empty__illo { width: 180px; min-height: 160px; display: grid; place-items: center; }
+.ab-empty__illo:empty { border: 1.5px dashed var(--color-ink-3); border-radius: var(--radius-l); }
+.ab-empty__action { align-self: stretch; margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }

@@ -1,0 +1,22 @@
+.ab-sheet {
+  position: fixed;
+  inset: auto 0 0 0;
+  width: 100%;
+  max-width: var(--app-max);
+  max-height: 92dvh;
+  margin: 0 auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-3);
+  overflow: auto;
+}
+.ab-sheet[open] { animation: ab-sheet-up var(--duration-3) var(--ease-spring); }
+.ab-sheet::backdrop { background: var(--color-scrim); }
+.ab-sheet__body { display: flex; flex-direction: column; gap: var(--space-2); padding: 8px var(--gutter) calc(24px + env(safe-area-inset-bottom)); }
+.ab-sheet__grab { width: 36px; height: 5px; border-radius: 3px; background: var(--color-fill-2); align-self: center; margin-bottom: 4px; }
+.ab-sheet__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ab-sheet__close { width: var(--tap-min); height: var(--tap-min); flex: none; border: 0; border-radius: 50%; background: var(--color-fill); color: var(--color-ink); display: grid; place-items: center; cursor: pointer; }
+@keyframes ab-sheet-up { from { transform: translateY(100%); } to { transform: none; } }

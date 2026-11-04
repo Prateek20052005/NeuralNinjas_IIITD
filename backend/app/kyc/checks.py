@@ -57,7 +57,7 @@ class KycContext:
     today: date
     claimed_gstin: str | None = None      # GSTIN the owner typed in the advisor chat, if any
     udyam_number: str | None = None       # typed instead of uploading the Udyam certificate
-    gst_registered: bool = True           # False: owner has no active GST, so GST and Udyam are optional
+    gst_registered: bool = True           # False: owner never registered for GST, so GST and Udyam are optional
 
 
 def required_documents(gst_registered: bool) -> list[str]:
@@ -197,6 +197,11 @@ def assess(docs: dict[str, ParsedDoc | None], ctx: KycContext) -> KycResult:
             add("address_proof_future_date", "REVIEW", "address_proof", f"Bill dated in the future: {billed}")
 
     # ---- 5. signatory ID: valid, for this business, and a person on record
+    # No GST or Udyam (small owners need neither): the bill is the only other proof of the business, so the ID must
+    # be for the business named on the bill. Otherwise anyone's bill plus anyone's ID would pass.
+    from_bill = not trade and bill is not None and bool(bill.fields.get("billed_to"))
+    if from_bill:
+        trade = bill.fields["billed_to"]
     lead = find_lead(gstin, udyam)
     if sid:
         valid = parse_date(sid.fields.get("valid_till", ""))
@@ -206,7 +211,8 @@ def assess(docs: dict[str, ParsedDoc | None], ctx: KycContext) -> KycResult:
             add("signatory_id_expired", "RETAKE", "signatory_id", f"ID expired on {valid}")
         if trade and _norm(sid.fields.get("business")) != _norm(trade):
             add("signatory_business_mismatch", "REVIEW", "signatory_id",
-                f"ID is for '{sid.fields.get('business')}', business is '{trade}'")
+                f"ID is for '{sid.fields.get('business')}', "
+                + (f"bill is for '{trade}' (no GST or Udyam certificate)" if from_bill else f"business is '{trade}'"))
         name = sid.fields.get("name")
         m = re.match(r"(.+?) \(Prop\.", reg.legal_name if reg else "")
         if m and _norm(name) != _norm(m.group(1)):   # proprietorship: only the proprietor can sign

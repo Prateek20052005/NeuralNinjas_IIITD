@@ -1,0 +1,4 @@
+.ab-prog { display: flex; align-items: center; gap: 12px; padding: 2px var(--gutter) 10px; }
+.ab-prog__bar { flex: 1; height: 4px; border-radius: var(--radius-pill); background: var(--color-fill); overflow: hidden; }
+.ab-prog__bar i { display: block; height: 100%; border-radius: inherit; background: var(--color-brand); transition: width var(--duration-3) var(--ease-spring); }
+.ab-prog span { font-size: var(--text-footnote); font-weight: var(--weight-semibold); color: var(--color-ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }

@@ -1,0 +1,22 @@
+.ab-num { display: flex; flex-direction: column; gap: 6px; }
+.ab-num .ab-field__label { font-size: var(--text-footnote); font-weight: var(--weight-semibold); color: var(--color-ink-2); }
+.ab-num__box {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr 3.25rem;
+  align-items: center;
+  min-height: 3.25rem;
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-s);
+  background: var(--color-surface);
+}
+.ab-num__box button {
+  height: 3.125rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-brand-ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.ab-num__box button:disabled { color: var(--color-ink-3); cursor: not-allowed; }
+.ab-num__box output { text-align: center; font-size: var(--text-body); font-weight: var(--weight-semibold); font-variant-numeric: tabular-nums; }

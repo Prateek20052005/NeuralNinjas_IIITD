@@ -26,9 +26,9 @@ from .kyc.lookups import clean_id, mask
 from .kyc.messages import owner_message, result_view
 from .kyc.ocr import NotAnImage
 from .negotiate import clean_phone, is_last_offer, next_offer, room_pct, rupees, settings as price_settings
-from .quote import build_quote, price_position, toggle, unit_price
+from .quote import build_quote, contract_options, price_position, toggle, unit_price
 from .voice import MAX_AUDIO_BYTES, VOICE_LANGUAGES, Transcriber, VoiceUnavailable
-from .store import CONSENT_PURPOSES, Application, Consent, Store, masked_fields
+from .store import CONSENT_PURPOSES, Application, Consent, Store, case_clock, masked_fields
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
@@ -124,9 +124,10 @@ def _plan_view(a: Application) -> dict:
 
 
 def _gst_registered(a: Application) -> bool:
-    """Owners who said they have no GST (or whose GST is cancelled/suspended) need no GST certificate.
-    Not asked yet (no chat) counts as registered, so the full document set is required."""
-    return a.session.profile.gstin_status not in ("none", "inactive")
+    """Owners who said they have no GST need no GST or Udyam certificate (small businesses don't have to register).
+    A cancelled or suspended GSTIN is different: the certificate is still required and checked against the registry,
+    so it is rejected like K01 in the answer key. Not asked yet (no chat) counts as registered."""
+    return a.session.profile.gstin_status != "none"
 
 
 def _status(a: Application) -> dict:
@@ -135,11 +136,17 @@ def _status(a: Application) -> dict:
         "id": a.id, "language": a.language, "profile": p.safe_view(), "accepted": a.accepted,
         "consent": a.consent.__dict__ if a.consent else None,
         "quote": _quote(a) if a.items else None,
-        "documents": {t_: {"uploaded": t_ in a.docs, "required": t_ in required_documents(_gst_registered(a))}
+        "documents": {t_: {"uploaded": t_ in a.docs, "required": t_ in required_documents(_gst_registered(a)),
+                           # the owner's own details, masked like everywhere else (shown on the privacy page)
+                           "fields": masked_fields(a.docs[t_]) if t_ in a.docs else {},
+                           **(dict(zip(("ok", "message"), _doc_check(t_, a.docs[t_], a.language))) if t_ in a.docs else {})}
                       for t_ in DOC_TYPES},
         "udyam_number": mask(a.udyam_number),
         "kyc": result_view(a.kyc, a.language) if a.kyc else None,
         "timeline": a.timeline,
+        # privacy page: everything is erased automatically after this much time without activity
+        "retention_hours": round(store.retention.total_seconds() / 3600),
+        "delete_after": case_clock(a.last_seen + store.retention).isoformat(timespec="minutes"),
     }
 
 
@@ -194,7 +201,9 @@ def voice_answer(app_id: str, file: UploadFile = File(...)):
     """A spoken answer -> text, returned to the owner's screen to check before sending (see voice.py on privacy)."""
     a = _app(app_id)
     lang = a.language
-    if lang not in VOICE_LANGUAGES or not transcriber.available:
+    if not transcriber.available:
+        raise HTTPException(503, "Voice input is switched off on this server")
+    if lang not in VOICE_LANGUAGES:
         raise HTTPException(404, "Voice is not available in this language")
     if a.session.recommendation:
         raise HTTPException(409, "Advice is finished; switch add-ons or accept the quote")
@@ -271,6 +280,8 @@ def sales_callback(app_id: str, body: CallbackBody):
     """The owner wants a lower price than the chatbot may give: a salesperson calls them. The phone number is used
     only for that call, shown only in the back office, masked everywhere else, and erased with the application."""
     a = _app(app_id)
+    if not a.session.recommendation or a.accepted:
+        raise HTTPException(409, "No open quote to change")
     lang, hours = a.language, price_settings()["sales_callback_hours"]
     if not body.consent:
         raise HTTPException(422, t(lang, "msg.callback_consent_required"))
@@ -281,7 +292,7 @@ def sales_callback(app_id: str, body: CallbackBody):
     q = _quote(a) if a.items else None
     a.callback = {"phone": phone, "target_monthly": target, "language": lang,
                   "offered_monthly": q["monthly_with_gst"] if q else None, "discount_pct": a.discount_pct,
-                  "consent": t(lang, "ui.callback_consent"), "requested_at": date.today().isoformat()}
+                  "consent": t(lang, "ui.callback_consent"), "requested_at": TODAY.isoformat()}
     a.mark("sales_callback_requested", phone=mask(phone), target_monthly=target)
     ref = a.id[:6].upper()
     return {"ok": True, "reference": ref, "message": t(lang, "msg.callback_ok", hours=hours, ref=ref)}
@@ -303,9 +314,13 @@ def choose_plan(app_id: str, body: PlanBody):
                 raise HTTPException(422, "Unknown plan")
             a.items, a.tier = tiers[body.tier], body.tier
         if body.contract_months is not None:
-            a.contract_months = body.contract_months   # raised to the bundle's minimum when priced
+            if body.contract_months not in contract_options(a.items):
+                raise HTTPException(422, "Choose one of the contract lengths shown")
+            a.contract_months = body.contract_months
         if body.setup_months is not None:
-            a.setup_months = body.setup_months         # ignored unless 1, 6 or 12 and within the contract
+            if body.setup_months not in (1, 6, 12):
+                raise HTTPException(422, "Setup can be paid at once or over 6 or 12 months")
+            a.setup_months = body.setup_months         # ignored if longer than the contract
         return _plan_view(a)
 
 
@@ -314,6 +329,8 @@ def accept(app_id: str):
     a = _app(app_id)
     if not a.items:
         raise HTTPException(409, "No quote yet")
+    if a.accepted:          # double tap or page reload: already accepted, nothing to record again
+        return _status(a)
     a.accepted = True
     q = _quote(a)
     a.mark("quote_accepted", monthly=q["monthly_with_gst"], expected_live=q["expected_live"], tier=a.tier,
@@ -344,6 +361,15 @@ def _require_consent(a: Application) -> None:
         raise HTTPException(403, t(a.language, "consent.required"))
 
 
+def _doc_check(doc_type: str, doc, lang: str) -> tuple[bool, str]:
+    """Was this photo good enough? Same answer right after upload and later in the status (after a reload)."""
+    if doc.wrong_type and not doc.blurred:
+        return False, owner_message(Issue(f"{doc_type}_wrong_document", "RETAKE", doc_type, ""), lang)
+    if doc.blurred or not doc.fields or doc.unread:
+        return False, owner_message(Issue(f"{doc_type}_unreadable", "RETAKE", doc_type, ""), lang)
+    return True, t(lang, "kyc.doc_ok", doc=t(lang, f"doc.{doc_type}"))
+
+
 @app.post("/api/applications/{app_id}/documents/{doc_type}")
 def upload(app_id: str, doc_type: str, file: UploadFile = File(...)):
     """Read one document photo now, so a blurred or wrong photo can be retaken straight away."""
@@ -362,13 +388,7 @@ def upload(app_id: str, doc_type: str, file: UploadFile = File(...)):
         del data   # the photo is never stored: only the fields read from it are kept
     a.docs[doc_type] = doc
     a.kyc = None   # documents changed: decision must be made again
-    lang = a.language
-    if doc.wrong_type and not doc.blurred:
-        ok, msg = False, owner_message(Issue(f"{doc_type}_wrong_document", "RETAKE", doc_type, ""), lang)
-    elif doc.blurred or not doc.fields or doc.unread:
-        ok, msg = False, owner_message(Issue(f"{doc_type}_unreadable", "RETAKE", doc_type, ""), lang)
-    else:
-        ok, msg = True, t(lang, "kyc.doc_ok", doc=t(lang, f"doc.{doc_type}"))
+    ok, msg = _doc_check(doc_type, doc, a.language)
     a.mark("document_read", doc=doc_type, ok=ok, seconds=doc.seconds)
     return {"doc_type": doc_type, "ok": ok, "message": msg, "fields": masked_fields(doc),
             "straightened": bool(doc.tilt)}

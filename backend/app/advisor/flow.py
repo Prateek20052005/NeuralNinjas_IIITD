@@ -86,8 +86,21 @@ def next_slot(p: Profile) -> str | None:
     return None
 
 
+def progress(p: Profile, slot: str) -> dict:
+    """Where this question sits in the chat, for the "3 of 8" bar. The total can change as answers come in
+    (a GSTIN adds the "is this your business?" step; the kind of business decides the need questions)."""
+    plan = ["gstin"] + (["gst_confirm"] if p.gstin else []) + ["segment", "city", "employees", "sites", "internet"]
+    plan += [f"need:{n}" for n in NEED_QUESTIONS.get(p.segment) or NEED_QUESTIONS["micro"]
+             if not _needs_internet_line(p, n)]
+    return {"step": plan.index(slot) + 1 if slot in plan else len(plan), "steps": len(plan)}
+
+
 def question(p: Profile, slot: str) -> dict:
-    """The question for a slot, in the owner's language, with tap-to-answer options."""
+    """The question for a slot, in the owner's language, with tap-to-answer options and its place in the chat."""
+    return {**_ask(p, slot), **progress(p, slot)}
+
+
+def _ask(p: Profile, slot: str) -> dict:
     lang = p.language
     if slot == "gstin":
         return {"slot": slot, "text": t(lang, "q.gstin"), "input": "text",

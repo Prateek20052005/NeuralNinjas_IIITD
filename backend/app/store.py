@@ -14,7 +14,7 @@ import os
 import secrets
 import threading
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from .advisor.engine import Session
 from .kyc.checks import KycResult
@@ -31,12 +31,24 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def case_clock(at: datetime | None = None) -> datetime:
+    """Time shown to people: the real time of day, on the case's date (APP_TODAY) when one is set.
+
+    Prices, document validity and install dates are worked out from APP_TODAY, so the timeline must use the same
+    calendar. Deleting data after the retention period always runs on the real clock."""
+    at = at or _now()
+    case = os.getenv("APP_TODAY")
+    if not case:
+        return at
+    return at + timedelta(days=(date.fromisoformat(case) - datetime.now().date()).days)
+
+
 @dataclass
 class Consent:
     purposes: list[str]
     language: str
     version: str = CONSENT_VERSION
-    given_at: str = field(default_factory=lambda: _now().isoformat(timespec="seconds"))
+    given_at: str = field(default_factory=lambda: case_clock().isoformat(timespec="seconds"))
 
 
 @dataclass
@@ -64,7 +76,7 @@ class Application:
         return self.session.profile.language
 
     def mark(self, step: str, **info) -> None:
-        self.timeline.append({"step": step, "at": _now().isoformat(timespec="seconds"), **info})
+        self.timeline.append({"step": step, "at": case_clock().isoformat(timespec="seconds"), **info})
         log.info("app=%s step=%s %s", self.id[:6], step, {k: mask(str(v)) if k in MASKED_FIELDS else v
                                                          for k, v in info.items()})
 

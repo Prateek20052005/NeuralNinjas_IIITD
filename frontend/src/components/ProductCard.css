@@ -1,0 +1,33 @@
+.ab-pc {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: var(--space-2);
+}
+.ab-pc__ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: var(--color-brand-tint);
+  color: var(--color-brand-ink);
+}
+.ab-pc__name { margin: 0; font-size: var(--text-headline); font-weight: var(--weight-semibold); line-height: 1.3; }
+.ab-pc__why { margin: 2px 0 0; font-size: var(--text-callout); line-height: 1.4; color: var(--color-ink-2); }
+:lang(hi) .ab-pc__why, :lang(mr) .ab-pc__why { line-height: var(--leading-deva); }
+.ab-pc__price { margin: 0; text-align: right; font-weight: var(--weight-semibold); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ab-pc__price small { display: block; font-size: 0.75rem; font-weight: var(--weight-medium); color: var(--color-ink-2); }
+
+.ab-qty {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-fill);
+  font-size: var(--text-footnote);
+  font-weight: var(--weight-semibold);
+  vertical-align: 2px;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,0 +1,65 @@
+@import "./tokens.css";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+:lang(hi), :lang(mr) {
+  font-family: var(--font-deva);
+  line-height: var(--leading-deva);
+  letter-spacing: 0;
+}
+
+:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* Owner app: centred 480 px column on tablets and desktops */
+.app-shell {
+  max-width: var(--app-max);
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-canvas);
+}
+
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--gutter) var(--space-3);
+}
+
+/* Type helpers */
+.t-large-title { margin: 0; font-size: var(--text-large-title); line-height: 1.12; font-weight: var(--weight-bold); letter-spacing: -0.025em; text-wrap: balance; }
+.t-title { margin: 0; font-size: var(--text-title); line-height: 1.27; font-weight: var(--weight-semibold); letter-spacing: -0.018em; text-wrap: balance; }
+.t-headline { margin: 0; font-size: var(--text-headline); line-height: 1.35; font-weight: var(--weight-semibold); }
+.t-body { margin: 0; font-size: var(--text-body); }
+.t-callout { margin: 0; font-size: var(--text-callout); line-height: 1.4; }
+.t-footnote { margin: 0; font-size: var(--text-footnote); line-height: 1.38; }
+.t-secondary { color: var(--color-ink-2); }
+.t-num { font-variant-numeric: tabular-nums; }
+.t-mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
+:lang(hi) .t-large-title, :lang(mr) .t-large-title { font-size: 1.875rem; line-height: 1.32; letter-spacing: 0; }
+:lang(hi) .t-title, :lang(mr) .t-title { line-height: 1.45; letter-spacing: 0; }
+
+.section-label { margin: var(--space-1) 4px 0; font-size: var(--text-footnote); font-weight: var(--weight-semibold); color: var(--color-ink-2); letter-spacing: 0.02em; }
+
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Inset grouped list (iOS Settings style) */
+.inset-group { background: var(--color-surface); border-radius: var(--radius-m); overflow: hidden; box-shadow: var(--shadow-1); }
+.inset-group > * + * { border-top: 1px solid var(--color-hairline); }
+
+.card { background: var(--color-surface); border-radius: var(--radius-l); box-shadow: var(--shadow-1); padding: var(--space-2); }

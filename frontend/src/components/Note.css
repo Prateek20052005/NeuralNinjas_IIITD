@@ -1,0 +1,8 @@
+.ab-note { display: flex; gap: 12px; align-items: flex-start; padding: 14px var(--space-2); border-radius: var(--radius-m); font-size: var(--text-callout); line-height: 1.45; }
+.ab-note p { margin: 0; }
+.ab-note strong { font-weight: var(--weight-semibold); }
+.ab-note svg { flex: none; margin-top: 1px; }
+.ab-note--info { background: var(--color-info-tint); } .ab-note--info svg { color: var(--color-info); }
+.ab-note--warn { background: var(--color-warning-tint); } .ab-note--warn svg { color: var(--color-warning); }
+.ab-note--ok { background: var(--color-success-tint); } .ab-note--ok svg { color: var(--color-success); }
+.ab-note--trust { background: var(--color-trust-tint); } .ab-note--trust svg { color: var(--color-trust-ink); }

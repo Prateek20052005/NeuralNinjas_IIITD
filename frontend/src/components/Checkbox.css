@@ -1,0 +1,35 @@
+.ab-check {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  min-height: 3.5rem;
+  padding: 14px var(--space-2);
+  cursor: pointer;
+}
+.ab-check__text { display: flex; flex-direction: column; gap: 2px; }
+.ab-check__box {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  position: relative;
+  width: 26px;
+  height: 26px;
+  margin: 2px 0 0;
+  border: 2px solid var(--color-ink-2);
+  border-radius: 8px;
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: background-color var(--duration-1) var(--ease-spring);
+}
+.ab-check__box:checked { background: var(--color-trust); border-color: var(--color-trust); }
+.ab-check__box:checked::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 2px;
+  width: 7px;
+  height: 13px;
+  border: solid var(--color-on-trust);
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
