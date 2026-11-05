@@ -114,7 +114,7 @@ class PlanBody(BaseModel):
 
 
 class CallbackBody(BaseModel):
-    phone: str
+    phone: str | None = None              # empty: call the number the owner already verified
     consent: bool                         # "call me about the price of this plan"
     target_monthly: int | None = None     # price that would work for the owner, if they said
 
@@ -146,6 +146,10 @@ class ResumeCodeBody(BaseModel):
 
 class UdyamBody(BaseModel):
     number: str
+
+
+class MarketingBody(BaseModel):
+    on: bool                  # offers and news from Accel Business (separate from messages about the order)
 
 
 # ---------- helpers ----------
@@ -377,7 +381,7 @@ def sales_callback(app_id: str, body: CallbackBody):
     lang, hours = a.language, price_settings()["sales_callback_hours"]
     if not body.consent:
         raise HTTPException(422, t(lang, "msg.callback_consent_required"))
-    phone = clean_phone(body.phone)
+    phone = a.phone if not (body.phone or "").strip() and a.phone_verified_at else clean_phone(body.phone or "")
     if not phone:
         raise HTTPException(422, t(lang, "msg.phone_invalid"))
     target = body.target_monthly if body.target_monthly and 0 < body.target_monthly < 10_000_000 else None
@@ -565,6 +569,19 @@ def verify_phone(app_id: str, body: CodeBody):
         a.marketing_consent = bool(body.marketing)
         a.mark("phone_verified", phone=mask(phone), marketing=a.marketing_consent)
     return {"verified": True, "phone": mask(phone), "marketing_consent": a.marketing_consent}
+
+
+@app.post("/api/applications/{app_id}/marketing")
+def set_marketing(app_id: str, body: MarketingBody):
+    """Privacy page: switch offers and news on or off at any time (DPDP: withdrawing is as easy as giving)."""
+    a = _app(app_id)
+    if body.on and not a.phone_verified_at:
+        raise HTTPException(409, "Verify a mobile number first")
+    with a.lock:
+        if a.marketing_consent != body.on:
+            a.marketing_consent = body.on
+            a.mark("marketing_on" if body.on else "marketing_off")
+    return {"marketing_consent": a.marketing_consent}
 
 
 @app.post("/api/resume")

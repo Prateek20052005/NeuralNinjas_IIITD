@@ -13,8 +13,10 @@ import numpy as np
 
 BASE = (sys.argv[1] if len(sys.argv) > 1 else "http://localhost:7860") + "/api"
 DOCS = Path(__file__).resolve().parent.parent / "data" / "kyc_documents"
-TAPS = [("gstin", "27XUIXG0767D1ZP"), ("gst_confirm", "yes"), ("segment", "mfg"), ("employees", "12"), ("sites", "1"), ("internet", "fibre"),
-        ("need:machines", "4"), ("need:vehicles", "0"), ("need:firewall", "yes")]
+# a tap for each question the chat may ask; it answers whatever comes next, so a new question doesn't break it
+TAPS = {"gstin": "27XUIXG0767D1ZP", "gst_confirm": "yes", "existing": "no", "segment": "mfg", "city": "Pune",
+        "employees": "12", "sites": "1", "current": "home", "internet": "fibre", "need:machines": "4",
+        "need:vehicles": "0", "need:firewall": "yes"}
 
 
 def photo(doc_type, how):
@@ -30,8 +32,10 @@ def main():
     c = httpx.Client(timeout=60)
     out = c.post(f"{BASE}/applications", json={"language": "en"}).json()
     app_id = out["id"]
-    for slot, value in TAPS:
-        out = c.post(f"{BASE}/applications/{app_id}/message", json={"slot": slot, "value": value}).json()
+    while out.get("question"):
+        slot = out["question"]["slot"]
+        assert slot in TAPS, f"the chat asked a question this script has no answer for: {slot}"
+        out = c.post(f"{BASE}/applications/{app_id}/message", json={"slot": slot, "value": TAPS[slot]}).json()
     rec = out["recommendation"]
     print("bundle:", {x["id"]: x["quantity"] for x in rec["core"]}, "| monthly incl. GST:", rec["quote"]["monthly_with_gst"])
     print("summary:", (rec.get("summary") or "")[:120])

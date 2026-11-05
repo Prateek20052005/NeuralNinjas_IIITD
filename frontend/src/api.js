@@ -60,6 +60,7 @@ export const api = {
   checkKyc: (id) => call("POST", `/applications/${id}/kyc`),
   status: (id) => call("GET", `/applications/${id}`),
   erase: (id) => call("DELETE", `/applications/${id}`),
+  marketing: (id, on) => call("POST", `/applications/${id}/marketing`, { on }),
   backoffice: (key) => call("GET", "/backoffice/applications", undefined, { "x-admin-key": key }),   // staff only
   officeStats: (key) => call("GET", "/backoffice/stats", undefined, { "x-admin-key": key }),
   officeCustomers: (key) => call("GET", "/backoffice/customers", undefined, { "x-admin-key": key }),

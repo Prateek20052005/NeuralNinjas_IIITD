@@ -2,8 +2,9 @@
 
 Both modes fill the same Profile and ask about the same next missing slot, so the AI never changes what
 is asked or decided; questions are always worded from the i18n files. Order: GSTIN first (it pre-fills
-name and city), then business kind, city, staff, sites, what internet they need (fibre, 5G wireless, not sure,
-or mobile lines only), and 2-3 needs questions for that kind of business.
+name and city), then business kind, city, staff, sites, what they use for internet today (the brief asks for current
+tools; any answer is accepted), what internet they need (fibre, 5G wireless, not sure, or mobile lines only), and 2-3
+needs questions for that kind of business.
 """
 from __future__ import annotations
 
@@ -15,7 +16,7 @@ from ..i18n import t
 from ..kyc.lookups import find_gstin_in_text, lookup_gstin, mask
 from ..recommend import NEED_PRODUCT, Needs, Recommendation, recommend
 from ..reference import canonical_city, city_tier, find_city
-from .parse import internet_choice, kind_of_business, number, yes_no
+from .parse import current_tools_choice, internet_choice, kind_of_business, number, yes_no
 
 NEED_QUESTIONS = {
     "micro": ["billing_pos", "whatsapp", "cctv"],
@@ -25,6 +26,7 @@ NEED_QUESTIONS = {
 }
 COUNT_NEEDS = {"machines", "vehicles"}  # asked as numbers, not yes/no
 INTERNET_OPTIONS = ("fibre", "wireless", "unsure", "mobile")
+CURRENT_OPTIONS = ("mobile", "home", "business", "leased", "none")   # what they use today ("other" if typed)
 CITY_BUTTONS = ["Mumbai", "Delhi", "Bengaluru", "Pune", "Hyderabad", "Chennai", "Kolkata", "Ahmedabad", "Jaipur",
                 "Lucknow", "Nagpur", "Surat"]
 
@@ -48,6 +50,7 @@ class Profile:
     needs_answered: set[str] = field(default_factory=set)
     city_other_asked: bool = False
     existing_customer: bool | None = None   # already with Accel? (GSTIN: our records; no GSTIN: we ask)
+    current_tools: str | None = None        # internet used today: one of CURRENT_OPTIONS or "other"
 
     def safe_view(self) -> dict:
         """Profile as shown to the AI and written to logs: identifiers masked."""
@@ -55,7 +58,7 @@ class Profile:
                 "business_name": self.business_name, "kind": self.segment, "business_type": self.business_type,
                 "city": self.city, "employees": self.employees, "sites": self.sites,
                 "needs": {k: getattr(self.needs, k) for k in self.needs_answered},
-                "existing_customer": self.existing_customer}
+                "existing_customer": self.existing_customer, "current_tools": self.current_tools}
 
     def ai_view(self) -> dict:
         """What the chat AI may see: no GST number and no business name (it needs neither to suggest a plan)."""
@@ -83,6 +86,8 @@ def next_slot(p: Profile) -> str | None:
         return "employees"
     if p.sites is None:
         return "sites"
+    if p.current_tools is None:
+        return "current"
     if "internet" not in p.needs_answered and p.needs.internet is None and p.needs.fibre_available is None:
         return "internet"
     for need in NEED_QUESTIONS[p.segment]:
@@ -95,7 +100,7 @@ def progress(p: Profile, slot: str) -> dict:
     """Where this question sits in the chat, for the "3 of 8" bar. The total can change as answers come in
     (a GSTIN adds the "is this your business?" step; the kind of business decides the need questions)."""
     plan = (["gstin"] + (["gst_confirm"] if p.gstin else []) + (["existing"] if p.gstin_status == "none" else [])
-            + ["segment", "city", "employees", "sites", "internet"])
+            + ["segment", "city", "employees", "sites", "current", "internet"])
     plan += [f"need:{n}" for n in NEED_QUESTIONS.get(p.segment) or NEED_QUESTIONS["micro"]
              if not _needs_internet_line(p, n)]
     return {"step": plan.index(slot) + 1 if slot in plan else len(plan), "steps": len(plan)}
@@ -134,6 +139,9 @@ def _ask(p: Profile, slot: str) -> dict:
     if slot == "sites":
         return {"slot": slot, "text": t(lang, "q.sites"), "input": "number",
                 "options": [{"value": v, "label": v} for v in ("1", "2", "3", "5", "10")]}
+    if slot == "current":
+        return {"slot": slot, "text": t(lang, "q.current_tools"), "input": "choice",
+                "options": [{"value": o, "label": t(lang, f"opt.current.{o}")} for o in CURRENT_OPTIONS]}
     if slot == "internet":
         return {"slot": slot, "text": t(lang, "q.internet"), "input": "choice",
                 "options": [{"value": o, "label": t(lang, f"opt.internet.{o}")} for o in INTERNET_OPTIONS]}
@@ -238,6 +246,10 @@ def apply_answer(p: Profile, slot: str, value) -> list[str]:
         if slot == "sites" and n >= 3 and p.segment in ("micro", "prof"):
             p.segment = "multi"
             msgs.append(t(lang, "msg.became_multi", sites=n))
+        return msgs
+
+    if slot == "current":   # never blocks: an answer we can't place is kept as "other"
+        p.current_tools = current_tools_choice(value) or "other"
         return msgs
 
     if slot == "internet":

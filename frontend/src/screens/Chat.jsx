@@ -313,7 +313,8 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
         )}
       </footer>
 
-      <SalesCallbackSheet open={sheet} onClose={() => setSheet(false)} id={state.id} tr={tr} onDone={callRequested} />
+      <SalesCallbackSheet open={sheet} onClose={() => setSheet(false)} id={state.id} tr={tr} onDone={callRequested}
+                          verifiedPhone={state.phoneVerified ? state.phoneSaved : null} />
       <PhoneVerifySheet open={saving} onClose={() => setSaving(false)} tr={tr} title={tr('ui.save_progress')}
                         why={tr('ui.phone_why_save')}
                         send={(phone) => api.phoneSend(state.id, phone)}

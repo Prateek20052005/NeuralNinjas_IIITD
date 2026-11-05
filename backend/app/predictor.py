@@ -170,11 +170,15 @@ def leads_to_call(limit: int = 50) -> list[dict]:
     return sorted(out, key=lambda x: -x["score"])[:limit]
 
 
+CURRENT_INTERNET = {"mobile": "Mobile hotspot", "home": "Home broadband", "business": "Business broadband",
+                    "leased": "Leased line", "none": "None"}   # chat answer -> the leads file's current_internet
+
+
 def score_application(profile, items: dict | None = None) -> dict:
     """Score a live application from what the chat has learned (the rest counts as average)."""
     seg = {k: v for k, v in SEGMENTS.items()}.get(profile.segment)
     f = {"lead_source": None, "segment": seg, "city_tier": str(profile.city_tier) if profile.city_tier else None,
-         "current_internet": None, "current_provider": None, "annual_turnover_band": None,
+         "current_internet": CURRENT_INTERNET.get(profile.current_tools), "current_provider": None, "annual_turnover_band": None,
          "has_gstin": {"active": "Y", "inactive": "Y", "none": "N"}.get(profile.gstin_status),
          "has_udyam": None, "employees": profile.employees, "sites": profile.sites, "spend": None,
          "interests": sum(1 for k in profile.needs_answered if getattr(profile.needs, k) is True) or None}

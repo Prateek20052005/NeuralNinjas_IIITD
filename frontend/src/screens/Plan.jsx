@@ -127,7 +127,7 @@ export default function Plan({ state, update, tr, actions, toast }) {
     { label: tr('ui.monthly_price'), value: money(quote.monthly_total), kind: 'sub' },
     { label: tr('ui.gst18'), value: money(quote.monthly_gst) },
     { label: tr('ui.you_pay'), value: money(quote.monthly_with_gst), kind: 'total' },
-    ...(welcome ? [{ label: tr('ui.first_months_price', { n: welcome.period_months }),
+    ...(welcome?.months_pct > 0 ? [{ label: tr('ui.first_months_price', { n: welcome.period_months }),
                      value: money(welcome.per_month_with_gst), kind: 'save',
                      note: tr('ui.welcome_title') }] : []),
     { label: tr('ui.setup_once'), value: money(quote.setup_total), kind: 'sub',
@@ -170,13 +170,13 @@ export default function Plan({ state, update, tr, actions, toast }) {
                   : tr('ui.welcome_setup_off', { pct: welcome.setup_off_pct, amount: money(quote.setup_discount).slice(1) })}
               </span>
             )}
-            <span className="welcome-line">
+            {welcome.months_pct > 0 && <span className="welcome-line">
               {quote.billing_months <= 3
                 ? tr('ui.welcome_months', { pct: welcome.months_pct, n: welcome.period_months,
                                             total: money(welcome.per_month_with_gst).slice(1) })
                 : tr('ui.welcome_first_bill', { pct: welcome.months_pct, n: quote.billing_months,
                                                 total: money(welcome.first_bill_with_gst).slice(1) })}
-            </span>
+            </span>}
             <span className="welcome-line">
               {tr('ui.welcome_saving', { amount: money(quote.setup_discount + welcome.saving_with_gst).slice(1) })}
             </span>

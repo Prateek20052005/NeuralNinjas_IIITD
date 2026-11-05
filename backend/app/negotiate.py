@@ -30,13 +30,17 @@ def settings() -> dict:
     w = s["welcome"]
     welcome = {"large_order_from": int(w["large_order_from"]), "very_large_order_from": int(w["very_large_order_from"]),
                "setup_off_pct": {k: float(w["setup_off_pct"][k]) for k in ("small", "large", "very_large")},
+               "setup_off_max_inr": {k: int(w["setup_off_max_inr"][k]) for k in ("small", "large", "very_large")},
                "first_months": int(w["first_months"]), "first_months_pct": float(w["first_months_pct"])}
     if not (set(pay_ahead) <= {3, 6, 12} and all(0 <= v <= 20 for v in pay_ahead.values())
             and 0 < welcome["large_order_from"] <= welcome["very_large_order_from"]
             and all(0 <= v <= 100 for v in welcome["setup_off_pct"].values())
+            and 0 <= welcome["setup_off_max_inr"]["small"] <= welcome["setup_off_max_inr"]["large"]
+            <= welcome["setup_off_max_inr"]["very_large"]
             and 1 <= welcome["first_months"] <= 12 and 0 <= welcome["first_months_pct"] <= 50):
         raise ValueError("pricing_settings.json: pay_ahead_saving_pct must be for 3/6/12 months (0-20%), welcome "
-                         "thresholds increasing, setup_off_pct 0-100, first_months 1-12, first_months_pct 0-50")
+                         "thresholds increasing, setup_off_pct 0-100, setup_off_max_inr not falling with size, "
+                         "first_months 1-12, first_months_pct 0-50")
     return {"first_offer_pct": first, "max_discount_pct": top, "sales_callback_hours": hours,
             "polite_refusals": refusals, "pay_ahead_saving_pct": pay_ahead, "welcome": welcome}
 
@@ -76,31 +80,49 @@ def negotiation_step(asks: int, room: float, current: float) -> tuple[str, float
 
 
 # "Can you give a discount?", "too expensive", "thoda kam karo" in all 7 languages. Latin words match at a word start;
-# Indian-script words anywhere (they take endings). Short or ambiguous words ("kam" alone) are left to the AI.
+# Indian-script words anywhere (they take endings).
+# PRICE_WORDS always mean the owner wants to pay less. MAYBE_PRICE_WORDS ("reduce", "too much", "kam karo") are also
+# used about other things ("will the firewall reduce attacks?"), so they count only with a word about money in the same
+# message (PRICE_CONTEXT) or an amount. Anything else is left to the AI, which only says yes or no; amounts are ours.
 PRICE_WORDS = [
     # English / Hinglish
-    "discount", "cheaper", "lower price", "lower the price", "less price", "reduce", "too expensive", "expensive",
-    "costly", "too much", "best price", "better price", "better deal", "negotiat", "afford", "kam karo", "kam kar",
-    "kam ho", "thoda kam", "price kam", "rate kam", "daam kam", "sasta", "saste", "mehenga", "mehnga", "mahanga",
-    "chhoot", "chhut", "concession",
+    "discount", "cheaper", "lower price", "lower the price", "less price", "too expensive", "very expensive",
+    "too costly", "best price", "better price", "better deal", "negotiat", "thoda kam", "price kam", "rate kam",
+    "daam kam", "sasta", "saste", "mehenga", "mehnga", "mahanga", "chhoot", "chhut", "concession",
     # Hindi / Marathi
-    "छूट", "डिस्काउंट", "सस्ता", "सस्ते", "महंगा", "महँगा", "कम कर", "कम करो", "कम हो", "कीमत कम", "दाम कम",
-    "सवलत", "स्वस्त", "महाग", "कमी करा", "किंमत कमी",
+    "छूट", "डिस्काउंट", "सस्ता", "सस्ते", "महंगा", "महँगा", "कीमत कम", "दाम कम", "सवलत", "स्वस्त", "महाग", "किंमत कमी",
     # Gujarati
-    "ડિસ્કાઉન્ટ", "છૂટ", "સસ્તું", "સસ્તા", "મોંઘું", "મોંઘા", "ઓછું કરો", "ઓછી કિંમત", "ભાવ ઓછો",
+    "ડિસ્કાઉન્ટ", "છૂટ", "સસ્તું", "સસ્તા", "મોંઘું", "મોંઘા", "ઓછી કિંમત", "ભાવ ઓછો",
     # Tamil
-    "தள்ளுபடி", "டிஸ்கவுண்ட்", "விலை குறை", "விலையைக் குறை", "மலிவு", "அதிக விலை", "குறைச்சு", "கம்மி",
+    "தள்ளுபடி", "டிஸ்கவுண்ட்", "விலை குறை", "விலையைக் குறை", "மலிவு", "அதிக விலை",
     # Telugu
-    "డిస్కౌంట్", "తగ్గింపు", "తక్కువ ధర", "ధర తగ్గించ", "ఖరీదు", "చౌక", "తగ్గించండి",
+    "డిస్కౌంట్", "తగ్గింపు", "తక్కువ ధర", "ధర తగ్గించ", "చౌక",
     # Kannada
-    "ರಿಯಾಯಿತಿ", "ಡಿಸ್ಕೌಂಟ್", "ಕಡಿಮೆ ಬೆಲೆ", "ಬೆಲೆ ಕಡಿಮೆ", "ದುಬಾರಿ", "ಅಗ್ಗ", "ಕಡಿಮೆ ಮಾಡಿ",
+    "ರಿಯಾಯಿತಿ", "ಡಿಸ್ಕೌಂಟ್", "ಕಡಿಮೆ ಬೆಲೆ", "ಬೆಲೆ ಕಡಿಮೆ", "ದುಬಾರಿ", "ಅಗ್ಗ",
 ]
+MAYBE_PRICE_WORDS = [
+    "reduce", "expensive", "costly", "too much", "afford", "kam karo", "kam kar", "kam ho",
+    "कम कर", "कम करो", "कम हो", "कमी करा", "ઓછું કરો", "குறைச்சு", "கம்மி", "తగ్గించండి", "ಕಡಿಮೆ ಮಾಡಿ",
+]
+PRICE_CONTEXT = [
+    "price", "pricing", "cost", "rate", "charge", "fee", "bill", "rupee", "rs", "inr", "paisa", "paise", "daam",
+    "kimat", "keemat", "budget", "monthly", "per month", "amount", "₹",
+    "कीमत", "दाम", "पैसे", "पैसा", "रुपये", "रुपए", "बजट", "किंमत", "भाव", "किमत",
+    "કિંમત", "ભાવ", "રૂપિયા", "પૈસા", "விலை", "ரூபாய்", "காசு", "பணம்", "ధర", "రూపాయ", "ఖరీదు", "డబ్బు",
+    "ಬೆಲೆ", "ರೂಪಾಯಿ", "ಹಣ",
+]
+
+
+def _has(words: list[str], s: str) -> bool:
+    return any((w in s) if re.search(r"[^\x00-\x7f]", w) else re.search(rf"(?<![a-z]){re.escape(w)}", s) for w in words)
 
 
 def wants_lower_price(text: str) -> bool:
     s = f" {str(text).lower()} "
-    return any((w in s) if re.search(r"[^\x00-\x7f]", w) else re.search(rf"(?<![a-z]){re.escape(w)}", s)
-               for w in PRICE_WORDS)
+    if _has(PRICE_WORDS, s):
+        return True
+    money = _has(PRICE_CONTEXT, s) or re.search(r"\d{3,}", ascii_digits(s.replace(",", "")))
+    return bool(money) and _has(MAYBE_PRICE_WORDS, s)
 
 
 def clean_phone(raw: str) -> str | None:

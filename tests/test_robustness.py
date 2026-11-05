@@ -28,7 +28,7 @@ def test_ai_dying_mid_chat_falls_back_and_still_finishes():
     adv = Advisor(llm=llm, order_date=TODAY)
     s, _ = adv.start("en")
     replies = iter(["we have no GST at all", "no, we are new", "a small bakery", "We are in Pune", "3 of us", "only one shop",
-                    "fibre is available", "yes please", "yes please", "no thanks"])
+                    "we use a mobile hotspot", "fibre is available", "yes please", "yes please", "no thanks"])
     out = {"question": True}
     while out.get("question"):
         out = adv.handle(s, text=next(replies))
@@ -153,7 +153,7 @@ def test_ai_explanation_in_the_wrong_language_is_replaced_by_our_template():
     adv = Advisor(llm=FakeLLM(english), order_date=TODAY)   # taps need no AI: the only call is the explanation
     s, _ = adv.start("hi")
     for slot, value in [("gstin", "none"), ("existing", "no"), ("segment", "micro"), ("city", "Pune"), ("employees", 2), ("sites", 1),
-                        ("internet", "fibre"), ("need:billing_pos", "no"), ("need:whatsapp", "no"), ("need:cctv", "no")]:
+                        ("current", "home"), ("internet", "fibre"), ("need:billing_pos", "no"), ("need:whatsapp", "no"), ("need:cctv", "no")]:
         out = adv.handle(s, slot=slot, value=value)
     rec = out["recommendation"]
     assert rec["summary"] is None and all(re.search("[ऀ-ॿ]", x["reason"]) for x in rec["core"])

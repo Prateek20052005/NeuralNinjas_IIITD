@@ -218,7 +218,7 @@ function Leads({ leads, error }) {
 }
 
 function Applications({ rows, open, setOpen }) {
-  const stage = (r) => STAGE[r.timeline.at(-1)?.step] || '—';
+  const stage = (r) => STAGE[r.timeline.findLast((s) => STAGE[s.step])?.step] || '—';
   if (!rows.length) {
     return <Note>No open applications right now. Applications are deleted automatically after 72 hours without activity.</Note>;
   }

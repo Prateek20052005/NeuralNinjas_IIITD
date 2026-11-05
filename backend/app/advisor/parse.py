@@ -182,3 +182,25 @@ def internet_choice(text) -> str | None:
     if _has(s, INTERNET_WORDS["mobile"]) or (no and _has(s, INTERNET_WORDS["internet"])):
         return "mobile"
     return None
+
+
+CURRENT_WORDS = {
+    "leased": ["leased", "lease line", "ill", "लीज़्ड", "लीज्ड", "લીઝ્ડ", "லீஸ்டு", "లీజ్డ్", "ಲೀಸ್ಡ್"],
+    "home": ["home", "ghar", "घर", "ઘર", "வீட்டு", "ఇంటి", "ಮನೆ"],
+    "business": ["business", "office", "बिज़नेस", "बिजनेस", "बिझनेस", "ऑफिस", "ઓફિસ", "બિઝનેસ", "ஆபீஸ்", "பிசினஸ்",
+                 "బిజినెస్", "ఆఫీస్", "ಬಿಸಿನೆಸ್", "ಆಫೀಸ್"],
+    "mobile": ["hotspot", "data", "हॉटस्पॉट", "डेटा", "હોટસ્પોટ", "ડેટા", "ஹாட்ஸ்பாட்", "டேட்டா", "హాట్‌స్పాట్",
+               "డేటా", "ಹಾಟ್‌ಸ್ಪಾಟ್", "ಡೇಟಾ"] + INTERNET_WORDS["mobile"],
+    "none": ["nothing", "none", "kuch nahi", "कुछ नहीं", "काही नाही", "કંઈ નથી", "எதுவும் இல்லை", "ఏమీ లేదు", "ಏನೂ ಇಲ್ಲ"],
+}
+
+
+def current_tools_choice(text) -> str | None:
+    """What the owner uses for internet today: 'mobile' | 'home' | 'business' | 'leased' | 'none', or None."""
+    s = f" {str(text).lower()} "
+    if s.strip() in CURRENT_WORDS:   # tapped option
+        return s.strip()
+    for choice in ("leased", "home", "business", "mobile", "none"):
+        if _has(s, CURRENT_WORDS[choice]):
+            return choice
+    return "none" if yes_no(text) is False else None

@@ -11,13 +11,18 @@
     "12": 8
   },
   "welcome": {
-    "_about": "First-time customers only (not already with Accel). Order size = monthly price before GST and discounts. The first-months discount covers the first 3 months (monthly or quarterly billing) or the first half-yearly / yearly bill, once; it is a time-limited promotion, so it may go below the catalogue minimum.",
+    "_about": "First-time customers only (not already with Accel). Order size = monthly price before GST and discounts. Setup: setup_off_pct of the fee, at most setup_off_max_inr rupees. The first-months discount covers the first 3 months (monthly or quarterly billing) or the first half-yearly / yearly bill, once, and never takes the price below the catalogue minimum.",
     "large_order_from": 6900,
     "very_large_order_from": 15900,
     "setup_off_pct": {
       "small": 100,
       "large": 30,
       "very_large": 40
+    },
+    "setup_off_max_inr": {
+      "small": 2500,
+      "large": 7500,
+      "very_large": 15000
     },
     "first_months": 3,
     "first_months_pct": 15

@@ -41,11 +41,16 @@ def test_code_limits():
     with pytest.raises(otp.OtpError) as e:
         otp.check(record, "x", now=1001)
     assert e.value.code == "too_many"
+    record, _ = otp.issue(None, PHONE, now=2000)
     for i in range(otp.MAX_SENDS - 1):
         record, _ = otp.issue(record, PHONE, now=2000 + 31 * (i + 1))
     with pytest.raises(otp.OtpError) as e:
-        otp.issue(record, PHONE, now=5000)
-    assert e.value.code == "too_many"
+        otp.issue(record, PHONE, now=2500)
+    assert e.value.code == "too_many" and e.value.seconds == 2000 + otp.SEND_WINDOW_SECONDS - 2500
+    record, _ = otp.issue(record, PHONE, now=2000 + otp.SEND_WINDOW_SECONDS + 1)   # an hour later: not locked out
+    assert record["sends"] == 1
+    assert not otp.stale(record, now=2000 + otp.SEND_WINDOW_SECONDS + 2)
+    assert otp.stale(record, now=2000 + 3 * otp.SEND_WINDOW_SECONDS)
 
 
 # ---------- saved, encrypted, and gone when deleted ----------
@@ -174,3 +179,27 @@ def test_two_quick_taps_save_cleanly(client, saved_store, tmp_path):
         codes = list(pool.map(lambda _: client.post(msg, json={"slot": "gstin", "value": "none"}).status_code, range(8)))
     assert set(codes) == {200} and len(list(tmp_path.glob("*.app"))) == 1 and not list(tmp_path.glob("*.tmp"))
     assert Store(state_dir=str(tmp_path), key=KEY).get(app_id).session.profile.gstin_status == "none"
+
+
+def test_unused_resume_codes_are_forgotten(client, monkeypatch):
+    import time as _time
+    for i in range(3):
+        client.post("/api/resume", json={"phone": f"90000{i:05d}"})
+    assert len(main.store.resume_codes) >= 3
+    later = _time.time() + 2 * otp.SEND_WINDOW_SECONDS
+    monkeypatch.setattr(otp.time, "time", lambda: later)
+    main.store.purge_expired()
+    assert not any(p.startswith("90000") for p in main.store.resume_codes)
+
+
+def test_privacy_page_can_switch_offers_off(client):
+    app_id, _ = chat_to_quote(client)
+    assert client.post(f"/api/applications/{app_id}/marketing", json={"on": True}).status_code == 409   # no number yet
+    code = client.post(f"/api/applications/{app_id}/phone", json={"phone": PHONE}).json()["demo_code"]
+    client.post(f"/api/applications/{app_id}/phone/verify", json={"code": code, "marketing": True})
+    st = client.get(f"/api/applications/{app_id}").json()
+    assert st["phone_verified"] and st["marketing_consent"] is True and st["phone"] == "98****3210"
+    assert client.post(f"/api/applications/{app_id}/marketing", json={"on": False}).json() == {"marketing_consent": False}
+    st = client.get(f"/api/applications/{app_id}").json()
+    assert st["marketing_consent"] is False and st["timeline"][-1]["step"] == "marketing_off"
+

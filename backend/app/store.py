@@ -27,6 +27,7 @@ from .advisor.engine import Session
 from .kyc.checks import KycResult
 from .kyc.documents import ParsedDoc
 from .kyc.lookups import mask
+from .otp import stale as otp_stale
 
 log = logging.getLogger("store")
 CONSENT_VERSION = "2026-07-v1"
@@ -207,6 +208,9 @@ class Store:
             self._forget(k)
         if old:
             log.info("purged %d applications idle for more than %s", len(old), self.retention)
+        with self._lock:   # "continue a saved application" codes: dropped once expired and out of their send hour
+            for phone in [p for p, r in self.resume_codes.items() if otp_stale(r)]:
+                del self.resume_codes[phone]
         return len(old)
 
     def all(self) -> list[Application]:

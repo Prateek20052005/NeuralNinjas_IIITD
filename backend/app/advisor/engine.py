@@ -22,7 +22,7 @@ from .flow import (COUNT_NEEDS, Profile, apply_answer, build_recommendation, exp
 from ..reference import find_city
 from .llm import LLM, LLMUnavailable
 from ..negotiate import wants_lower_price
-from .parse import internet_choice, kind_of_business
+from .parse import current_tools_choice, internet_choice, kind_of_business
 from .parse import number as _number
 from .parse import yes_no as _yes_no
 
@@ -201,6 +201,8 @@ class Advisor:
             elif kind == "yes_no" and (yn := _yes_no(text)) is not None:
                 msgs += apply_answer(p, answering, "yes" if yn else "no")
                 s.fallbacks.append(f"safety_net:{answering}")
+            elif answering == "current" and "?" not in text:
+                msgs += apply_answer(p, answering, text)
             elif answering == "internet" and internet_choice(text):
                 msgs += apply_answer(p, answering, text)
                 s.fallbacks.append(f"safety_net:{answering}")
@@ -232,6 +234,8 @@ class Advisor:
             n = _int(ex.get(key))
             if n and 1 <= n <= 1000 and getattr(p, key) is None:
                 msgs += apply_answer(p, key, n)
+        if answering == "current":   # "we use a mobile hotspot today" is not "we only want mobile lines"
+            ex = {k: v for k, v in ex.items() if k not in ("fibre_available", "mobile_only")}
         if isinstance(ex.get("fibre_available"), bool):
             p.needs.fibre_available = ex["fibre_available"]
         if ex.get("mobile_only") is True and p.needs.internet is None and p.needs.fibre_available is None:
@@ -333,6 +337,8 @@ def _plain_answer(slot: str | None, text: str) -> bool:
         return bool(find_gstin_in_text(text)) or _yes_no(text) is False or text.strip().lower() in ("none", "skip")
     if slot == "internet":
         return internet_choice(text) is not None
+    if slot == "current":
+        return current_tools_choice(text) is not None
     kind = _answer_kind(slot)
     return (kind == "number" and _number(text) is not None) or (kind == "yes_no" and _yes_no(text) is not None)
 

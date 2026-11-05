@@ -68,7 +68,12 @@ def test_no_discount_first_then_five_then_ten_then_a_salesperson():
                                        ("thoda kam karo bhai", True), ("कुछ छूट मिलेगी?", True),
                                        ("விலை குறைக்க முடியுமா", True), ("ಬೆಲೆ ಕಡಿಮೆ ಮಾಡಿ", True),
                                        ("ధర తగ్గించండి", True), ("ભાવ ઓછો કરો", True),
-                                       ("what is static IP?", False), ("looks good", False), ("I need 2 lines", False)])
+                                       ("what is static IP?", False), ("looks good", False), ("I need 2 lines", False),
+                                       # words that are about price only when money is mentioned
+                                       ("Will the firewall reduce virus attacks?", False),
+                                       ("Is it too much effort to set up CCTV?", False), ("camera kam karo", False),
+                                       ("can you reduce the price?", True), ("too much, reduce it to 5,000", True),
+                                       ("kam karo rate", True), ("कम करो कीमत", True), ("it's expensive for my budget", True)])
 def test_price_requests_in_seven_languages(text, asks):
     assert wants_lower_price(text) is asks
 

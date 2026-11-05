@@ -5,6 +5,7 @@ import { shortTime } from '../lib/ui.js';
 import AppHeader from '../components/AppHeader.jsx';
 import BottomSheet from '../components/BottomSheet.jsx';
 import Button from '../components/Button.jsx';
+import Checkbox from '../components/Checkbox.jsx';
 import FieldPreviewList from '../components/FieldPreviewList.jsx';
 import Note from '../components/Note.jsx';
 
@@ -30,6 +31,16 @@ export default function Privacy({ state, update, tr, onErased }) {
     a.download = `accel-my-data-${status.id.slice(0, 6)}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  async function setMarketing(on) {
+    setError('');
+    try {
+      const out = await api.marketing(state.id, on);
+      setStatus((s) => ({ ...s, marketing_consent: out.marketing_consent }));
+    } catch {
+      setError(tr('ui.error'));
+    }
   }
 
   async function erase() {
@@ -69,6 +80,23 @@ export default function Privacy({ state, update, tr, onErased }) {
                 label: tr(`field.${k}`), node: MONO.has(k) ? <span className="t-mono">{v}</span> : String(v),
               }))} />
             )}
+
+            <section className="card stack">
+              <p className="t-headline">{tr('ui.privacy_phone')}</p>
+              {status.phone_verified ? (
+                <>
+                  <p className="t-callout t-secondary">
+                    {tr('ui.privacy_phone_verified', { phone: status.phone })}
+                  </p>
+                  <div className="inset-group">
+                    <Checkbox checked={!!status.marketing_consent} onChange={setMarketing}
+                              label={tr('ui.privacy_marketing')} hint={tr('ui.privacy_marketing_hint')} />
+                  </div>
+                </>
+              ) : (
+                <p className="t-callout t-secondary">{tr('ui.privacy_phone_none')}</p>
+              )}
+            </section>
 
             <section className="card stack">
               <p className="t-headline">{tr('ui.privacy_consent')}</p>

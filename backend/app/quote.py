@@ -16,9 +16,10 @@ A negotiated discount (see negotiate.py) comes off the monthly price before GST,
 
 Billing: pay every month, or every 3, 6 or 12 months in advance for a small saving (pay_ahead_saving_pct), again never
 below the catalogue minimum. Welcome offer for first-time customers (pricing_settings.json "welcome"):
-  - setup fee: free for small orders, 30% off for large, 40% off for very large (order size = list monthly price)
-  - 15% off the first 3 months (monthly or quarterly billing) or off the first half-yearly / yearly bill, once.
-    It is a time-limited promotion, so this one may go below the catalogue minimum; everything else may not.
+  - setup fee: free for small orders, 30% off for large, 40% off for very large (order size = list monthly price),
+    capped in rupees per size (setup_off_max_inr), so a small order with costly installation can't get it all free
+  - up to 15% off the first 3 months (monthly or quarterly billing) or off the first half-yearly / yearly bill, once,
+    never below the catalogue minimum (a plan already at the minimum gets only the setup part).
 """
 from __future__ import annotations
 
@@ -146,19 +147,23 @@ def build_quote(items: dict[str, int], biz: Business, order_date: date | None = 
     billing = billing_months if any(o["months"] == billing_months for o in billing_options) else 1
     pay_month = per_month(billing)
 
-    # welcome offer for first-time customers: setup by order size, and the first months (may go below the floor)
+    # welcome offer for first-time customers: part of the setup fee (by order size, capped in rupees) and the first
+    # months. Like every other saving it stops at the catalogue minimum; the percentages shown are what is really given.
     welcome, setup_discount = None, 0
     if first_time and lines:
         w = rules["welcome"]
         size = ("very_large" if list_total >= w["very_large_order_from"]
                 else "large" if list_total >= w["large_order_from"] else "small")
-        setup_discount = round(setup_total * w["setup_off_pct"][size] / 100)
+        setup_discount = min(round(setup_total * w["setup_off_pct"][size] / 100), w["setup_off_max_inr"][size])
         period = max(w["first_months"], billing)          # first 3 months, or the first half-yearly / yearly bill
-        first = round(pay_month * (1 - w["first_months_pct"] / 100))
-        welcome = {"size": size, "setup_off_pct": w["setup_off_pct"][size], "months_pct": w["first_months_pct"],
-                   "period_months": period, "per_month_with_gst": with_gst(first),
-                   "first_bill_with_gst": with_gst(first * billing),
-                   "saving_with_gst": with_gst(pay_month * period) - with_gst(first * period)}
+        first = max(round(pay_month * (1 - w["first_months_pct"] / 100)), min(floor_total, pay_month))
+        if setup_discount or first < pay_month:
+            welcome = {"size": size,
+                       "setup_off_pct": round(100 * setup_discount / setup_total) if setup_total else 0,
+                       "months_pct": round(100 * (pay_month - first) / pay_month, 1) if pay_month else 0.0,
+                       "period_months": period, "per_month_with_gst": with_gst(first),
+                       "first_bill_with_gst": with_gst(first * billing),
+                       "saving_with_gst": with_gst(pay_month * period) - with_gst(first * period)}
     setup_due = setup_total - setup_discount
     spread = setup_months if setup_months in SETUP_SPREAD_CHOICES and setup_months <= contract and setup_due else 1
     options = [{"months": m, "monthly_with_gst": build_quote(items, biz, order_date, m, discount_pct=discount_pct,

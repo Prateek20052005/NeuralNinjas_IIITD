@@ -71,7 +71,7 @@ def run_scripted(lang, answers):
 
 
 def test_scripted_flow_gst_prefills_city_and_finishes():
-    s, out = run_scripted("en", ["37IHKXV5167L1ZS", "yes", "prof", "13", "1", "fibre", "yes", "no", "yes"])
+    s, out = run_scripted("en", ["37IHKXV5167L1ZS", "yes", "prof", "13", "1", "business broadband", "fibre", "yes", "no", "yes"])
     assert s.profile.city == "Visakhapatnam" and s.profile.gstin_status == "inactive"
     ids = {x["id"] for x in out["recommendation"]["core"]}
     assert "P12" not in ids and "P09" in ids                     # telephony needs active GST; failover wanted
@@ -80,7 +80,7 @@ def test_scripted_flow_gst_prefills_city_and_finishes():
 
 @pytest.mark.parametrize("lang", ["hi", "mr"])
 def test_scripted_flow_in_hindi_and_marathi(lang):
-    s, out = run_scripted(lang, ["none", "no", "micro", "Pune", "दो", "1", "fibre", "हो", "हो", "नाही"])  # wants WhatsApp, no GST
+    s, out = run_scripted(lang, ["none", "no", "micro", "Pune", "दो", "1", "घर वाला ब्रॉडबैंड", "fibre", "हो", "हो", "नाही"])  # wants WhatsApp, no GST
     rec = out["recommendation"]
     assert all(ord(c) < 128 or "ऀ" <= c <= "ॿ" or not c.isalpha() for c in rec["headline"])
     assert any("ऀ" <= c <= "ॿ" for c in rec["core"][0]["reason"])  # reasons translated
@@ -147,6 +147,7 @@ def test_plain_short_answers_skip_the_ai():
         adv.handle(s, text=a)
     adv.llm = fake
     adv.handle(s, text="just one")                       # sites
+    adv.handle(s, text="home broadband")                 # what they use today
     adv.handle(s, text="fibre")                          # internet
     adv.handle(s, text="nahi")                           # phone system
     assert s.profile.sites == 1 and s.profile.needs.phone_system is False and not s.fallbacks
@@ -162,7 +163,7 @@ def test_ai_failure_falls_back_to_scripted_without_error():
 
 
 def test_safety_net_records_plain_answers_the_ai_missed():
-    p_answers = ["none", "no", "prof", "Pune", "8", "1", "fibre"]
+    p_answers = ["none", "no", "prof", "Pune", "8", "1", "home", "fibre"]
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
     for a in p_answers:
@@ -174,7 +175,7 @@ def test_safety_net_records_plain_answers_the_ai_missed():
 
 
 def test_ai_explanation_cannot_drop_products_or_notes():
-    answers = ["none", "no", "micro", "Pune", "3", "1", "fibre", "yes", "yes", "no"]
+    answers = ["none", "no", "micro", "Pune", "3", "1", "home", "fibre", "yes", "yes", "no"]
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
     for a in answers[:-1]:
@@ -216,7 +217,7 @@ def test_city_names_in_any_script_get_the_right_tier(typed, city, tier):
 def test_unclear_answer_repeats_the_question_only_once():
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
-    for a in ["none", "no", "prof", "Pune", "8", "1", "fibre"]:
+    for a in ["none", "no", "prof", "Pune", "8", "1", "home", "fibre"]:
         adv.handle(s, text=a)
     out = adv.handle(s, text="what is that?")
     assert out["messages"] == ["Please answer yes or no.", "Do you need business phone lines with a welcome menu for callers?"]
@@ -252,7 +253,7 @@ def test_mobile_only_owner_gets_no_internet_line_and_no_internet_questions():
     s, _ = adv.start("en")
     asked = []
     out = {}
-    for a in ["none", "no", "micro", "Pune", "3", "1", "sirf mobile sim chahiye", "no", "no", "no"]:
+    for a in ["none", "no", "micro", "Pune", "3", "1", "mobile", "sirf mobile sim chahiye", "no", "no", "no"]:
         out = adv.handle(s, text=a)
         if out.get("question"):
             asked.append(out["question"]["slot"])
@@ -268,14 +269,14 @@ def test_mobile_only_owner_gets_no_internet_line_and_no_internet_questions():
 @pytest.mark.parametrize("typed,line", [("no fibre here", "P04"), ("5G wireless", "P04"), ("fibre", "P01"),
                                         ("पता नहीं", "P01")])
 def test_internet_answer_picks_the_line(typed, line):
-    s, out = run_scripted("en", ["none", "no", "micro", "Pune", "3", "1", typed, "no", "no", "no"])
+    s, out = run_scripted("en", ["none", "no", "micro", "Pune", "3", "1", "home", typed, "no", "no", "no"])
     assert out["recommendation"]["core"][0]["id"] == line
 
 
 def test_not_sure_about_fibre_is_explained():
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
-    for a in ["none", "no", "micro", "Pune", "3", "1"]:
+    for a in ["none", "no", "micro", "Pune", "3", "1", "home"]:
         adv.handle(s, text=a)
     out = adv.handle(s, text="not sure")
     assert any("5G AirFiber instead" in m for m in out["messages"])
@@ -317,11 +318,11 @@ def test_no_ai_notice_when_the_ai_is_off():
 
 # ---------- Gujarati, Tamil, Telugu, Kannada ----------
 
-NEW_LANGS = {   # typed answers in the language's own script: GST, kind, city, staff, sites, internet, then needs
-    "gu": ["GST નથી", "ના", "મારી કરિયાણાની દુકાન છે", "અમદાવાદ", "ત્રણ", "એક", "ફાઇબર છે", "હા", "ના", "ના"],
-    "ta": ["GST இல்லை", "இல்லை", "எனக்கு மளிகை கடை இருக்கு", "சென்னை", "மூணு பேர்", "ஒரே கடை", "ஃபைபர் இருக்கு", "ஆமா", "வேண்டாம்", "இல்லை"],
-    "te": ["GST లేదు", "లేదు", "మాది కిరాణా దుకాణం", "హైదరాబాద్", "మూడు", "ఒక్కటే", "ఫైబర్ ఉంది", "అవును", "వద్దు", "లేదు"],
-    "kn": ["GST ಇಲ್ಲ", "ಇಲ್ಲ", "ನಮ್ಮದು ಕಿರಾಣಿ ಅಂಗಡಿ", "ಬೆಂಗಳೂರು", "ಮೂರು ಜನ", "ಒಂದೇ ಅಂಗಡಿ", "ಫೈಬರ್ ಇದೆ", "ಹೌದು", "ಬೇಡ", "ಇಲ್ಲ"],
+NEW_LANGS = {   # typed answers in the language's own script: GST, kind, city, staff, sites, used today, internet, needs
+    "gu": ["GST નથી", "ના", "મારી કરિયાણાની દુકાન છે", "અમદાવાદ", "ત્રણ", "એક", "મોબાઇલ હોટસ્પોટ", "ફાઇબર છે", "હા", "ના", "ના"],
+    "ta": ["GST இல்லை", "இல்லை", "எனக்கு மளிகை கடை இருக்கு", "சென்னை", "மூணு பேர்", "ஒரே கடை", "வீட்டு பிராட்பேண்ட்", "ஃபைபர் இருக்கு", "ஆமா", "வேண்டாம்", "இல்லை"],
+    "te": ["GST లేదు", "లేదు", "మాది కిరాణా దుకాణం", "హైదరాబాద్", "మూడు", "ఒక్కటే", "మొబైల్ డేటా", "ఫైబర్ ఉంది", "అవును", "వద్దు", "లేదు"],
+    "kn": ["GST ಇಲ್ಲ", "ಇಲ್ಲ", "ನಮ್ಮದು ಕಿರಾಣಿ ಅಂಗಡಿ", "ಬೆಂಗಳೂರು", "ಮೂರು ಜನ", "ಒಂದೇ ಅಂಗಡಿ", "ಏನೂ ಇಲ್ಲ", "ಫೈಬರ್ ಇದೆ", "ಹೌದು", "ಬೇಡ", "ಇಲ್ಲ"],
 }
 
 
@@ -331,6 +332,7 @@ def test_scripted_flow_in_new_languages(lang):
     s, out = run_scripted(lang, NEW_LANGS[lang])
     p, rec = s.profile, out["recommendation"]
     assert (p.segment, p.employees, p.sites, p.gstin_status) == ("micro", 3, 1, "none")
+    assert p.current_tools == {"gu": "mobile", "ta": "home", "te": "mobile", "kn": "none"}[lang]
     assert p.needs.billing_pos is True and p.needs.whatsapp is False
     assert script_share(rec["headline"], lang)[0] > 0                         # headline in the owner's script
     assert all(script_share(x["reason"], lang)[0] > 0 for x in rec["core"])    # reasons translated
@@ -397,3 +399,37 @@ def test_ai_price_talk_is_caught_in_every_language(sentence):
     from backend.app.advisor.engine import PRICE_TALK
     assert PRICE_TALK.search(sentence)
     assert not PRICE_TALK.search("வாட்ஸ்அப் வாடிக்கையாளர்களை அடைய உதவும்")   # no price: kept
+
+
+# ---------- what the owner uses today (the brief asks for current tools) ----------
+
+@pytest.mark.parametrize("typed,choice", [("mobile", "mobile"), ("we use the hotspot on my phone", "mobile"),
+                                          ("leased line from another company", "leased"), ("ghar ka wifi", "home"),
+                                          ("बिज़नेस ब्रॉडबैंड", "business"), ("nothing", "none"), ("no", "none"),
+                                          ("some cable guy", None)])
+def test_current_tools_are_understood(typed, choice):
+    from backend.app.advisor.parse import current_tools_choice
+    assert current_tools_choice(typed) == choice
+
+
+def test_current_tools_question_never_blocks_the_chat():
+    adv = Advisor(llm=NoLLM(), order_date=TODAY)
+    s, _ = adv.start("en")
+    for a in ["none", "no", "micro", "Pune", "3", "1"]:
+        out = adv.handle(s, text=a)
+    assert out["question"]["slot"] == "current" and len(out["question"]["options"]) == 5
+    out = adv.handle(s, text="some cable guy")               # can't place it: kept as "other", chat moves on
+    assert s.profile.current_tools == "other" and out["question"]["slot"] == "internet"
+
+
+def test_mobile_hotspot_today_is_not_mobile_only_tomorrow():
+    llm = FakeLLM({"extract": {"mobile_only": True}, "say": ""})   # the AI reads "hotspot" as "only mobile lines"
+    adv = Advisor(llm=llm, order_date=TODAY)
+    s, _ = adv.start("en")
+    for slot, value in [("gstin", "none"), ("existing", "no"), ("segment", "micro"), ("city", "Pune"),
+                        ("employees", 2), ("sites", 1)]:
+        adv.handle(s, slot=slot, value=value)
+    out = adv.handle(s, text="right now we just share the hotspot from my phone, it keeps dropping")
+    assert s.profile.current_tools == "mobile" and s.profile.needs.internet is None
+    assert out["question"]["slot"] == "internet"               # still asked what they need
+

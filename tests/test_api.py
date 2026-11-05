@@ -8,7 +8,7 @@ from backend.app import main
 
 DOCS = Path(__file__).resolve().parent.parent / "data" / "kyc_documents"
 ANSWERS = {"gstin": "27XUIXG0767D1ZP", "gst_confirm": "yes", "segment": "mfg", "employees": "12", "sites": "1",
-           "internet": "fibre", "existing": "no", "need:machines": "4", "need:vehicles": "0", "need:firewall": "yes"}
+           "current": "home", "internet": "fibre", "existing": "no", "need:machines": "4", "need:vehicles": "0", "need:firewall": "yes"}
 
 
 class NoLLM:
@@ -133,7 +133,7 @@ def test_owner_without_gst_uploads_only_address_proof_and_id(client):
 
 def test_mobile_only_plan_can_still_switch_extras(client):
     answers = {**ANSWERS, "gstin": "none", "segment": "micro", "city": "Pune", "employees": "3",
-               "internet": "mobile", "need:billing_pos": "no", "need:whatsapp": "no"}
+               "current": "mobile", "internet": "mobile", "need:billing_pos": "no", "need:whatsapp": "no"}
     r = client.post("/api/applications", json={"language": "en"}).json()
     app_id, out = r["id"], r
     while out.get("question"):
@@ -221,7 +221,7 @@ def test_progress_status_survives_reload_and_uses_the_case_date(client, monkeypa
     monkeypatch.setenv("APP_TODAY", "2026-07-15")
     r = client.post("/api/applications", json={"language": "en"}).json()
     app_id, q = r["id"], r["question"]
-    assert (q["step"], q["steps"]) == (1, 9)                  # GST number first; confirm step added once it's known
+    assert (q["step"], q["steps"]) == (1, 10)                  # GST number first; confirm step added once it's known
     out = client.post(f"/api/applications/{app_id}/message", json={"text": ANSWERS["gstin"]}).json()
     assert out["question"]["slot"] == "gst_confirm" and out["question"]["step"] == 2
     while out.get("question"):
@@ -255,3 +255,15 @@ def test_when_basic_equals_recommended_the_selected_card_is_shown(client):
     plan = client.post(f"/api/applications/{app_id}/plan", json={}).json()
     ids = [t["id"] for t in plan["tiers"]]
     assert plan["tier"] in ids and ids == sorted(ids, key=["basic", "recommended", "full"].index)
+
+
+def test_sales_call_uses_the_verified_number_unless_another_is_given(client):
+    app_id, _ = chat_to_quote(client)
+    cb = f"/api/applications/{app_id}/sales-callback"
+    assert client.post(cb, json={"consent": True}).status_code == 422             # no number at all
+    verify_phone(client, app_id, phone="9876543210")
+    assert client.post(cb, json={"consent": True}).status_code == 200            # not asked again
+    assert main.store.get(app_id).callback["phone"] == "9876543210"
+    assert client.post(cb, json={"phone": "9123456780", "consent": True}).status_code == 200
+    assert main.store.get(app_id).callback["phone"] == "9123456780"               # the owner chose another one
+    assert client.delete(f"/api/applications/{app_id}").json()["deleted"]
