@@ -37,6 +37,7 @@ from .quote import build_quote, contract_options, price_position, toggle, unit_p
 from .voice import MAX_AUDIO_BYTES, VOICE_LANGUAGES, Transcriber, VoiceUnavailable
 from .store import CONSENT_PURPOSES, Application, Consent, Store, case_clock, masked_fields
 from .otp import OtpError, check as check_code, demo_mode, issue as issue_code
+from .sms import SmsError, missing_settings as sms_missing, provider as sms_provider, send_code as send_sms
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
@@ -89,6 +90,9 @@ def _warm_predictor() -> None:
 
 
 threading.Thread(target=_warm_predictor, daemon=True).start()
+
+if not demo_mode() and sms_missing():   # say it at start-up, not at the first owner's failed code
+    log.error("OTP_MODE=sms but SMS is not set up (missing %s): codes cannot be sent", ", ".join(sms_missing()))
 
 
 # ---------- request bodies ----------
@@ -218,7 +222,8 @@ def _status(a: Application) -> dict:
 def health():
     return {"status": "ok", "advisor_mode": advisor.mode, "today": TODAY.isoformat(), "languages": LANGUAGES,
             "voice_languages": list(VOICE_LANGUAGES) if transcriber.available else [],
-            "progress_saved": store.saving, "otp_demo": demo_mode()}
+            "progress_saved": store.saving, "otp_demo": demo_mode(),
+            "sms": None if demo_mode() else {"provider": sms_provider() or None, "ready": not sms_missing()}}
 
 
 @app.get("/api/i18n/{lang}")
@@ -523,9 +528,15 @@ def _phone(raw: str, lang: str) -> str:
     return phone
 
 
-def _sent(phone: str, code: str) -> dict:
-    # demo mode: the prototype has no SMS provider, so the code is shown on screen instead
-    return {"sent": True, "phone": mask(phone), **({"demo_code": code} if demo_mode() else {})}
+def _deliver(phone: str, code: str, lang: str) -> dict:
+    """Demo mode: the code goes back to the screen (for judging). SMS mode: it is texted and never returned."""
+    if demo_mode():
+        return {"sent": True, "phone": mask(phone), "demo_code": code}
+    try:
+        send_sms(phone, code, t(lang, "msg.otp_sms", code=code))
+    except SmsError:
+        raise HTTPException(503, t(lang, "msg.otp_send_failed"))
+    return {"sent": True, "phone": mask(phone)}
 
 
 @app.post("/api/applications/{app_id}/phone")
@@ -534,10 +545,12 @@ def send_phone_code(app_id: str, body: PhoneBody):
     phone = _phone(body.phone, a.language)
     with a.lock:
         try:
-            a.otp, code = issue_code(a.otp, phone)
+            record, code = issue_code(a.otp, phone)
         except OtpError as e:
             raise _otp_error(e, a.language)
-    return _sent(phone, code)
+        sent = _deliver(phone, code, a.language)   # kept only once it is sent: a failed SMS costs no wait or try
+        a.otp = record
+    return sent
 
 
 @app.post("/api/applications/{app_id}/phone/verify")
@@ -561,10 +574,12 @@ def send_resume_code(body: PhoneBody):
     lang = body.lang if body.lang in LANGUAGES else "en"
     phone = _phone(body.phone, lang)
     try:
-        store.resume_codes[phone], code = issue_code(store.resume_codes.get(phone), phone)
+        record, code = issue_code(store.resume_codes.get(phone), phone)
     except OtpError as e:
         raise _otp_error(e, lang)
-    return _sent(phone, code)
+    sent = _deliver(phone, code, lang)
+    store.resume_codes[phone] = record
+    return sent
 
 
 @app.post("/api/resume/verify")

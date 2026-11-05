@@ -342,5 +342,7 @@
   "msg.phone_required": "Please verify your mobile number to accept the plan.",
   "ui.popular": "{pct}% of similar businesses chose this",
   "ui.popular_with": "{pct}% of similar businesses with {product} also chose this",
-  "ui.based_on_similar": "Quantities and extras are based on the {n} past customers most like your business."
+  "ui.based_on_similar": "Quantities and extras are based on the {n} past customers most like your business.",
+  "msg.otp_sms": "{code} is your Accel Business code. It expires in 10 minutes. Don't share it with anyone.",
+  "msg.otp_send_failed": "We couldn't send the code right now. Please try again in a few minutes."
 }

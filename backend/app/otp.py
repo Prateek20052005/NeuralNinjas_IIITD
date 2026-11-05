@@ -1,8 +1,8 @@
 """One-time codes to verify an owner's mobile number (save progress, resume on another phone, accept the plan).
 
 Only a salted hash of the code is kept; a code expires after 10 minutes and allows 5 tries; a new code can be asked
-for every 30 seconds, at most 5 times. OTP_MODE=demo (the default here, as the prototype has no SMS provider)
-returns the code to the screen instead of sending an SMS; a real deployment sets OTP_MODE=sms and plugs in a provider.
+for every 30 seconds, at most 5 times. OTP_MODE=demo (the default) returns the code to the screen instead of sending
+an SMS, for judging the prototype; OTP_MODE=sms sends it through an SMS provider (sms.py) and never shows it.
 """
 from __future__ import annotations
 
@@ -27,7 +27,8 @@ class OtpError(Exception):
 
 
 def demo_mode() -> bool:
-    return os.getenv("OTP_MODE", "demo") == "demo"
+    """Only an explicit "demo" shows codes on screen; any other value means SMS (and fails safe if not set up)."""
+    return os.getenv("OTP_MODE", "demo").strip().lower() == "demo"
 
 
 def _digest(code: str, salt: str) -> str:
@@ -46,8 +47,6 @@ def issue(record: dict | None, phone: str, now: float | None = None) -> tuple[di
         if sends >= MAX_SENDS:
             raise OtpError("too_many")
     code, salt = f"{secrets.randbelow(10 ** 6):06d}", secrets.token_hex(8)
-    if not demo_mode():
-        raise NotImplementedError("OTP_MODE=sms needs an SMS provider; the prototype runs with OTP_MODE=demo")
     return {"phone": phone, "salt": salt, "hash": _digest(code, salt), "sent_at": now,
             "expires": now + CODE_TTL_SECONDS, "tries": 0, "sends": sends + 1}, code
 
