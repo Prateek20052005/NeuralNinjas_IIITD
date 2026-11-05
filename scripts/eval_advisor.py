@@ -29,7 +29,7 @@ from backend.app.catalogue import check_bundle  # noqa: E402
 from backend.app.i18n import INDIC_RE, script_share  # noqa: E402
 from backend.app.recommend import NEED_PRODUCT  # noqa: E402
 
-MAX_TURNS = 14
+MAX_TURNS = 16   # 14 before the internet and "already with Accel?" questions were added
 LEAKS = re.compile(r"\bP\d{2}\b|need:|[{}]|\b[a-z]+_[a-z_]+\b|\bNone\b|\bnull\b")
 
 # answers: slot -> reply (a list = replies for repeated asks, the last one repeats). Missing need slots -> "no".

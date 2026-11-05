@@ -1,12 +1,14 @@
-"""Price negotiation on the plan screen: up to max_discount_pct in two steps, never below the catalogue minimum,
-then a salesperson's call (phone + consent). Offers come from pricing_settings.json, never from the AI."""
+"""Price negotiation in the chat after the plan: the first request gets no discount (cheaper plan and longer contract
+shown instead); if the owner insists, 5% then 10%, never below the catalogue minimum; then a salesperson's call
+(phone + consent). Offers come from pricing_settings.json, never from the AI."""
 import json
 
 import pytest
 
 from backend.app import main, negotiate
-from backend.app.negotiate import clean_phone, next_offer, rupees
-from tests.test_api import ANSWERS, client  # noqa: F401  (pytest fixture)
+from backend.app.negotiate import clean_phone, negotiation_step, next_offer, rupees, wants_lower_price
+from tests.test_advisor import FakeLLM
+from tests.test_api import ANSWERS, client, verify_phone  # noqa: F401  (pytest fixture)
 
 
 def test_two_steps_then_a_salesperson():
@@ -52,18 +54,42 @@ def _clinic(client, extra=None):
     return app_id
 
 
-def test_negotiation_journey_and_sales_callback(client, monkeypatch):
+def say(client, app_id, text):
+    return client.post(f"/api/applications/{app_id}/message", json={"text": text})
+
+
+def test_no_discount_first_then_five_then_ten_then_a_salesperson():
+    assert [negotiation_step(n, room=13.0, current=c) for n, c in [(1, 0), (2, 0), (3, 5), (4, 10)]] == \
+        [("pushback", None), ("offer", 5.0), ("final", 10.0), ("handoff", None)]
+    assert negotiation_step(2, room=0.0, current=0) == ("handoff", None)     # already at the catalogue floor
+
+
+@pytest.mark.parametrize("text,asks", [("can you give me a discount?", True), ("this is too expensive", True),
+                                       ("thoda kam karo bhai", True), ("कुछ छूट मिलेगी?", True),
+                                       ("விலை குறைக்க முடியுமா", True), ("ಬೆಲೆ ಕಡಿಮೆ ಮಾಡಿ", True),
+                                       ("ధర తగ్గించండి", True), ("ભાવ ઓછો કરો", True),
+                                       ("what is static IP?", False), ("looks good", False), ("I need 2 lines", False)])
+def test_price_requests_in_seven_languages(text, asks):
+    assert wants_lower_price(text) is asks
+
+
+def test_negotiation_in_the_chat_and_sales_callback(client, monkeypatch):
     monkeypatch.setenv("BACKOFFICE_KEY", "k")
     app_id = _clinic(client)
     start = client.post(f"/api/applications/{app_id}/plan", json={}).json()["quote"]
-    seen = [client.post(f"/api/applications/{app_id}/price-request").json() for _ in range(3)]
-    assert [s["status"] for s in seen] == ["offer", "final", "handoff"]
-    q1, q2 = seen[0]["quote"], seen[1]["quote"]
+    seen = [say(client, app_id, "can you give me a discount?").json() for _ in range(4)]
+    assert [s["negotiation"]["status"] for s in seen] == ["pushback", "offer", "final", "handoff"]
+    first = seen[0]
+    assert first["quote"]["discount"] == 0                                   # first request: no discount...
+    assert any("Basic plan" in m for m in first["messages"])                 # ...but the honest ways to pay less
+    assert any("24-month contract" in m for m in first["messages"])
+    q1, q2 = seen[1]["quote"], seen[2]["quote"]
     assert start["monthly_with_gst"] > q1["monthly_with_gst"] > q2["monthly_with_gst"]
     assert q1["discount_pct"] == 5 and q2["discount_pct"] == 10
     assert q2["monthly_total"] >= q2["floor_total"]
-    assert "10%" in seen[1]["message"] and "24 hours" in seen[2]["message"]
-    assert seen[2]["quote"]["discount_pct"] == 10                        # asking again keeps the best offer
+    assert "10%" in seen[2]["messages"][0] and "24 hours" in seen[3]["messages"][0]
+    assert seen[3]["quote"]["discount_pct"] == 10                            # asking again keeps the best offer
+    assert client.post(f"/api/applications/{app_id}/plan", json={}).json()["quote"]["discount_pct"] == 10
 
     url = f"/api/applications/{app_id}/sales-callback"
     assert client.post(url, json={"phone": "9876543210", "consent": False}).status_code == 422
@@ -78,24 +104,46 @@ def test_negotiation_journey_and_sales_callback(client, monkeypatch):
     assert lead["sales_callback"]["phone"] == "9876543210" and lead["sales_callback"]["target_monthly"] == 5500
     assert lead["price"]["discount_pct"] == 10
 
+    verify_phone(client, app_id)   # accepting needs a verified mobile number
     accepted = client.post(f"/api/applications/{app_id}/accept").json()   # owner can still take the offer
     assert next(s for s in accepted["timeline"] if s["step"] == "quote_accepted")["discount_pct"] == 10
-    assert client.post(f"/api/applications/{app_id}/price-request").status_code == 409
+    assert say(client, app_id, "any discount?").status_code == 409         # no price talk after accepting
     client.delete(f"/api/applications/{app_id}")
 
 
-def test_plan_already_at_the_floor_goes_straight_to_a_salesperson(client):
+def test_other_messages_after_the_plan_get_no_discount(client):
+    app_id = _clinic(client)
+    out = say(client, app_id, "looks good, thanks").json()
+    assert "negotiation" not in out and "Your plan" in out["messages"][0]
+    assert client.post(f"/api/applications/{app_id}/plan", json={}).json()["quote"]["discount"] == 0
+
+
+def test_plan_already_at_the_floor_goes_to_a_salesperson_without_a_discount(client):
     app_id = _clinic(client, extra=[{"contract_months": 24}])           # 24 months = catalogue minimum
-    out = client.post(f"/api/applications/{app_id}/price-request").json()
-    assert out["status"] == "handoff" and "lowest price" in out["message"]
+    first = say(client, app_id, "too expensive").json()
+    assert first["negotiation"]["status"] == "pushback"
+    out = say(client, app_id, "please reduce the price").json()
+    assert out["negotiation"]["status"] == "handoff" and "lowest price" in out["messages"][0]
     assert out["quote"]["discount"] == 0
 
 
 def test_discount_survives_plan_changes_but_never_breaks_the_floor(client):
     app_id = _clinic(client)
-    for _ in range(2):
-        client.post(f"/api/applications/{app_id}/price-request")
+    for _ in range(3):
+        say(client, app_id, "discount please")
     full = client.post(f"/api/applications/{app_id}/plan", json={"tier": "full"}).json()["quote"]
     assert full["discount_pct"] == 10
     two_years = client.post(f"/api/applications/{app_id}/plan", json={"contract_months": 24}).json()["quote"]
     assert two_years["monthly_total"] == two_years["floor_total"] and two_years["discount"] == 0
+
+
+def test_ai_spots_a_price_request_but_never_sets_the_amount(client, monkeypatch):
+    app_id = _clinic(client)
+    monkeypatch.setattr(main.advisor, "llm", FakeLLM(
+        {"wants_lower_price": True, "say": "I can give you 50% off today!"},       # the AI overreaching
+        {"wants_lower_price": False, "say": "Static IP gives you a fixed address for CCTV. It costs ₹250 a month."}))
+    out = say(client, app_id, "can you do something for me on this?").json()   # no price keyword: the AI decides
+    assert out["negotiation"]["status"] == "pushback" and out["quote"]["discount"] == 0
+    assert not any("50%" in m for m in out["messages"])                         # the AI's own words are not used
+    answer = say(client, app_id, "what does static IP do").json()
+    assert answer["messages"] == ["Static IP gives you a fixed address for CCTV."]   # the price sentence is dropped

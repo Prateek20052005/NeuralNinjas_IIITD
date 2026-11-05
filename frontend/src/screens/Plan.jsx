@@ -1,20 +1,18 @@
 import { useEffect, useState } from 'react';
-import { BadgePercent, Phone, Share2 } from 'lucide-react';
+import { MessageCircle, Share2 } from 'lucide-react';
 import { api } from '../api.js';
 import { longDate } from '../i18n.js';
 import { money, PRODUCT_ICONS } from '../lib/ui.js';
 import AppHeader from '../components/AppHeader.jsx';
-import BottomSheet from '../components/BottomSheet.jsx';
 import Button from '../components/Button.jsx';
-import Checkbox from '../components/Checkbox.jsx';
 import Chip from '../components/Chip.jsx';
 import ChipGroup from '../components/ChipGroup.jsx';
 import Note from '../components/Note.jsx';
 import PriceBar from '../components/PriceBar.jsx';
 import PriceBreakdown from '../components/PriceBreakdown.jsx';
 import ProductCard from '../components/ProductCard.jsx';
-import TextField from '../components/TextField.jsx';
 import ToggleRow from '../components/ToggleRow.jsx';
+import PhoneVerifySheet from '../components/PhoneVerifySheet.jsx';
 
 let catalogueCache = null;
 
@@ -27,12 +25,9 @@ export default function Plan({ state, update, tr, actions, toast }) {
   const [error, setError] = useState('');
   const [plan, setPlan] = useState(state.plan || null); // tiers and unit prices for the chosen contract
   const [who, setWho] = useState(null); // business name and city for the eyebrow
-  // price negotiation: offers come from the server's rules; after the last one, a salesperson can call
+  // price talk happens in the chat (a discount only if the owner insists); this screen just shows the result
   const neg = state.neg || {};
-  const [sheet, setSheet] = useState(false);
-  const [phone, setPhone] = useState('');
-  const [target, setTarget] = useState('');
-  const [callOk, setCallOk] = useState(false);
+  const [verifying, setVerifying] = useState(false); // mobile number + code, needed to accept
 
   useEffect(() => {
     if (!catalogueCache) api.catalogue().then((c) => setCatalogue((catalogueCache = c))).catch(() => {});
@@ -69,24 +64,27 @@ export default function Plan({ state, update, tr, actions, toast }) {
     else update({ quote: out.quote, items: out.items });
   });
 
-  const askPrice = () => run(async () => {
-    const out = await api.priceRequest(state.id);
-    show(out);
-    update({ neg: { ...neg, status: out.status, message: out.message } });
-    if (out.status === 'handoff') setSheet(true);
-  });
+  // accepting needs a verified mobile number (order updates, installation visit): ask for it first if missing
+  const accept = () => {
+    if (!state.phoneVerified) return setVerifying(true);
+    return run(async () => {
+      try {
+        await api.accept(state.id);
+        update({ accepted: true, screen: 'consent' });
+      } catch (e) {
+        if (e.status === 409 && !state.phoneVerified) setVerifying(true);
+        else throw e;
+      }
+    });
+  };
 
-  const requestCall = () => run(async () => {
-    const out = await api.salesCallback(state.id, { phone, consent: callOk,
-                                                    target_monthly: Number(target.replace(/\D/g, '')) || null });
-    update({ neg: { ...neg, status: 'called', message: out.message } });
-    setSheet(false);
-  });
-
-  const accept = () => run(async () => {
+  async function phoneVerified(code, marketing) {
+    const out = await api.phoneVerify(state.id, code, marketing);
+    update({ phoneVerified: true, phoneSaved: out.phone });
+    setVerifying(false);
     await api.accept(state.id);
     update({ accepted: true, screen: 'consent' });
-  });
+  }
 
   async function share() {
     const text = tr('ui.share_text', {
@@ -113,6 +111,9 @@ export default function Plan({ state, update, tr, actions, toast }) {
   const contracts = quote.contract_options || [];
   const dearest = contracts.length ? Math.max(...contracts.map((c) => c.monthly_with_gst)) : 0;
   const spreads = [1, 6, 12].filter((m) => m <= quote.contract_months);
+  const welcome = quote.welcome; // first-time customers only
+  const setupDue = quote.setup_due ?? quote.setup_total;
+  const billing = quote.billing_options || [];
   const live = longDate(quote.expected_live, lang);
 
   const rows = [
@@ -126,8 +127,12 @@ export default function Plan({ state, update, tr, actions, toast }) {
     { label: tr('ui.monthly_price'), value: money(quote.monthly_total), kind: 'sub' },
     { label: tr('ui.gst18'), value: money(quote.monthly_gst) },
     { label: tr('ui.you_pay'), value: money(quote.monthly_with_gst), kind: 'total' },
+    ...(welcome ? [{ label: tr('ui.first_months_price', { n: welcome.period_months }),
+                     value: money(welcome.per_month_with_gst), kind: 'save',
+                     note: tr('ui.welcome_title') }] : []),
     { label: tr('ui.setup_once'), value: money(quote.setup_total), kind: 'sub',
       note: quote.setup_months > 1 ? tr('ui.setup_line', { amount: money(quote.setup_monthly).slice(1), n: quote.setup_months }) : '' },
+    ...(quote.setup_discount > 0 ? [{ label: tr('ui.setup_discount'), value: `−${money(quote.setup_discount)}`, kind: 'save' }] : []),
     { label: tr('ui.contract_title'), value: tr('ui.months', { n: quote.contract_months }) },
   ];
 
@@ -156,6 +161,28 @@ export default function Plan({ state, update, tr, actions, toast }) {
           {rec.summary && <p className="lead">{rec.summary}</p>}
         </section>
 
+        {welcome && (
+          <Note tone="ok" title={tr('ui.welcome_title')}>
+            {quote.setup_discount > 0 && (
+              <span className="welcome-line">
+                {welcome.setup_off_pct >= 100
+                  ? tr('ui.welcome_setup_free', { amount: money(quote.setup_discount).slice(1) })
+                  : tr('ui.welcome_setup_off', { pct: welcome.setup_off_pct, amount: money(quote.setup_discount).slice(1) })}
+              </span>
+            )}
+            <span className="welcome-line">
+              {quote.billing_months <= 3
+                ? tr('ui.welcome_months', { pct: welcome.months_pct, n: welcome.period_months,
+                                            total: money(welcome.per_month_with_gst).slice(1) })
+                : tr('ui.welcome_first_bill', { pct: welcome.months_pct, n: quote.billing_months,
+                                                total: money(welcome.first_bill_with_gst).slice(1) })}
+            </span>
+            <span className="welcome-line">
+              {tr('ui.welcome_saving', { amount: money(quote.setup_discount + welcome.saving_with_gst).slice(1) })}
+            </span>
+          </Note>
+        )}
+
         {plan?.tiers?.length > 1 && (
           <section className="stack" aria-labelledby="tiers-title">
             <h2 id="tiers-title" className="section-label">{tr('ui.choose_plan')}</h2>
@@ -179,6 +206,7 @@ export default function Plan({ state, update, tr, actions, toast }) {
         {included.length > 0 && (
           <section className="stack" aria-labelledby="in-plan">
             <h2 id="in-plan" className="section-label">{tr('ui.included')}</h2>
+            {rec.similar ? <p className="choice-hint">{tr('ui.based_on_similar', { n: rec.similar })}</p> : null}
             <div className="inset-group">
               {included.map((p) => (
                 <ProductCard key={p.id} icon={PRODUCT_ICONS[p.id]} name={name(p.id)} reason={p.reason}
@@ -195,6 +223,9 @@ export default function Plan({ state, update, tr, actions, toast }) {
             <div className="inset-group">
               {extras.map((p) => (
                 <ToggleRow key={p.id} icon={PRODUCT_ICONS[p.id]} name={name(p.id)} reason={p.reason} quantity={p.quantity}
+                           proof={p.popular ? (p.popular.with
+                             ? tr('ui.popular_with', { pct: p.popular.pct, product: p.popular.with })
+                             : tr('ui.popular', { pct: p.popular.pct })) : null}
                            monthly={unit(p.id) * p.quantity} checked={p.id in items}
                            onChange={(on) => !busy && toggle(p.id, on)} />
               ))}
@@ -230,32 +261,44 @@ export default function Plan({ state, update, tr, actions, toast }) {
           </section>
         )}
 
-        {quote.setup_total > 0 && spreads.length > 1 && (
+        {setupDue > 0 && spreads.length > 1 && (
           <section className="stack" aria-labelledby="setup-title">
-            <h2 id="setup-title" className="section-label">{tr('ui.setup_title', { amount: money(quote.setup_total).slice(1) })}</h2>
-            <ChipGroup label={tr('ui.setup_title', { amount: money(quote.setup_total).slice(1) })}>
+            <h2 id="setup-title" className="section-label">{tr('ui.setup_title', { amount: money(setupDue).slice(1) })}</h2>
+            <ChipGroup label={tr('ui.setup_title', { amount: money(setupDue).slice(1) })}>
               {spreads.map((m) => (
                 <Chip key={m} selected={quote.setup_months === m} disabled={busy} onClick={() => choose({ setup_months: m })}>
-                  {m === 1 ? tr('ui.setup_now') : tr('ui.setup_spread', { amount: money(Math.ceil(quote.setup_total / m)).slice(1), n: m })}
+                  {m === 1 ? tr('ui.setup_now') : tr('ui.setup_spread', { amount: money(Math.ceil(setupDue / m)).slice(1), n: m })}
                 </Chip>
               ))}
             </ChipGroup>
           </section>
         )}
 
+        {billing.length > 1 && (
+          <section className="stack" aria-labelledby="billing-title">
+            <h2 id="billing-title" className="section-label">{tr('ui.billing_title')}</h2>
+            <ChipGroup label={tr('ui.billing_title')}>
+              {billing.map((o) => (
+                <Chip key={o.months} selected={quote.billing_months === o.months} disabled={busy}
+                      onClick={() => choose({ billing_months: o.months })}>
+                  {o.months === 1 ? tr('ui.billing_monthly') : tr('ui.billing_every', { n: o.months })}
+                  {o.saving_pct > 0 ? ` · ${tr('ui.billing_save', { pct: o.saving_pct })}` : ''}
+                </Chip>
+              ))}
+            </ChipGroup>
+            {quote.billing_months > 1 && (
+              <p className="choice-hint">{tr('ui.billing_bill', { total: money(quote.bill_with_gst).slice(1), n: quote.billing_months })}</p>
+            )}
+          </section>
+        )}
+
         <PriceBreakdown title={tr('ui.price_how')} rows={rows} footnote={tr('ui.price_explain')} />
 
-        <section className="stack" aria-live="polite">
-          {neg.message && <Note tone={neg.status === 'called' ? 'ok' : 'info'}>{neg.message}</Note>}
-          {neg.status === 'handoff' && (
-            <Button variant="secondary" block icon={Phone} onClick={() => setSheet(true)}>{tr('ui.request_call')}</Button>
-          )}
-          {!['handoff', 'called'].includes(neg.status) && (
-            <Button variant="secondary" block icon={BadgePercent} onClick={askPrice} disabled={busy}>
-              {tr(neg.status === 'offer' ? 'ui.ask_better' : neg.status === 'final' ? 'ui.ask_sales' : 'ui.ask_lower')}
-            </Button>
-          )}
-        </section>
+        {neg.status !== 'called' && (
+          <Button variant="secondary" block icon={MessageCircle} onClick={() => update({ screen: 'chat' })} disabled={busy}>
+            {tr('ui.chat_about_price')}
+          </Button>
+        )}
       </main>
 
       <PriceBar
@@ -266,8 +309,10 @@ export default function Plan({ state, update, tr, actions, toast }) {
         meta={[
           quote.setup_months > 1
             ? tr('ui.setup_line', { amount: money(quote.setup_monthly).slice(1), n: quote.setup_months })
-            : `${tr('ui.setup_once')}: ${money(quote.setup_total)}`,
+            : `${tr('ui.setup_once')}: ${money(setupDue)}`,
           tr('ui.contract', { n: quote.contract_months }),
+          ...(quote.billing_months > 1
+            ? [tr('ui.billing_bill', { total: money(quote.bill_with_gst).slice(1), n: quote.billing_months })] : []),
           tr('ui.live_by', { date: live }),
         ]}
         actionLabel={tr('ui.accept')}
@@ -275,19 +320,9 @@ export default function Plan({ state, update, tr, actions, toast }) {
         disabled={busy}
       />
 
-      <BottomSheet open={sheet} onClose={() => setSheet(false)} title={tr('ui.ask_sales')} closeLabel={tr('ui.cancel')}>
-        <TextField label={tr('ui.phone_label')} type="tel" inputMode="tel" autoComplete="tel" placeholder="98765 43210"
-                   value={phone} onChange={(e) => setPhone(e.target.value)} />
-        <TextField label={tr('ui.target_label')} inputMode="numeric" placeholder="₹" value={target}
-                   onChange={(e) => setTarget(e.target.value)} />
-        <div className="inset-group">
-          <Checkbox checked={callOk} onChange={setCallOk} label={tr('ui.callback_consent')} />
-        </div>
-        {error && <Note tone="warn">{error}</Note>}
-        <Button block icon={Phone} onClick={requestCall} disabled={busy || !callOk || phone.replace(/\D/g, '').length < 10}>
-          {tr('ui.request_call')}
-        </Button>
-      </BottomSheet>
+      <PhoneVerifySheet open={verifying} onClose={() => setVerifying(false)} tr={tr} why={tr('ui.phone_why_order')}
+                        withMarketing verifyLabel={tr('ui.accept')}
+                        send={(phone) => api.phoneSend(state.id, phone)} verify={phoneVerified} />
     </div>
   );
 }

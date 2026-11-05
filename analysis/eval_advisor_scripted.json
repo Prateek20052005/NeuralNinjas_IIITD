@@ -2,7 +2,7 @@
  {
   "name": "kirana_indore_en",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -15,6 +15,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: no GST yet",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: I run a kirana store",
    "BOT: Which city is your business in?",
@@ -33,13 +36,13 @@
    "YOU [need:cctv]: not needed",
    "BOT: Here is what I suggest for your shop in Indore:"
   ],
-  "seconds": 0.2,
+  "seconds": 0.3,
   "tokens": 0
  },
  {
   "name": "medical_lucknow_hi",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -53,6 +56,9 @@
    "BOT: क्या आपके पास GST नंबर है? यहाँ लिखिए, मैं आपके बिज़नेस की जानकारी खुद भर दूँगा।",
    "YOU [gstin]: जीएसटी नहीं है",
    "BOT: कोई बात नहीं। मैं ऐसी सेवाएँ सुझाऊँगा जो बिना GST के मिलती हैं।",
+   "BOT: क्या आप पहले से Accel की कोई सेवा इस्तेमाल करते हैं, जैसे Accel मोबाइल नंबर या ब्रॉडबैंड?",
+   "YOU [existing]: no",
+   "BOT: स्वागत है! पहली बार के ग्राहक के रूप में आपको अपने प्लान पर स्वागत ऑफ़र मिलेगा।",
    "BOT: आपका बिज़नेस किस तरह का है?",
    "YOU [segment]: मेरी दवाई की दुकान है",
    "BOT: आपका बिज़नेस किस शहर में है?",
@@ -77,7 +83,7 @@
  {
   "name": "salon_nashik_mr",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -90,6 +96,9 @@
    "BOT: तुमच्याकडे GST नंबर आहे का? इथे लिहा, मी तुमच्या व्यवसायाची माहिती स्वतः भरेन.",
    "YOU [gstin]: GST नाही",
    "BOT: काही हरकत नाही. मी GST शिवाय मिळणाऱ्या सेवा सुचवेन.",
+   "BOT: तुम्ही आधीच Accel ची कोणतीही सेवा वापरता का, जसे Accel मोबाईल नंबर किंवा ब्रॉडबँड?",
+   "YOU [existing]: no",
+   "BOT: स्वागत आहे! पहिल्यांदाच ग्राहक म्हणून तुम्हाला तुमच्या प्लॅनवर स्वागत ऑफर मिळेल.",
    "BOT: तुमचा व्यवसाय कोणत्या प्रकारचा आहे?",
    "YOU [segment]: माझं सलून आहे",
    "BOT: तुमचा व्यवसाय कोणत्या शहरात आहे?",
@@ -114,12 +123,12 @@
  {
   "name": "textile_surat_gu",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 2,
-   "P16": 5,
+   "P08": 1,
+   "P16": 3,
    "P25": 2
   },
   "fallbacks": [],
@@ -128,6 +137,9 @@
    "BOT: શું તમારી પાસે GST નંબર છે? અહીં લખો, હું તમારા વ્યવસાયની વિગતો જાતે ભરી દઈશ.",
    "YOU [gstin]: GST નથી",
    "BOT: કોઈ વાંધો નહીં. હું એવી સેવાઓ સૂચવીશ જે GST વગર ચાલે છે.",
+   "BOT: શું તમે પહેલેથી Accel ની કોઈ સેવા વાપરો છો, જેમ કે Accel મોબાઇલ નંબર કે બ્રોડબેન્ડ?",
+   "YOU [existing]: no",
+   "BOT: સ્વાગત છે! પહેલી વારના ગ્રાહક તરીકે તમને તમારા પ્લાન પર સ્વાગત ઑફર મળશે.",
    "BOT: તમે કયા પ્રકારનો વ્યવસાય ચલાવો છો?",
    "YOU [segment]: અમારી કપડાંની ફેક્ટરી છે",
    "BOT: તમારો વ્યવસાય કયા શહેરમાં છે?",
@@ -152,11 +164,11 @@
  {
   "name": "clinic_chennai_ta",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 1,
+   "P08": 3,
    "P16": 5,
    "P17": 1,
    "P20": 5,
@@ -168,6 +180,9 @@
    "BOT: உங்களிடம் GST எண் உள்ளதா? இங்கே தட்டச்சு செய்யுங்கள், உங்கள் வணிக விவரங்களை நானே நிரப்புகிறேன்.",
    "YOU [gstin]: GST இல்லை",
    "BOT: பரவாயில்லை. GST இல்லாமல் செயல்படும் சேவைகளைப் பரிந்துரைக்கிறேன்.",
+   "BOT: நீங்கள் ஏற்கனவே Accel சேவை ஏதாவது பயன்படுத்துகிறீர்களா, உதாரணமாக Accel மொபைல் எண் அல்லது பிராட்பேண்ட்?",
+   "YOU [existing]: no",
+   "BOT: வரவேற்கிறோம்! முதல் முறை வாடிக்கையாளராக உங்கள் திட்டத்தில் வரவேற்புச் சலுகை கிடைக்கும்.",
    "BOT: நீங்கள் எந்த வகை வணிகம் நடத்துகிறீர்கள்?",
    "YOU [segment]: எனக்கு ஒரு கிளினிக் இருக்கு",
    "BOT: உங்கள் வணிகம் எந்த நகரத்தில் உள்ளது?",
@@ -192,10 +207,10 @@
  {
   "name": "kirana_mobile_only_te",
   "ok": true,
-  "turns": 8,
+  "turns": 9,
   "problems": [],
   "items": {
-   "P07": 2
+   "P07": 1
   },
   "fallbacks": [],
   "transcript": [
@@ -203,6 +218,9 @@
    "BOT: మీకు GST నంబర్ ఉందా? ఇక్కడ టైప్ చేయండి, మీ వ్యాపార వివరాలను నేనే నింపుతాను.",
    "YOU [gstin]: GST లేదు",
    "BOT: పర్వాలేదు. GST లేకుండా పనిచేసే సేవలను సూచిస్తాను.",
+   "BOT: మీరు ఇప్పటికే Accel సేవ ఏదైనా వాడుతున్నారా, ఉదా. Accel మొబైల్ నంబర్ లేదా బ్రాడ్‌బ్యాండ్?",
+   "YOU [existing]: no",
+   "BOT: స్వాగతం! మొదటిసారి కస్టమర్‌గా మీ ప్లాన్‌పై స్వాగత ఆఫర్ లభిస్తుంది.",
    "BOT: మీరు ఏ రకమైన వ్యాపారం నడుపుతున్నారు?",
    "YOU [segment]: మాది కిరాణా దుకాణం",
    "BOT: మీ వ్యాపారం ఏ నగరంలో ఉంది?",
@@ -226,7 +244,7 @@
  {
   "name": "medical_no_fibre_kn",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P04": 1,
@@ -240,6 +258,9 @@
    "BOT: ನಿಮ್ಮ ಬಳಿ GST ಸಂಖ್ಯೆ ಇದೆಯೇ? ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ, ನಿಮ್ಮ ವ್ಯವಹಾರದ ವಿವರಗಳನ್ನು ನಾನೇ ತುಂಬುತ್ತೇನೆ.",
    "YOU [gstin]: GST ಇಲ್ಲ",
    "BOT: ಪರವಾಗಿಲ್ಲ. GST ಇಲ್ಲದೆ ಕೆಲಸ ಮಾಡುವ ಸೇವೆಗಳನ್ನು ಸೂಚಿಸುತ್ತೇನೆ.",
+   "BOT: ನೀವು ಈಗಾಗಲೇ Accel ನ ಯಾವುದಾದರೂ ಸೇವೆ ಬಳಸುತ್ತೀರಾ, ಉದಾ. Accel ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಅಥವಾ ಬ್ರಾಡ್‌ಬ್ಯಾಂಡ್?",
+   "YOU [existing]: no",
+   "BOT: ಸ್ವಾಗತ! ಮೊದಲ ಬಾರಿಯ ಗ್ರಾಹಕರಾಗಿ ನಿಮ್ಮ ಪ್ಲಾನ್ ಮೇಲೆ ಸ್ವಾಗತ ಆಫರ್ ಸಿಗುತ್ತದೆ.",
    "BOT: ನೀವು ಯಾವ ರೀತಿಯ ವ್ಯವಹಾರ ನಡೆಸುತ್ತೀರಿ?",
    "YOU [segment]: ನಮ್ಮದು ಮೆಡಿಕಲ್ ಅಂಗಡಿ",
    "BOT: ನಿಮ್ಮ ವ್ಯವಹಾರ ಯಾವ ನಗರದಲ್ಲಿದೆ?",
@@ -265,7 +286,7 @@
  {
   "name": "bakery_tanglish_kovai",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -278,6 +299,9 @@
    "BOT: உங்களிடம் GST எண் உள்ளதா? இங்கே தட்டச்சு செய்யுங்கள், உங்கள் வணிக விவரங்களை நானே நிரப்புகிறேன்.",
    "YOU [gstin]: GST illai",
    "BOT: பரவாயில்லை. GST இல்லாமல் செயல்படும் சேவைகளைப் பரிந்துரைக்கிறேன்.",
+   "BOT: நீங்கள் ஏற்கனவே Accel சேவை ஏதாவது பயன்படுத்துகிறீர்களா, உதாரணமாக Accel மொபைல் எண் அல்லது பிராட்பேண்ட்?",
+   "YOU [existing]: no",
+   "BOT: வரவேற்கிறோம்! முதல் முறை வாடிக்கையாளராக உங்கள் திட்டத்தில் வரவேற்புச் சலுகை கிடைக்கும்.",
    "BOT: நீங்கள் எந்த வகை வணிகம் நடத்துகிறீர்கள்?",
    "YOU [segment]: naan oru bakery kadai vechirukken",
    "BOT: உங்கள் வணிகம் எந்த நகரத்தில் உள்ளது?",
@@ -302,7 +326,7 @@
  {
   "name": "tailor_kannada_latin_mysuru",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -314,6 +338,9 @@
    "BOT: ನಿಮ್ಮ ಬಳಿ GST ಸಂಖ್ಯೆ ಇದೆಯೇ? ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಿ, ನಿಮ್ಮ ವ್ಯವಹಾರದ ವಿವರಗಳನ್ನು ನಾನೇ ತುಂಬುತ್ತೇನೆ.",
    "YOU [gstin]: GST illa",
    "BOT: ಪರವಾಗಿಲ್ಲ. GST ಇಲ್ಲದೆ ಕೆಲಸ ಮಾಡುವ ಸೇವೆಗಳನ್ನು ಸೂಚಿಸುತ್ತೇನೆ.",
+   "BOT: ನೀವು ಈಗಾಗಲೇ Accel ನ ಯಾವುದಾದರೂ ಸೇವೆ ಬಳಸುತ್ತೀರಾ, ಉದಾ. Accel ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ಅಥವಾ ಬ್ರಾಡ್‌ಬ್ಯಾಂಡ್?",
+   "YOU [existing]: no",
+   "BOT: ಸ್ವಾಗತ! ಮೊದಲ ಬಾರಿಯ ಗ್ರಾಹಕರಾಗಿ ನಿಮ್ಮ ಪ್ಲಾನ್ ಮೇಲೆ ಸ್ವಾಗತ ಆಫರ್ ಸಿಗುತ್ತದೆ.",
    "BOT: ನೀವು ಯಾವ ರೀತಿಯ ವ್ಯವಹಾರ ನಡೆಸುತ್ತೀರಿ?",
    "YOU [segment]: nammadu tailor angadi",
    "BOT: ನಿಮ್ಮ ವ್ಯವಹಾರ ಯಾವ ನಗರದಲ್ಲಿದೆ?",
@@ -339,7 +366,7 @@
  {
   "name": "parlour_hinglish",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -352,6 +379,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: bhai GST nahi hai",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: beauty parlour hai",
    "BOT: Which city is your business in?",
@@ -380,10 +410,10 @@
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 1,
+   "P08": 3,
    "P16": 8,
    "P17": 1,
-   "P20": 8,
+   "P20": 7,
    "P12": 2
   },
   "fallbacks": [],
@@ -410,7 +440,7 @@
    "YOU [need:failover]: no",
    "BOT: Here is what I suggest for your office in Pune:"
   ],
-  "seconds": 0.0,
+  "seconds": 0.4,
   "tokens": 0
  },
  {
@@ -420,7 +450,7 @@
   "problems": [],
   "items": {
    "P01": 1,
-   "P07": 2,
+   "P07": 1,
    "P19": 1,
    "P15": 1,
    "P23": 1
@@ -455,7 +485,7 @@
  {
   "name": "gst_not_ours",
   "ok": true,
-  "turns": 11,
+  "turns": 12,
   "problems": [],
   "items": {
    "P01": 1,
@@ -474,6 +504,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: we don't have GST actually",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: bakery",
    "BOT: Which city is your business in?",
@@ -502,9 +535,9 @@
   "problems": [],
   "items": {
    "P01": 1,
-   "P07": 2,
+   "P07": 1,
    "P19": 1,
-   "P23": 1
+   "P23": 2
   },
   "fallbacks": [],
   "transcript": [
@@ -540,9 +573,9 @@
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 5,
-   "P16": 5,
-   "P20": 4,
+   "P08": 4,
+   "P16": 9,
+   "P20": 6,
    "P25": 3
   },
   "fallbacks": [],
@@ -575,7 +608,7 @@
  {
   "name": "typo_gstin_then_none",
   "ok": true,
-  "turns": 10,
+  "turns": 11,
   "problems": [],
   "items": {
    "P01": 1,
@@ -591,6 +624,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: skip it, no GST",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: tailoring shop",
    "BOT: Which city is your business in?",
@@ -615,11 +651,11 @@
  {
   "name": "restaurant_chain_hyd",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 4,
-   "P08": 5,
+   "P08": 3,
    "P19": 4,
    "P23": 8,
    "P09": 4
@@ -630,6 +666,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: don't have it handy",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: restaurant chain",
    "BOT: Which city is your business in?",
@@ -654,11 +693,11 @@
  {
   "name": "retail_chain_jaipur_hinglish",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 6,
-   "P08": 4,
+   "P08": 3,
    "P19": 6,
    "P23": 12,
    "P09": 6
@@ -669,6 +708,9 @@
    "BOT: क्या आपके पास GST नंबर है? यहाँ लिखिए, मैं आपके बिज़नेस की जानकारी खुद भर दूँगा।",
    "YOU [gstin]: abhi nahi hai",
    "BOT: कोई बात नहीं। मैं ऐसी सेवाएँ सुझाऊँगा जो बिना GST के मिलती हैं।",
+   "BOT: क्या आप पहले से Accel की कोई सेवा इस्तेमाल करते हैं, जैसे Accel मोबाइल नंबर या ब्रॉडबैंड?",
+   "YOU [existing]: no",
+   "BOT: स्वागत है! पहली बार के ग्राहक के रूप में आपको अपने प्लान पर स्वागत ऑफ़र मिलेगा।",
    "BOT: आपका बिज़नेस किस तरह का है?",
    "YOU [segment]: kapdon ki 6 dukaanein hain",
    "BOT: आपका बिज़नेस किस शहर में है?",
@@ -693,13 +735,13 @@
  {
   "name": "autoparts_ludhiana",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 4,
-   "P16": 5,
-   "P20": 4,
+   "P08": 3,
+   "P16": 6,
+   "P20": 3,
    "P25": 3
   },
   "fallbacks": [],
@@ -708,6 +750,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: no",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: auto parts manufacturing unit",
    "BOT: Which city is your business in?",
@@ -732,13 +777,13 @@
  {
   "name": "textile_surat_mr",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 2,
-   "P08": 6,
-   "P16": 6,
-   "P20": 5
+   "P08": 4,
+   "P16": 8,
+   "P20": 9
   },
   "fallbacks": [],
   "transcript": [
@@ -746,6 +791,9 @@
    "BOT: तुमच्याकडे GST नंबर आहे का? इथे लिहा, मी तुमच्या व्यवसायाची माहिती स्वतः भरेन.",
    "YOU [gstin]: नाही",
    "BOT: काही हरकत नाही. मी GST शिवाय मिळणाऱ्या सेवा सुचवेन.",
+   "BOT: तुम्ही आधीच Accel ची कोणतीही सेवा वापरता का, जसे Accel मोबाईल नंबर किंवा ब्रॉडबँड?",
+   "YOU [existing]: no",
+   "BOT: स्वागत आहे! पहिल्यांदाच ग्राहक म्हणून तुम्हाला तुमच्या प्लॅनवर स्वागत ऑफर मिळेल.",
    "BOT: तुमचा व्यवसाय कोणत्या प्रकारचा आहे?",
    "YOU [segment]: कापड कारखाना",
    "BOT: तुमचा व्यवसाय कोणत्या शहरात आहे?",
@@ -770,11 +818,11 @@
  {
   "name": "asks_question_midway",
   "ok": true,
-  "turns": 11,
+  "turns": 12,
   "problems": [],
   "items": {
    "P01": 1,
-   "P07": 2,
+   "P07": 1,
    "P19": 1
   },
   "fallbacks": [],
@@ -783,6 +831,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: none",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: mobile repair shop",
    "BOT: Which city is your business in?",
@@ -813,7 +864,7 @@
  {
   "name": "micro_becomes_multi",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 4,
@@ -828,6 +879,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: no",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: sweet shop",
    "BOT: Which city is your business in?",
@@ -853,14 +907,14 @@
  {
   "name": "all_in_first_message",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 2,
-   "P16": 12,
+   "P08": 3,
+   "P16": 10,
    "P17": 1,
-   "P20": 10,
+   "P20": 6,
    "P09": 1
   },
   "fallbacks": [],
@@ -869,6 +923,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: No GST. I run a coaching centre in Delhi with 12 teachers, one branch.",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: coaching centre",
    "BOT: Which city is your business in?",
@@ -893,7 +950,7 @@
  {
   "name": "unknown_small_town",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -907,6 +964,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: no",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: hardware shop",
    "BOT: Which city is your business in?",
@@ -931,14 +991,14 @@
  {
   "name": "noise_and_odd_numbers",
   "ok": true,
-  "turns": 14,
+  "turns": 15,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 4,
-   "P16": 20,
+   "P08": 2,
+   "P16": 9,
    "P17": 1,
-   "P20": 10
+   "P20": 9
   },
   "fallbacks": [],
   "transcript": [
@@ -949,6 +1009,9 @@
    "BOT: Do you have a GST number? Type it here and I'll fill in your business details for you.",
    "YOU [gstin]: no gst",
    "BOT: No problem. I'll suggest products that work without GST.",
+   "BOT: Do you already use any Accel service, like an Accel mobile number or broadband?",
+   "YOU [existing]: no",
+   "BOT: Welcome! As a first-time customer you'll get a welcome offer on your plan.",
    "BOT: What kind of business do you run?",
    "YOU [segment]: what's the weather?",
    "BOT: Sorry, I didn't catch that. Please tap the option that fits best, or describe it in a few words.",
@@ -985,13 +1048,13 @@
  {
   "name": "coaching_patna_hi",
   "ok": true,
-  "turns": 9,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 2,
-   "P16": 15,
-   "P20": 10,
+   "P08": 3,
+   "P16": 10,
+   "P20": 5,
    "P09": 1
   },
   "fallbacks": [],
@@ -1000,6 +1063,9 @@
    "BOT: क्या आपके पास GST नंबर है? यहाँ लिखिए, मैं आपके बिज़नेस की जानकारी खुद भर दूँगा।",
    "YOU [gstin]: नहीं",
    "BOT: कोई बात नहीं। मैं ऐसी सेवाएँ सुझाऊँगा जो बिना GST के मिलती हैं।",
+   "BOT: क्या आप पहले से Accel की कोई सेवा इस्तेमाल करते हैं, जैसे Accel मोबाइल नंबर या ब्रॉडबैंड?",
+   "YOU [existing]: no",
+   "BOT: स्वागत है! पहली बार के ग्राहक के रूप में आपको अपने प्लान पर स्वागत ऑफ़र मिलेगा।",
    "BOT: आपका बिज़नेस किस तरह का है?",
    "YOU [segment]: कोचिंग सेंटर",
    "BOT: आपका बिज़नेस किस शहर में है?",

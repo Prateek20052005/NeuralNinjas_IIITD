@@ -119,7 +119,8 @@ export default function App() {
     body = <NotFound tr={tr} onHome={() => { window.location.hash = ''; }} />;
   } else if (screen === 'home') {
     body = <Home tr={tr} lang={homeLang} setLang={setHomeLang} saved={state?.id ? state : null}
-                 onStart={() => start(homeLang)} onResume={resume} actions={actions} />;
+                 onStart={() => start(homeLang)} onResume={resume} actions={actions}
+                 onResumed={(snapshot) => { setHomeLang(snapshot.lang); setState(snapshot); }} />;
   } else if (screen === 'chat') {
     body = <Chat {...common} onRetry={() => start(lang)} onHome={() => update({ screen: 'home' })} />;
   } else if (screen === 'plan') {

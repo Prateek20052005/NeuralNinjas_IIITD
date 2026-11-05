@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ..catalogue import Business, load_catalogue
+from ..customers import is_existing_customer
 from ..i18n import t
 from ..kyc.lookups import find_gstin_in_text, lookup_gstin, mask
 from ..recommend import NEED_PRODUCT, Needs, Recommendation, recommend
@@ -46,13 +47,15 @@ class Profile:
     needs: Needs = field(default_factory=Needs)
     needs_answered: set[str] = field(default_factory=set)
     city_other_asked: bool = False
+    existing_customer: bool | None = None   # already with Accel? (GSTIN: our records; no GSTIN: we ask)
 
     def safe_view(self) -> dict:
         """Profile as shown to the AI and written to logs: identifiers masked."""
         return {"language": self.language, "gstin": mask(self.gstin), "gst_status": self.gstin_status,
                 "business_name": self.business_name, "kind": self.segment, "business_type": self.business_type,
                 "city": self.city, "employees": self.employees, "sites": self.sites,
-                "needs": {k: getattr(self.needs, k) for k in self.needs_answered}}
+                "needs": {k: getattr(self.needs, k) for k in self.needs_answered},
+                "existing_customer": self.existing_customer}
 
     def ai_view(self) -> dict:
         """What the chat AI may see: no GST number and no business name (it needs neither to suggest a plan)."""
@@ -70,6 +73,8 @@ def next_slot(p: Profile) -> str | None:
         return "gstin"
     if p.gstin and p.gst_confirmed is None:
         return "gst_confirm"
+    if p.gstin_status == "none" and p.existing_customer is None:   # no GSTIN to check our records with
+        return "existing"
     if p.segment is None:
         return "segment"
     if p.city is None:
@@ -89,7 +94,8 @@ def next_slot(p: Profile) -> str | None:
 def progress(p: Profile, slot: str) -> dict:
     """Where this question sits in the chat, for the "3 of 8" bar. The total can change as answers come in
     (a GSTIN adds the "is this your business?" step; the kind of business decides the need questions)."""
-    plan = ["gstin"] + (["gst_confirm"] if p.gstin else []) + ["segment", "city", "employees", "sites", "internet"]
+    plan = (["gstin"] + (["gst_confirm"] if p.gstin else []) + (["existing"] if p.gstin_status == "none" else [])
+            + ["segment", "city", "employees", "sites", "internet"])
     plan += [f"need:{n}" for n in NEED_QUESTIONS.get(p.segment) or NEED_QUESTIONS["micro"]
              if not _needs_internet_line(p, n)]
     return {"step": plan.index(slot) + 1 if slot in plan else len(plan), "steps": len(plan)}
@@ -109,6 +115,10 @@ def _ask(p: Profile, slot: str) -> dict:
         return {"slot": slot, "text": t(lang, "q.gst_confirm", name=p.business_name, city=p.city or ""),
                 "input": "choice",
                 "options": [{"value": "yes", "label": t(lang, "opt.yes")}, {"value": "no", "label": t(lang, "opt.no")}]}
+    if slot == "existing":
+        return {"slot": slot, "text": t(lang, "q.existing_customer"), "input": "choice",
+                "options": [{"value": "no", "label": t(lang, "opt.existing.no")},
+                            {"value": "yes", "label": t(lang, "opt.existing.yes")}]}
     if slot == "segment":
         return {"slot": slot, "text": t(lang, "q.segment"), "input": "choice",
                 "options": [{"value": s, "label": t(lang, f"opt.segment.{s}")} for s in ("micro", "prof", "multi", "mfg")]}
@@ -168,6 +178,7 @@ def apply_answer(p: Profile, slot: str, value) -> list[str]:
         if not r.found:
             return [t(lang, "msg.gst_notfound")]
         p.gstin, p.gstin_status, p.business_name = r.gstin, r.business_status, r.trade_name
+        p.existing_customer = is_existing_customer(r.gstin)   # our records decide; no need to ask
         city = _city_from_address(r.address or "")
         if city and p.city is None:
             set_city(p, city)
@@ -190,8 +201,15 @@ def apply_answer(p: Profile, slot: str, value) -> list[str]:
             p.city, p.city_tier, p.city_from_gst = None, None, False
             if p.stated_city:
                 set_city(p, p.stated_city)
-        p.gstin = p.gstin_status = p.business_name = p.gst_confirmed = None
+        p.gstin = p.gstin_status = p.business_name = p.gst_confirmed = p.existing_customer = None
         return [t(lang, "msg.gst_rejected")]
+
+    if slot == "existing":
+        yn = yes_no(value)
+        if yn is None:
+            return [t(lang, "msg.yes_no_hint"), question(p, slot)["text"]]
+        p.existing_customer = yn
+        return [t(lang, "msg.existing.yes" if yn else "msg.existing.no")]
 
     if slot == "segment":
         if value in ("micro", "prof", "multi", "mfg"):

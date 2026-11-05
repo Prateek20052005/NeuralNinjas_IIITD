@@ -15,6 +15,8 @@ import math
 from dataclasses import dataclass, field
 
 from .catalogue import Business, check_bundle, check_product, load_catalogue
+from .bundles import SHOW_FROM_PCT, rank_extras
+from .similar import neighbours, quantity as similar_quantity
 from .quote import Quote, build_quote
 
 
@@ -49,6 +51,7 @@ class Pick:
     product_id: str
     quantity: int
     reason: str
+    popularity: dict | None = None        # extras: how often similar businesses took it (bundles.py)
 
 
 @dataclass
@@ -59,6 +62,7 @@ class Recommendation:
     note_items: list[dict] = field(default_factory=list)  # same notes, structured for translation
     quote: Quote | None = None
     essential: set[str] = field(default_factory=set)      # internet, mobile lines and what the owner asked for
+    similar: int = 0                                        # how many similar past customers shaped quantities and extras
 
     def items(self) -> dict[str, int]:
         return {p.product_id: p.quantity for p in self.core}
@@ -145,21 +149,26 @@ def _connectivity(biz: Business, needs: Needs) -> str:
     return "P01"
 
 
-def _quantity(pid: str, biz: Business, needs: Needs) -> int:
+def _quantity(pid: str, biz: Business, needs: Needs, near: list | None = None) -> int:
+    """The owner's own answer first, then what similar businesses bought for their size (similar.py), then a rule."""
     e, s = biz.employees, biz.sites
     per_site = {"P01", "P02", "P03", "P04", "P05", "P06", "P09", "P10", "P19", "P21", "P22"}
     if pid in per_site:
         return s
+    if pid in ("P07", "P08") and needs.mobile_lines:
+        return needs.mobile_lines
+    if pid == "P23" and needs.cameras:
+        return needs.cameras
+    if near and (q := similar_quantity(near, pid, biz)):
+        return q
     if pid in ("P07", "P08"):
-        if needs.mobile_lines:
-            return needs.mobile_lines
         return min(2, e) if biz.segment == "micro" else min(max(1, math.ceil(e / 8)), 6)
     if pid == "P16":  # desk staff who need email
         return min(e, 20) if biz.segment != "mfg" else min(max(5, e // 10), 15)
     if pid == "P20":
         return min(e, 10) if biz.segment != "mfg" else min(max(4, e // 12), 12)
     if pid == "P23":
-        return needs.cameras or (1 if biz.segment == "micro" else 2 * s)
+        return 1 if biz.segment == "micro" else 2 * s
     if pid == "P12":
         return min(max(2, math.ceil(e / 5)), 4)
     if pid == "P24":
@@ -198,6 +207,7 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
     core: dict[str, Pick] = {}
     addons: dict[str, Pick] = {}
     essential: set[str] = set()
+    near = neighbours(biz) if biz.segment else []   # businesses like yours (similar.py)
 
     def add(pid, bucket, must=False):
         placed = _place(pid, biz, notes, note_items)
@@ -209,7 +219,7 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
                                "params": {"needs": sorted(needs_one_of)}})
             return
         if placed and placed not in core and placed not in addons:
-            qty = _quantity(placed, biz, needs)
+            qty = _quantity(placed, biz, needs, near)
             if qty > 0:
                 bucket[placed] = Pick(placed, qty, _reason(placed, biz))
                 if must:
@@ -249,6 +259,13 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
             notes.append(f"{check.reasons[0]}, so it is not included.")
             note_items.append({"type": "drop", "product": pid, "code": check.codes[0][0], "params": check.codes[0][1]})
             core.pop(pid)
-    rec = Recommendation(list(core.values()), list(addons.values()), notes, note_items, essential=essential)
+    # 4. Extras in the order similar businesses took them, each with that share (bundles.py: rules per kind of business)
+    ranked = rank_extras(biz.segment, set(core), list(addons), near)
+    extras = []
+    for pid, seen in ranked:
+        pick = addons[pid]
+        pick.popularity = seen if seen and seen["pct"] >= SHOW_FROM_PCT else None
+        extras.append(pick)
+    rec = Recommendation(list(core.values()), extras, notes, note_items, essential=essential, similar=len(near))
     rec.quote = build_quote(rec.items(), biz, order_date)
     return rec

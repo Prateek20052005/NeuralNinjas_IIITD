@@ -27,7 +27,7 @@ def test_ai_dying_mid_chat_falls_back_and_still_finishes():
     llm = FakeLLM({"extract": {"no_gstin": True}, "say": ""}, LLMUnavailable("RateLimitError"))
     adv = Advisor(llm=llm, order_date=TODAY)
     s, _ = adv.start("en")
-    replies = iter(["we have no GST at all", "a small bakery", "We are in Pune", "3 of us", "only one shop",
+    replies = iter(["we have no GST at all", "no, we are new", "a small bakery", "We are in Pune", "3 of us", "only one shop",
                     "fibre is available", "yes please", "yes please", "no thanks"])
     out = {"question": True}
     while out.get("question"):
@@ -107,6 +107,7 @@ def test_double_tap_answers_only_one_question(client):
     app_id = client.post("/api/applications", json={"language": "en"}).json()["id"]
     msg = f"/api/applications/{app_id}/message"
     client.post(msg, json={"slot": "gstin", "value": "none"})
+    client.post(msg, json={"slot": "existing", "value": "no"})
     with ThreadPoolExecutor(4) as pool:
         list(pool.map(lambda _: client.post(msg, json={"slot": "segment", "value": "micro"}), range(4)))
     out = client.post(msg, json={"slot": "city", "value": "Pune"}).json()
@@ -135,6 +136,7 @@ def test_owners_words_beat_the_ai_on_kind_of_business():
     adv = Advisor(llm=FakeLLM({"extract": {"kind": "prof"}, "say": ""}), order_date=TODAY)
     s, _ = adv.start("hi")
     adv.handle(s, slot="gstin", value="none")
+    adv.handle(s, slot="existing", value="no")
     adv.handle(s, text="मेरी दवाई की दुकान है")
     assert s.profile.segment == "micro"
 
@@ -150,7 +152,7 @@ def test_ai_explanation_in_the_wrong_language_is_replaced_by_our_template():
     english = {"summary": "This plan suits your shop.", "reasons": {"P01": "Fast internet."}, "notes": []}
     adv = Advisor(llm=FakeLLM(english), order_date=TODAY)   # taps need no AI: the only call is the explanation
     s, _ = adv.start("hi")
-    for slot, value in [("gstin", "none"), ("segment", "micro"), ("city", "Pune"), ("employees", 2), ("sites", 1),
+    for slot, value in [("gstin", "none"), ("existing", "no"), ("segment", "micro"), ("city", "Pune"), ("employees", 2), ("sites", 1),
                         ("internet", "fibre"), ("need:billing_pos", "no"), ("need:whatsapp", "no"), ("need:cctv", "no")]:
         out = adv.handle(s, slot=slot, value=value)
     rec = out["recommendation"]

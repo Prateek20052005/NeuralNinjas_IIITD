@@ -8,7 +8,7 @@ from backend.app import main
 
 DOCS = Path(__file__).resolve().parent.parent / "data" / "kyc_documents"
 ANSWERS = {"gstin": "27XUIXG0767D1ZP", "gst_confirm": "yes", "segment": "mfg", "employees": "12", "sites": "1",
-           "internet": "fibre", "need:machines": "4", "need:vehicles": "0", "need:firewall": "yes"}
+           "internet": "fibre", "existing": "no", "need:machines": "4", "need:vehicles": "0", "need:firewall": "yes"}
 
 
 class NoLLM:
@@ -25,6 +25,12 @@ def client(monkeypatch):
 def upload(client, app_id, doc_type, applicant="K03"):
     with open(DOCS / f"{applicant}_{doc_type}.png", "rb") as f:
         return client.post(f"/api/applications/{app_id}/documents/{doc_type}", files={"file": ("p.png", f, "image/png")})
+
+
+def verify_phone(client, app_id, phone="9876543210"):
+    """Demo mode: the one-time code comes back in the response (no SMS in the prototype)."""
+    code = client.post(f"/api/applications/{app_id}/phone", json={"phone": phone}).json()["demo_code"]
+    assert client.post(f"/api/applications/{app_id}/phone/verify", json={"code": code}).status_code == 200
 
 
 def chat_to_quote(client):
@@ -44,6 +50,7 @@ def test_full_journey_from_chat_to_installation(client):
         r = client.post(f"/api/applications/{app_id}/addons", json={"product_id": rec["addons"][0]["id"], "on": True})
         assert r.status_code == 200 and r.json()["quote"]["monthly_with_gst"] > before
     assert client.post(f"/api/applications/{app_id}/addons", json={"product_id": "P13", "on": True}).status_code == 422
+    verify_phone(client, app_id)   # accepting needs a verified mobile number
     assert client.post(f"/api/applications/{app_id}/accept").json()["accepted"]
 
     assert upload(client, app_id, "gst_certificate").status_code == 403          # no consent yet
@@ -114,6 +121,7 @@ def test_owner_without_gst_uploads_only_address_proof_and_id(client):
     app_id, out = r["id"], r
     while out.get("question"):
         out = client.post(f"/api/applications/{app_id}/message", json={"text": answers[out["question"]["slot"]]}).json()
+    verify_phone(client, app_id)   # accepting needs a verified mobile number
     client.post(f"/api/applications/{app_id}/accept")
     client.post(f"/api/applications/{app_id}/consent", json={"purposes": ["kyc"]})
     docs = client.get(f"/api/applications/{app_id}").json()["documents"]
@@ -153,10 +161,12 @@ def test_plan_tiers_contract_and_setup_choices(client):
     assert longer["quote"]["monthly_with_gst"] < basic["quote"]["monthly_with_gst"]
     assert all(longer["unit_prices"][pid] == main.load_catalogue()[pid].price_min for pid in longer["unit_prices"])
     spread = client.post(f"/api/applications/{app_id}/plan", json={"setup_months": 12}).json()["quote"]
-    assert spread["setup_months"] == 12 and spread["setup_monthly"] * 12 >= spread["setup_total"]
+    # a new customer with a small order: setup is free, so there is nothing to spread (spreading: test_rules.py)
+    assert spread["welcome"] and spread["setup_due"] == 0 and spread["setup_months"] == 1
 
+    verify_phone(client, app_id)   # accepting needs a verified mobile number
     accepted = client.post(f"/api/applications/{app_id}/accept").json()
-    assert accepted["quote"]["contract_months"] == 24 and accepted["quote"]["setup_months"] == 12
+    assert accepted["quote"]["contract_months"] == 24 and accepted["quote"]["setup_due"] == 0
     step = next(s for s in accepted["timeline"] if s["step"] == "quote_accepted")
     assert step["tier"] == "basic" and step["contract_months"] == 24
     assert client.post(f"/api/applications/{app_id}/plan", json={"tier": "full"}).status_code == 409
@@ -195,6 +205,7 @@ def test_accept_twice_and_callback_rules(client):
     assert client.post(cb, json={"phone": "98765 43210", "consent": True}).status_code == 200
     a = main.store.get(app_id)
     assert a.callback["requested_at"] == main.TODAY.isoformat()          # same calendar as the rest of the app
+    verify_phone(client, app_id)   # accepting needs a verified mobile number
     assert client.post(f"/api/applications/{app_id}/accept").status_code == 200
     assert client.post(f"/api/applications/{app_id}/accept").status_code == 200   # second tap: no error...
     assert sum(s["step"] == "quote_accepted" for s in a.timeline) == 1             # ...and recorded once
@@ -216,6 +227,7 @@ def test_progress_status_survives_reload_and_uses_the_case_date(client, monkeypa
     while out.get("question"):
         assert 1 <= out["question"]["step"] <= out["question"]["steps"]
         out = client.post(f"/api/applications/{app_id}/message", json={"text": ANSWERS[out["question"]["slot"]]}).json()
+    verify_phone(client, app_id)   # accepting needs a verified mobile number
     client.post(f"/api/applications/{app_id}/accept")
     client.post(f"/api/applications/{app_id}/consent", json={"purposes": ["kyc"]})
     upload(client, app_id, "gst_certificate")
@@ -231,3 +243,15 @@ def test_progress_status_survives_reload_and_uses_the_case_date(client, monkeypa
     assert s["consent"]["given_at"].startswith("2026-07-15")
     assert s["retention_hours"] > 0 and s["delete_after"] >= "2026-07-15"
     assert client.delete(f"/api/applications/{app_id}").json()["deleted"]
+
+
+def test_when_basic_equals_recommended_the_selected_card_is_shown(client):
+    answers = {**ANSWERS, "gstin": "none", "segment": "micro", "city": "Pune", "employees": "3",
+               "need:billing_pos": "no", "need:whatsapp": "no", "need:cctv": "no"}
+    r = client.post("/api/applications", json={"language": "en"}).json()
+    app_id, out = r["id"], r
+    while out.get("question"):
+        out = client.post(f"/api/applications/{app_id}/message", json={"text": answers[out["question"]["slot"]]}).json()
+    plan = client.post(f"/api/applications/{app_id}/plan", json={}).json()
+    ids = [t["id"] for t in plan["tiers"]]
+    assert plan["tier"] in ids and ids == sorted(ids, key=["basic", "recommended", "full"].index)

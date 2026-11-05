@@ -1,16 +1,20 @@
 # Running and hosting the app
 
-Everything here is free. The only secret is the Groq API key, and it is never put in the code or the image.
+Everything here is free. The secrets are the Groq API key and the `APP_STATE_KEY` that encrypts saved applications;
+neither is ever put in the code or the image.
 
 ## 1. On your own computer (Docker)
 
 ```bash
 docker build -t udyam-digital .
-docker run --env-file .env -p 7860:7860 udyam-digital
+docker run --env-file .env -p 7860:7860 -v udyam-state:/app/state udyam-digital
 ```
 
 Open http://localhost:7860 (on a phone on the same Wi-Fi: http://<your-computer-ip>:7860).
 Without a `GROQ_API_KEY` in `.env` the advisor still works in guided (scripted) mode.
+The `udyam-state` volume keeps owners' applications (encrypted with `APP_STATE_KEY`) across restarts and rebuilds, for
+`RETENTION_HOURS` (72) after the last activity. Without `APP_STATE_KEY` they are kept in memory only.
+One-time codes run in demo mode (`OTP_MODE=demo`): the code is shown on screen, as there is no SMS provider yet.
 
 ## 2. Free public link: Hugging Face Spaces
 

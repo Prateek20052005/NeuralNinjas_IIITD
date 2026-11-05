@@ -1,8 +1,11 @@
-import { ArrowRight, MessagesSquare, ScanLine, Zap, History } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, MessagesSquare, ScanLine, Smartphone, Zap, History } from 'lucide-react';
+import { api } from '../api.js';
 import AppHeader from '../components/AppHeader.jsx';
 import BrandMark from '../components/BrandMark.jsx';
 import Button from '../components/Button.jsx';
 import Note from '../components/Note.jsx';
+import PhoneVerifySheet from '../components/PhoneVerifySheet.jsx';
 
 export const LANGS = [
   { code: 'en', name: 'English', hello: 'Choose your language' },
@@ -41,7 +44,9 @@ function CounterArt() {
   );
 }
 
-export default function Home({ tr, lang, setLang, saved, onStart, onResume, actions }) {
+export default function Home({ tr, lang, setLang, saved, onStart, onResume, onResumed, actions }) {
+  const [resuming, setResuming] = useState(false); // continue a saved application with the mobile number
+  const [resumePhone, setResumePhone] = useState('');
   const steps = [
     { icon: MessagesSquare, title: tr('ui.home_step1_title'), body: tr('ui.home_step1') },
     { icon: ScanLine, title: tr('ui.home_step2_title'), body: tr('ui.home_step2') },
@@ -79,6 +84,10 @@ export default function Home({ tr, lang, setLang, saved, onStart, onResume, acti
           ))}
         </ol>
 
+        <Button variant="secondary" block icon={Smartphone} onClick={() => setResuming(true)}>
+          {tr('ui.resume_title')}
+        </Button>
+
         <div className="stack">
           <Note tone="ok">{tr('ui.home_honest')}</Note>
           <Note tone="trust">{tr('ui.home_private')}</Note>
@@ -97,6 +106,14 @@ export default function Home({ tr, lang, setLang, saved, onStart, onResume, acti
           </div>
         </section>
       </main>
+      <PhoneVerifySheet open={resuming} onClose={() => setResuming(false)} tr={tr} title={tr('ui.resume_title')}
+                        why={tr('ui.resume_hint')} verifyLabel={tr('ui.resume_go')}
+                        send={(phone) => { setResumePhone(phone); return api.resumeSend(phone, lang); }}
+                        verify={async (code) => {
+                          const snapshot = await api.resumeVerify(resumePhone, code, lang);
+                          setResuming(false);
+                          onResumed(snapshot);
+                        }} />
       <div className="sticky-bar">
         <Button block onClick={onStart} icon={saved ? undefined : ArrowRight}>
           {saved ? tr('ui.new_chat') : tr('ui.start')}

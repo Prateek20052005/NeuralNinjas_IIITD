@@ -5,30 +5,38 @@ All state is per application id (an unguessable token the phone keeps). See stor
 """
 from __future__ import annotations
 
+import csv
+import hmac
 import logging
 import os
 import re
+import threading
+from collections import Counter
+from functools import lru_cache
 from datetime import date
 from pathlib import Path
 
-from fastapi import FastAPI, File, Header, HTTPException, UploadFile
+from fastapi import FastAPI, File, Header, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from .advisor.engine import Advisor, quote_view
-from .advisor.flow import to_business
-from .catalogue import INTERNET_LINES, load_catalogue
+from .advisor.engine import Advisor, quote_view, recommendation_view
+from .advisor.flow import next_slot, question, to_business
+from .catalogue import DATA_DIR, INTERNET_LINES, load_catalogue
+from .predictor import leads_to_call, model as predictor_model, score_application
+from .bundles import top_rules
 from .i18n import LANGUAGES, _strings, t
 from .kyc.checks import Issue, KycContext, assess, required_documents
 from .kyc.documents import DOC_TYPES, read_document
 from .kyc.lookups import clean_id, mask
 from .kyc.messages import owner_message, result_view
 from .kyc.ocr import NotAnImage
-from .negotiate import clean_phone, is_last_offer, next_offer, room_pct, rupees, settings as price_settings
+from .negotiate import clean_phone, negotiation_step, room_pct, rupees, settings as price_settings
 from .quote import build_quote, contract_options, price_position, toggle, unit_price
 from .voice import MAX_AUDIO_BYTES, VOICE_LANGUAGES, Transcriber, VoiceUnavailable
 from .store import CONSENT_PURPOSES, Application, Consent, Store, case_clock, masked_fields
+from .otp import OtpError, check as check_code, demo_mode, issue as issue_code
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
@@ -48,11 +56,39 @@ MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 MAX_MESSAGE_CHARS = 500   # a chat reply; longer pastes are cut so one message can't use up the AI budget
 
 app = FastAPI(title="Accel Business - Udyam Digital", version="0.4")
+_APP_PATH = re.compile(r"^/api/applications/([A-Za-z0-9_-]+)")
+
+
+@app.middleware("http")
+async def save_progress(request: Request, call_next):
+    """Every change to an application is saved (encrypted) so a server restart doesn't lose the owner's progress."""
+    response = await call_next(request)
+    m = _APP_PATH.match(request.url.path)
+    if m and request.method in ("POST", "PUT", "DELETE") and response.status_code < 500:
+        store.save(m.group(1))
+    return response
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
                    allow_methods=["*"], allow_headers=["*"])
 advisor = Advisor(order_date=TODAY)
 transcriber = Transcriber(advisor.llm.client)   # voice answers use the same Groq key as the chat
 store = Store()
+log = logging.getLogger("api")
+
+# The conversion predictor trains on the 5,000 past leads in a few seconds; do it in the background at start-up so
+# the owner app is never slowed down. Staff pages show "starting up" until it is ready.
+predictor_ready = threading.Event()
+
+
+def _warm_predictor() -> None:
+    try:
+        metrics = predictor_model().metrics
+        predictor_ready.set()
+        log.info("conversion predictor ready: AUC %.3f on %d unseen leads", metrics["auc"], metrics["test_leads"])
+    except Exception:
+        log.exception("conversion predictor could not be trained; staff pages run without scores")
+
+
+threading.Thread(target=_warm_predictor, daemon=True).start()
 
 
 # ---------- request bodies ----------
@@ -70,6 +106,7 @@ class PlanBody(BaseModel):
     tier: str | None = None               # basic / recommended / full
     contract_months: int | None = None
     setup_months: int | None = None       # 1 = pay setup at once, 6 or 12 = spread
+    billing_months: int | None = None     # pay every 1, 3, 6 or 12 months
 
 
 class CallbackBody(BaseModel):
@@ -87,6 +124,22 @@ class ConsentBody(BaseModel):
     purposes: list[str]
 
 
+class PhoneBody(BaseModel):
+    phone: str
+    lang: str = "en"          # for "continue a saved application", picked on the home screen
+
+
+class CodeBody(BaseModel):
+    code: str
+    marketing: bool = False   # separate, optional: offers and news from Accel Business
+
+
+class ResumeCodeBody(BaseModel):
+    phone: str
+    code: str
+    lang: str = "en"
+
+
 class UdyamBody(BaseModel):
     number: str
 
@@ -101,7 +154,12 @@ def _app(app_id: str) -> Application:
 
 def _build(a: Application, items: dict[str, int] | None = None):
     return build_quote(a.items if items is None else items, to_business(a.session.profile), TODAY,
-                       a.contract_months, a.setup_months, a.discount_pct)
+                       a.contract_months, a.setup_months, a.discount_pct, a.billing_months, _first_time(a))
+
+
+def _first_time(a: Application) -> bool:
+    """Welcome offer: only for businesses not already with Accel (our records for a GSTIN, the owner's answer otherwise)."""
+    return a.session.profile.existing_customer is False
 
 
 def _quote(a: Application) -> dict:
@@ -113,11 +171,15 @@ def _plan_view(a: Application) -> dict:
     q, cat, rec = _build(a), load_catalogue(), a.session.recommendation
     pos = price_position(q.contract_months, q.min_contract_months)
     tiers, seen = [], set()
-    for name, items in rec.tiers().items():
+    # Basic is often the same as Recommended: show it once, as "Recommended" (the plan the owner starts on, so one
+    # card is always selected), and keep the cards in Basic -> Recommended -> Full order
+    for name in ("recommended", "basic", "full"):
+        items = rec.tiers()[name]
         key = frozenset(items.items())
-        if key not in seen:   # Basic is often the same as Recommended: show it once
+        if key not in seen:
             seen.add(key)
             tiers.append({"id": name, "count": len(items), "monthly_with_gst": _build(a, items).monthly_with_gst})
+    tiers.sort(key=lambda t: ("basic", "recommended", "full").index(t["id"]))
     return {"quote": quote_view(q), "items": a.items, "tier": a.tier, "tiers": tiers,
             "callback_requested": a.callback is not None,
             "unit_prices": {pk.product_id: unit_price(cat[pk.product_id], pos) for pk in rec.core + rec.addons}}
@@ -145,6 +207,7 @@ def _status(a: Application) -> dict:
         "kyc": result_view(a.kyc, a.language) if a.kyc else None,
         "timeline": a.timeline,
         # privacy page: everything is erased automatically after this much time without activity
+        "phone": mask(a.phone), "phone_verified": bool(a.phone_verified_at), "marketing_consent": a.marketing_consent,
         "retention_hours": round(store.retention.total_seconds() / 3600),
         "delete_after": case_clock(a.last_seen + store.retention).isoformat(timespec="minutes"),
     }
@@ -154,7 +217,8 @@ def _status(a: Application) -> dict:
 @app.get("/api/health")
 def health():
     return {"status": "ok", "advisor_mode": advisor.mode, "today": TODAY.isoformat(), "languages": LANGUAGES,
-            "voice_languages": list(VOICE_LANGUAGES) if transcriber.available else []}
+            "voice_languages": list(VOICE_LANGUAGES) if transcriber.available else [],
+            "progress_saved": store.saving, "otp_demo": demo_mode()}
 
 
 @app.get("/api/i18n/{lang}")
@@ -188,7 +252,9 @@ def message(app_id: str, body: MessageBody):
         raise HTTPException(422, "Empty message")
     with a.lock:   # two quick taps on one phone must not answer two questions at once
         if a.session.recommendation:
-            raise HTTPException(409, "Advice is finished; switch add-ons or accept the quote")
+            if a.accepted:
+                raise HTTPException(409, "The plan is accepted; carry on with the documents")
+            return _after_plan(a, text)
         out = advisor.handle(a.session, text=text, slot=body.slot, value=body.value)
         if out.get("recommendation"):
             a.items = a.session.recommendation.items()
@@ -249,30 +315,51 @@ def switch_addon(app_id: str, body: AddonBody):
     return {**_plan_view(a), "notes": notes}
 
 
-@app.post("/api/applications/{app_id}/price-request")
-def price_request(app_id: str):
-    """Owner taps 'Ask for a lower price'. Offers come from pricing_settings.json, never from the AI, and never go
-    below the catalogue minimum. When there is nothing more to offer, the owner is offered a salesperson's call."""
-    a = _app(app_id)
-    if not a.session.recommendation or a.accepted:
-        raise HTTPException(409, "No open quote to change")
-    lang, hours = a.language, price_settings()["sales_callback_hours"]
-    with a.lock:
-        before = build_quote(a.items, to_business(a.session.profile), TODAY, a.contract_months, a.setup_months)
-        room = room_pct(before.list_total, before.floor_total)
-        a.price_asks += 1
-        offer = next_offer(a.price_asks, room, a.discount_pct)
-        if offer is None:
-            a.mark("price_handoff", asks=a.price_asks, best_pct=a.discount_pct)
-            key = "msg.price.floor" if a.discount_pct == 0 and room < 0.5 else "msg.price.handoff"
-            return {**_plan_view(a), "status": "handoff", "message": t(lang, key, hours=hours)}
-        a.discount_pct = offer
+def _after_plan(a: Application, text: str) -> dict:
+    """The chat stays open after the plan: product questions get an answer, and price requests are negotiated.
+    Asking for a lower price first gets no discount, only the honest ways to pay less (Basic plan, longer contract);
+    if the owner insists, 5% and then 10% (pricing_settings.json), then a salesperson's call. Amounts always come
+    from negotiate.py and never go below the catalogue minimum; the AI only helps tell that a message is a request."""
+    lang = a.language
+    plan = {"question": None, "mode": advisor.mode}
+    if not text:   # a stale tap on an old question
+        return {**plan, "messages": [t(lang, "msg.plan_ready")]}
+    price, say = advisor.after_plan(a.session, text)
+    if not price:
+        return {**plan, "messages": [say or t(lang, "msg.plan_ready")]}
+
+    hours = price_settings()["sales_callback_hours"]
+    before = build_quote(a.items, to_business(a.session.profile), TODAY, a.contract_months, a.setup_months)
+    room = room_pct(before.list_total, before.floor_total)
+    a.price_asks += 1
+    step, pct = negotiation_step(a.price_asks, room, a.discount_pct)
+    if step == "pushback":
+        msgs = [t(lang, "msg.price.pushback")] + _cheaper_ways(a)
+        a.mark("price_pushback", asks=a.price_asks)
+    elif step == "handoff":
+        key = "msg.price.floor" if a.discount_pct == 0 and room < 0.5 else "msg.price.handoff"
+        msgs = [t(lang, key, hours=hours)]
+        a.mark("price_handoff", asks=a.price_asks, best_pct=a.discount_pct)
+    else:
+        a.discount_pct = pct
         q = _build(a)
-        last = is_last_offer(a.price_asks, room, a.discount_pct)
+        msgs = [t(lang, f"msg.price.{step}", pct=f"{q.discount_pct:g}", total=rupees(q.monthly_with_gst))]
         a.mark("price_offer", pct=q.discount_pct, monthly=q.monthly_with_gst)
-        message = t(lang, "msg.price.final" if last else "msg.price.offer",
-                    pct=f"{q.discount_pct:g}", total=rupees(q.monthly_with_gst))
-        return {**_plan_view(a), "status": "final" if last else "offer", "message": message}
+    return {**plan, "messages": msgs, "negotiation": {"status": step}, "quote": quote_view(_build(a))}
+
+
+def _cheaper_ways(a: Application) -> list[str]:
+    """Honest ways to pay less without a discount: the Basic plan, and a longer contract (both at list prices)."""
+    lang, now = a.language, _build(a).monthly_with_gst
+    out = []
+    basic = a.session.recommendation.tiers()["basic"]
+    if basic != a.items and (b := _build(a, basic).monthly_with_gst) < now:
+        out.append(t(lang, "msg.price.alt_basic", total=rupees(b)))
+    longer = [o for o in _build(a).contract_options if o["monthly_with_gst"] < now]
+    if longer:
+        best = min(longer, key=lambda o: o["monthly_with_gst"])
+        out.append(t(lang, "msg.price.alt_contract", months=best["months"], total=rupees(best["monthly_with_gst"])))
+    return out
 
 
 @app.post("/api/applications/{app_id}/sales-callback")
@@ -305,7 +392,7 @@ def choose_plan(app_id: str, body: PlanBody):
     rec = a.session.recommendation
     if not rec:
         raise HTTPException(409, "No quote yet")
-    if a.accepted and (body.tier or body.contract_months or body.setup_months):
+    if a.accepted and (body.tier or body.contract_months or body.setup_months or body.billing_months):
         raise HTTPException(409, "No open quote to change")
     with a.lock:
         if body.tier:
@@ -321,6 +408,10 @@ def choose_plan(app_id: str, body: PlanBody):
             if body.setup_months not in (1, 6, 12):
                 raise HTTPException(422, "Setup can be paid at once or over 6 or 12 months")
             a.setup_months = body.setup_months         # ignored if longer than the contract
+        if body.billing_months is not None:
+            if body.billing_months not in [o["months"] for o in _build(a).billing_options]:
+                raise HTTPException(422, "Choose one of the billing options shown")
+            a.billing_months = body.billing_months
         return _plan_view(a)
 
 
@@ -331,10 +422,13 @@ def accept(app_id: str):
         raise HTTPException(409, "No quote yet")
     if a.accepted:          # double tap or page reload: already accepted, nothing to record again
         return _status(a)
+    if not a.phone_verified_at:   # needed for order updates and the installation visit
+        raise HTTPException(409, t(a.language, "msg.phone_required"))
     a.accepted = True
     q = _quote(a)
     a.mark("quote_accepted", monthly=q["monthly_with_gst"], expected_live=q["expected_live"], tier=a.tier,
-           contract_months=q["contract_months"], setup_months=q["setup_months"], discount_pct=q["discount_pct"])
+           contract_months=q["contract_months"], setup_months=q["setup_months"], discount_pct=q["discount_pct"],
+           billing_months=q["billing_months"], first_time=bool(q["welcome"]), setup_due=q["setup_due"])
     return _status(a)
 
 
@@ -417,6 +511,94 @@ def submit_kyc(app_id: str):
 
 
 # ---------- tracker and privacy ----------
+# ---------- mobile number: save progress, continue on another phone, required to accept ----------
+def _otp_error(e: OtpError, lang: str) -> HTTPException:
+    return HTTPException(429 if e.code in ("wait", "too_many") else 422, t(lang, f"msg.otp_{e.code}", seconds=e.seconds))
+
+
+def _phone(raw: str, lang: str) -> str:
+    phone = clean_phone(raw)
+    if not phone:
+        raise HTTPException(422, t(lang, "msg.phone_invalid"))
+    return phone
+
+
+def _sent(phone: str, code: str) -> dict:
+    # demo mode: the prototype has no SMS provider, so the code is shown on screen instead
+    return {"sent": True, "phone": mask(phone), **({"demo_code": code} if demo_mode() else {})}
+
+
+@app.post("/api/applications/{app_id}/phone")
+def send_phone_code(app_id: str, body: PhoneBody):
+    a = _app(app_id)
+    phone = _phone(body.phone, a.language)
+    with a.lock:
+        try:
+            a.otp, code = issue_code(a.otp, phone)
+        except OtpError as e:
+            raise _otp_error(e, a.language)
+    return _sent(phone, code)
+
+
+@app.post("/api/applications/{app_id}/phone/verify")
+def verify_phone(app_id: str, body: CodeBody):
+    a = _app(app_id)
+    with a.lock:
+        try:
+            phone = check_code(a.otp, body.code)
+        except OtpError as e:
+            raise _otp_error(e, a.language)
+        a.phone, a.phone_verified_at = phone, case_clock().isoformat(timespec="seconds")
+        a.marketing_consent = bool(body.marketing)
+        a.mark("phone_verified", phone=mask(phone), marketing=a.marketing_consent)
+    return {"verified": True, "phone": mask(phone), "marketing_consent": a.marketing_consent}
+
+
+@app.post("/api/resume")
+def send_resume_code(body: PhoneBody):
+    """Continue a saved application on any phone. The answer is the same whether or not the number has one,
+    so nobody can find out which numbers have applications."""
+    lang = body.lang if body.lang in LANGUAGES else "en"
+    phone = _phone(body.phone, lang)
+    try:
+        store.resume_codes[phone], code = issue_code(store.resume_codes.get(phone), phone)
+    except OtpError as e:
+        raise _otp_error(e, lang)
+    return _sent(phone, code)
+
+
+@app.post("/api/resume/verify")
+def resume(body: ResumeCodeBody):
+    lang = body.lang if body.lang in LANGUAGES else "en"
+    phone = _phone(body.phone, lang)
+    try:
+        check_code(store.resume_codes.get(phone), body.code)
+    except OtpError as e:
+        raise _otp_error(e, lang)
+    store.resume_codes.pop(phone, None)
+    a = store.find_by_phone(phone)
+    if not a:
+        raise HTTPException(404, t(lang, "msg.resume_none", hours=round(store.retention.total_seconds() / 3600)))
+    a.mark("resumed")
+    store.save(a.id)
+    return _snapshot(a)
+
+
+def _snapshot(a: Application) -> dict:
+    """What a phone needs to pick up an application. The chat transcript is not kept, so the chat restarts with
+    "welcome back" and the next question; plan, documents and tracker come back as they were."""
+    s, lang = a.session, a.language
+    rec = recommendation_view(s.recommendation, s.explanation) if s.recommendation else None
+    slot = None if rec else next_slot(s.profile)
+    q = question(s.profile, slot) if slot else None
+    screen = ("tracker" if a.kyc else "documents" if a.consent else "consent" if a.accepted
+              else "plan" if rec else "chat")
+    texts = [t(lang, "msg.welcome_back")] + ([q["text"]] if q else [t(lang, "msg.plan_ready")] if rec else [])
+    return {"id": a.id, "lang": lang, "screen": screen, "question": q, "rec": rec, "items": a.items,
+            "accepted": a.accepted, "consented": bool(a.consent), "phoneVerified": bool(a.phone_verified_at),
+            "phoneSaved": mask(a.phone), "messages": [{"from": "bot", "text": x} for x in texts]}
+
+
 @app.get("/api/applications/{app_id}")
 def status(app_id: str):
     return _status(_app(app_id))
@@ -431,11 +613,24 @@ def erase(app_id: str):
 
 
 # ---------- back office (needs BACKOFFICE_KEY in .env; off when unset) ----------
+def _staff(x_admin_key: str | None) -> None:
+    key = os.getenv("BACKOFFICE_KEY")
+    if not key or not x_admin_key or not hmac.compare_digest(x_admin_key, key):
+        raise HTTPException(401, "back office key required")
+
+
+def _score(a: Application) -> dict | None:
+    """Conversion score for a live application (predictor.py); None while the predictor is still warming up."""
+    try:
+        return score_application(a.session.profile) if predictor_ready.is_set() else None
+    except Exception:   # the score is a hint for staff; never let it break the page
+        log.exception("conversion score failed")
+        return None
+
+
 @app.get("/api/backoffice/applications")
 def backoffice(x_admin_key: str | None = Header(default=None)):
-    key = os.getenv("BACKOFFICE_KEY")
-    if not key or x_admin_key != key:
-        raise HTTPException(401, "back office key required")
+    _staff(x_admin_key)
     out = []
     for a in store.all():
         p = a.session.profile
@@ -444,11 +639,92 @@ def backoffice(x_admin_key: str | None = Header(default=None)):
                     "monthly": _quote(a)["monthly_with_gst"] if a.items else None,
                     "documents": {k: masked_fields(d) for k, d in a.docs.items()},
                     "kyc": result_view(a.kyc, "en", back_office=True) if a.kyc else None,
-                    "price": {"asks": a.price_asks, "discount_pct": a.discount_pct, "tier": a.tier},
+                    "price": {"asks": a.price_asks, "discount_pct": a.discount_pct, "tier": a.tier,
+                              "billing_months": a.billing_months, "first_time": _first_time(a)},
+                    "phone": mask(a.phone), "marketing_consent": a.marketing_consent,
+                    "conversion": None if a.accepted else _score(a),
                     # leads the chatbot could not close: the full number is shown here only, so sales can call
                     "sales_callback": {**a.callback, "reference": a.id[:6].upper()} if a.callback else None,
                     "timeline": a.timeline})
     return sorted(out, key=lambda x: x["sales_callback"] is None)   # calls to make come first
+
+
+HISTORY_STAGES = ["Lead", "Contacted", "Needs assessed", "Quote accepted", "KYC complete", "Activated"]
+
+
+@lru_cache(maxsize=1)
+def _history() -> dict:
+    """The old, sales-led funnel from the leads file (Apr-Jun 2026), to compare the app against."""
+    with open(DATA_DIR / "smb_leads.csv", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    reached = Counter(HISTORY_STAGES.index(r["stage_reached"]) for r in rows)
+    funnel = [{"stage": st, "count": sum(n for i, n in reached.items() if i >= k)} for k, st in enumerate(HISTORY_STAGES)]
+    days = [int(r["days_lead_to_activation"]) for r in rows if r["days_lead_to_activation"]]
+    return {"funnel": funnel, "avg_days_to_activate": round(sum(days) / len(days), 1),
+            "top_drop_reasons": [{"reason": k, "count": n} for k, n in
+                                 Counter(r["drop_reason"] for r in rows if r["drop_reason"]).most_common(6)]}
+
+
+@app.get("/api/backoffice/stats")
+def backoffice_stats(x_admin_key: str | None = Header(default=None)):
+    """Live numbers from the app's applications, the old funnel for comparison, and how good the predictor is."""
+    _staff(x_admin_key)
+    apps = store.all()
+    steps = [{s["step"] for s in a.timeline} for a in apps]
+    accepted = [a for a in apps if a.accepted]
+    quotes = [_quote(a) for a in accepted]
+    funnel = [("Started a chat", len(apps)),
+              ("Got a plan", sum("quote_ready" in s for s in steps)),
+              ("Accepted the plan", len(accepted)),
+              ("Gave consent", sum("consent_given" in s for s in steps)),
+              ("KYC passed", sum(1 for a in apps if a.kyc and a.kyc.decision == "PASS")),
+              ("Installation booked", sum("installation_booked" in s for s in steps))]
+    monthly = sum(q["monthly_with_gst"] for q in quotes)
+    return {
+        "funnel": [{"stage": k, "count": n} for k, n in funnel],
+        "money": {"monthly_with_gst": monthly, "average_monthly": round(monthly / len(quotes)) if quotes else 0,
+                  "setup_due": sum(q["setup_due"] for q in quotes)},
+        "offers": {"discounted": sum(1 for a in apps if a.discount_pct), "callbacks": sum(1 for a in apps if a.callback),
+                   "welcome": sum(1 for q in quotes if q["welcome"]),
+                   "pay_ahead": sum(1 for q in quotes if q["billing_months"] > 1),
+                   "marketing_ok": sum(1 for a in apps if a.marketing_consent)},
+        "kyc": dict(Counter(a.kyc.decision for a in apps if a.kyc)),
+        "languages": dict(Counter(LANGUAGES.get(a.language, a.language) for a in apps)),
+        "kinds": dict(Counter(a.session.profile.segment or "not yet" for a in apps)),
+        "history": _history(),
+        "predictor": predictor_model().metrics if predictor_ready.is_set() else None,
+        "sells_together": top_rules(2),   # strongest 'bought together' rules per kind of business (bundles.py)
+    }
+
+
+@app.get("/api/backoffice/customers")
+def backoffice_customers(x_admin_key: str | None = Header(default=None)):
+    """Owners who accepted a plan: what they bought and on what terms (phone masked; marketing only if they agreed)."""
+    _staff(x_admin_key)
+    out = []
+    for a in store.all():
+        if not a.accepted:
+            continue
+        p, q = a.session.profile, _quote(a)
+        when = next((s["at"] for s in a.timeline if s["step"] == "quote_accepted"), None)
+        out.append({"ref": a.id[:6].upper(), "business": p.business_name or p.business_type, "city": p.city,
+                    "kind": p.segment, "language": LANGUAGES.get(a.language, a.language),
+                    "plan": [f"{l['name']} ×{l['quantity']}" if l["quantity"] > 1 else l["name"] for l in q["lines"]],
+                    "monthly_with_gst": q["monthly_with_gst"], "contract_months": q["contract_months"],
+                    "billing_months": q["billing_months"], "setup_due": q["setup_due"],
+                    "discount_pct": q["discount_pct"], "welcome": bool(q["welcome"]), "tier": a.tier,
+                    "phone": mask(a.phone), "marketing_consent": a.marketing_consent,
+                    "kyc": a.kyc.decision if a.kyc else None, "accepted_at": when})
+    return sorted(out, key=lambda c: c["accepted_at"] or "", reverse=True)
+
+
+@app.get("/api/backoffice/leads")
+def backoffice_leads(limit: int = 50, x_admin_key: str | None = Header(default=None)):
+    """Conversion predictor: past leads that dropped for a reason the app now answers, best chance first."""
+    _staff(x_admin_key)
+    if not predictor_ready.is_set():
+        raise HTTPException(503, "The conversion predictor is still starting up. Try again in a few seconds.")
+    return {"model": predictor_model().metrics, "leads": leads_to_call(max(1, min(limit, 200)))}
 
 
 # ---------- the built phone app (frontend/dist), served from the same address ----------

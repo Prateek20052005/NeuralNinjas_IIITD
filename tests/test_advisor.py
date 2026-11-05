@@ -80,7 +80,7 @@ def test_scripted_flow_gst_prefills_city_and_finishes():
 
 @pytest.mark.parametrize("lang", ["hi", "mr"])
 def test_scripted_flow_in_hindi_and_marathi(lang):
-    s, out = run_scripted(lang, ["none", "micro", "Pune", "दो", "1", "fibre", "हो", "हो", "नाही"])  # wants WhatsApp, no GST
+    s, out = run_scripted(lang, ["none", "no", "micro", "Pune", "दो", "1", "fibre", "हो", "हो", "नाही"])  # wants WhatsApp, no GST
     rec = out["recommendation"]
     assert all(ord(c) < 128 or "ऀ" <= c <= "ॿ" or not c.isalpha() for c in rec["headline"])
     assert any("ऀ" <= c <= "ॿ" for c in rec["core"][0]["reason"])  # reasons translated
@@ -121,8 +121,8 @@ def test_ai_extract_is_validated_before_use():
     assert p.gstin_status == "none" and p.city == "Pune"
     assert p.segment is None and p.employees is None          # invalid kind and absurd number rejected
     assert p.needs.backup is True and "teleport" not in p.needs_answered
-    assert out["messages"] == ["What kind of business do you run?"]  # AI's question and bare "Got it." dropped
-    assert out["question"]["slot"] == "segment"                                        # our order, our words
+    assert out["messages"] == [out["question"]["text"]]   # AI's question and bare "Got it." dropped
+    assert out["question"]["slot"] == "existing"                                       # our order, our words
 
 
 def test_ai_answers_the_confirmation_but_the_owner_decides():
@@ -143,7 +143,7 @@ def test_plain_short_answers_skip_the_ai():
     fake = FakeLLM()
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
-    for a in ["none", "prof", "Pune", "8"]:
+    for a in ["none", "no", "prof", "Pune", "8"]:
         adv.handle(s, text=a)
     adv.llm = fake
     adv.handle(s, text="just one")                       # sites
@@ -157,12 +157,12 @@ def test_ai_failure_falls_back_to_scripted_without_error():
     s, _ = adv.start("en")
     out = adv.handle(s, text="I don't have GST, no")
     assert s.profile.gstin_status == "none"                    # scripted path understood it
-    assert out["question"]["slot"] == "segment"
+    assert out["question"]["slot"] == "existing"
     assert s.fallbacks == ["turn:RateLimitError"]
 
 
 def test_safety_net_records_plain_answers_the_ai_missed():
-    p_answers = ["none", "prof", "Pune", "8", "1", "fibre"]
+    p_answers = ["none", "no", "prof", "Pune", "8", "1", "fibre"]
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
     for a in p_answers:
@@ -174,7 +174,7 @@ def test_safety_net_records_plain_answers_the_ai_missed():
 
 
 def test_ai_explanation_cannot_drop_products_or_notes():
-    answers = ["none", "micro", "Pune", "3", "1", "fibre", "yes", "yes", "no"]
+    answers = ["none", "no", "micro", "Pune", "3", "1", "fibre", "yes", "yes", "no"]
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
     for a in answers[:-1]:
@@ -216,7 +216,7 @@ def test_city_names_in_any_script_get_the_right_tier(typed, city, tier):
 def test_unclear_answer_repeats_the_question_only_once():
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
-    for a in ["none", "prof", "Pune", "8", "1", "fibre"]:
+    for a in ["none", "no", "prof", "Pune", "8", "1", "fibre"]:
         adv.handle(s, text=a)
     out = adv.handle(s, text="what is that?")
     assert out["messages"] == ["Please answer yes or no.", "Do you need business phone lines with a welcome menu for callers?"]
@@ -228,7 +228,7 @@ def test_typed_answers_work_without_ai():
     s, _ = adv.start("en")
     out = adv.handle(s, text="03PJNXS4821G1ZB")
     assert "Please answer" not in " ".join(out["messages"])     # the GSTIN is not taken as the yes/no answer
-    for a in ["no, not us", "skip, no GST", "kapdon ki 6 dukaanein hain", "We are in Chennai", "about twenty five"]:
+    for a in ["no, not us", "skip, no GST", "no", "kapdon ki 6 dukaanein hain", "We are in Chennai", "about twenty five"]:
         adv.handle(s, text=a)
     p = s.profile
     assert (p.gstin_status, p.segment, p.city, p.employees) == ("none", "multi", "Chennai", 25)
@@ -252,7 +252,7 @@ def test_mobile_only_owner_gets_no_internet_line_and_no_internet_questions():
     s, _ = adv.start("en")
     asked = []
     out = {}
-    for a in ["none", "micro", "Pune", "3", "1", "sirf mobile sim chahiye", "no", "no", "no"]:
+    for a in ["none", "no", "micro", "Pune", "3", "1", "sirf mobile sim chahiye", "no", "no", "no"]:
         out = adv.handle(s, text=a)
         if out.get("question"):
             asked.append(out["question"]["slot"])
@@ -268,14 +268,14 @@ def test_mobile_only_owner_gets_no_internet_line_and_no_internet_questions():
 @pytest.mark.parametrize("typed,line", [("no fibre here", "P04"), ("5G wireless", "P04"), ("fibre", "P01"),
                                         ("पता नहीं", "P01")])
 def test_internet_answer_picks_the_line(typed, line):
-    s, out = run_scripted("en", ["none", "micro", "Pune", "3", "1", typed, "no", "no", "no"])
+    s, out = run_scripted("en", ["none", "no", "micro", "Pune", "3", "1", typed, "no", "no", "no"])
     assert out["recommendation"]["core"][0]["id"] == line
 
 
 def test_not_sure_about_fibre_is_explained():
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
-    for a in ["none", "micro", "Pune", "3", "1"]:
+    for a in ["none", "no", "micro", "Pune", "3", "1"]:
         adv.handle(s, text=a)
     out = adv.handle(s, text="not sure")
     assert any("5G AirFiber instead" in m for m in out["messages"])
@@ -318,10 +318,10 @@ def test_no_ai_notice_when_the_ai_is_off():
 # ---------- Gujarati, Tamil, Telugu, Kannada ----------
 
 NEW_LANGS = {   # typed answers in the language's own script: GST, kind, city, staff, sites, internet, then needs
-    "gu": ["GST નથી", "મારી કરિયાણાની દુકાન છે", "અમદાવાદ", "ત્રણ", "એક", "ફાઇબર છે", "હા", "ના", "ના"],
-    "ta": ["GST இல்லை", "எனக்கு மளிகை கடை இருக்கு", "சென்னை", "மூணு பேர்", "ஒரே கடை", "ஃபைபர் இருக்கு", "ஆமா", "வேண்டாம்", "இல்லை"],
-    "te": ["GST లేదు", "మాది కిరాణా దుకాణం", "హైదరాబాద్", "మూడు", "ఒక్కటే", "ఫైబర్ ఉంది", "అవును", "వద్దు", "లేదు"],
-    "kn": ["GST ಇಲ್ಲ", "ನಮ್ಮದು ಕಿರಾಣಿ ಅಂಗಡಿ", "ಬೆಂಗಳೂರು", "ಮೂರು ಜನ", "ಒಂದೇ ಅಂಗಡಿ", "ಫೈಬರ್ ಇದೆ", "ಹೌದು", "ಬೇಡ", "ಇಲ್ಲ"],
+    "gu": ["GST નથી", "ના", "મારી કરિયાણાની દુકાન છે", "અમદાવાદ", "ત્રણ", "એક", "ફાઇબર છે", "હા", "ના", "ના"],
+    "ta": ["GST இல்லை", "இல்லை", "எனக்கு மளிகை கடை இருக்கு", "சென்னை", "மூணு பேர்", "ஒரே கடை", "ஃபைபர் இருக்கு", "ஆமா", "வேண்டாம்", "இல்லை"],
+    "te": ["GST లేదు", "లేదు", "మాది కిరాణా దుకాణం", "హైదరాబాద్", "మూడు", "ఒక్కటే", "ఫైబర్ ఉంది", "అవును", "వద్దు", "లేదు"],
+    "kn": ["GST ಇಲ್ಲ", "ಇಲ್ಲ", "ನಮ್ಮದು ಕಿರಾಣಿ ಅಂಗಡಿ", "ಬೆಂಗಳೂರು", "ಮೂರು ಜನ", "ಒಂದೇ ಅಂಗಡಿ", "ಫೈಬರ್ ಇದೆ", "ಹೌದು", "ಬೇಡ", "ಇಲ್ಲ"],
 }
 
 

@@ -1,6 +1,25 @@
 {
-  "_about": "Price negotiation on the plan screen. Offers come from these numbers, never from the AI. A discount never takes a price below the catalogue minimum, whatever these say.",
+  "_about": "Price negotiation in the chat, after the plan is shown. The first polite_refusals requests get no discount (the owner is shown the cheaper Basic plan and longer contracts instead); if they insist, first_offer_pct, then max_discount_pct; after that a salesperson calls. Offers come from these numbers, never from the AI, and a discount never takes a price below the catalogue minimum, whatever these say.",
+  "polite_refusals": 1,
   "first_offer_pct": 5,
   "max_discount_pct": 10,
-  "sales_callback_hours": 24
+  "sales_callback_hours": 24,
+  "pay_ahead_saving_pct": {
+    "_about": "Paying every 3, 6 or 12 months in advance saves this much on the monthly price (never below the catalogue minimum).",
+    "3": 2,
+    "6": 4,
+    "12": 8
+  },
+  "welcome": {
+    "_about": "First-time customers only (not already with Accel). Order size = monthly price before GST and discounts. The first-months discount covers the first 3 months (monthly or quarterly billing) or the first half-yearly / yearly bill, once; it is a time-limited promotion, so it may go below the catalogue minimum.",
+    "large_order_from": 6900,
+    "very_large_order_from": 15900,
+    "setup_off_pct": {
+      "small": 100,
+      "large": 30,
+      "very_large": 40
+    },
+    "first_months": 3,
+    "first_months_pct": 15
+  }
 }

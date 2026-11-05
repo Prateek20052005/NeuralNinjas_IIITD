@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, ArrowUp, Lock, Mic, Square, Volume2, VolumeX } from 'lucide-react';
+import { ArrowRight, ArrowUp, BookmarkCheck, BookmarkPlus, Lock, Mic, Phone, Square, Volume2, VolumeX } from 'lucide-react';
 import { api } from '../api.js';
 import AppHeader from '../components/AppHeader.jsx';
 import BottomSheet from '../components/BottomSheet.jsx';
@@ -9,6 +9,8 @@ import Chip from '../components/Chip.jsx';
 import ChipGroup from '../components/ChipGroup.jsx';
 import Note from '../components/Note.jsx';
 import ProgressIndicator from '../components/ProgressIndicator.jsx';
+import SalesCallbackSheet from '../components/SalesCallbackSheet.jsx';
+import PhoneVerifySheet from '../components/PhoneVerifySheet.jsx';
 import TypingIndicator from '../components/TypingIndicator.jsx';
 
 // Voice answers (languages the server lists in /api/health; English and Hindi for now).
@@ -37,7 +39,7 @@ function speak(texts, lang) {
   }
 }
 
-export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
+export default function Chat({ state, update, tr, actions, onRetry, onHome, toast }) {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(state.error ? 'ui.offline' : ''); // a screen-text key
@@ -46,6 +48,9 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
   const [mic, setMic] = useState('idle'); // idle | warn | recording | transcribing
   const [checkHint, setCheckHint] = useState(false);
   const [business, setBusiness] = useState(null); // the GST registry's answer, shown as a card
+  const [sheet, setSheet] = useState(false); // salesperson-call form, offered when the chatbot can't go lower
+  const neg = state.neg || {}; // price talk after the plan: pushback | offer | final | handoff | called
+  const [saving, setSaving] = useState(false); // "save my progress" sheet
   const recorder = useRef(null);
   const timer = useRef(null);
   const end = useRef(null);
@@ -85,9 +90,11 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
     api.status(state.id).then((s) => setBusiness(s.profile)).catch(() => {});
   }, [question?.slot, state.id]);
 
-  const voiceOn = !rec && (voiceLangs || []).includes(lang) && canRecord();
+  // after the plan the chat stays open for questions and price talk (until the plan is accepted)
+  const talking = !!rec && !state.accepted;
+  const voiceOn = (voiceLangs || []).includes(lang) && canRecord() && (!rec || talking);
   const gstQuestion = question?.slot === 'gstin';
-  const micReady = voiceOn && !!state.id && !!question && !gstQuestion && !busy;
+  const micReady = voiceOn && !!state.id && (!!question || talking) && !gstQuestion && !busy;
   const progress = question?.steps ? { n: question.step, total: question.steps } : state.progress;
 
   async function send(msg, shown) {
@@ -108,7 +115,10 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
         patch.items = Object.fromEntries(out.recommendation.core.map((p) => [p.id, p.quantity]));
         patch.progress = progress && { n: progress.total, total: progress.total };
       }
+      if (out.quote) patch.quote = out.quote; // a discount given in the chat shows on the plan screen too
+      if (out.negotiation) patch.neg = { status: out.negotiation.status };
       update(patch);
+      if (out.negotiation?.status === 'handoff') setSheet(true);
       if (state.voiceMode && !state.muted) speak(out.messages, lang);
     } catch (e) {
       update({ messages: before.slice(0, -1), question }); // put the question back so they can answer again
@@ -183,7 +193,12 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
   const hints = new Set([tr('msg.yes_no_hint'), tr('msg.pick_option')].filter(Boolean));
   const notice = tr('msg.ai_notice');
   const placeholder = mic === 'recording' ? tr('ui.listening') : mic === 'transcribing' ? tr('ui.transcribing')
-    : tr('ui.type_message');
+    : rec ? tr('ui.ask_about_plan') : tr('ui.type_message');
+
+  function callRequested(message) {
+    setSheet(false);
+    update({ messages: [...messages, { from: 'bot', text: message }], neg: { status: 'called' } });
+  }
   const numeric = question?.input === 'number';
 
   function bubble(m, i) {
@@ -201,6 +216,18 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
     return <ChatBubble key={i} from={hints.has(m.text) ? 'hint' : 'assistant'} avatar={lastInRun}>{m.text}</ChatBubble>;
   }
 
+  // optional: save progress with a verified mobile number, to continue on any phone
+  const saveBtn = state.id ? (
+    <button type="button" className="ab-icon-btn"
+            aria-label={state.phoneVerified ? tr('ui.progress_saved', { phone: state.phoneSaved }) : tr('ui.save_progress')}
+            title={state.phoneVerified ? tr('ui.progress_saved', { phone: state.phoneSaved }) : tr('ui.save_progress')}
+            onClick={() => (state.phoneVerified ? toast?.(tr('ui.progress_saved', { phone: state.phoneSaved })) : setSaving(true))}>
+      {state.phoneVerified
+        ? <BookmarkCheck size={21} strokeWidth={1.75} aria-hidden="true" />
+        : <BookmarkPlus size={21} strokeWidth={1.75} aria-hidden="true" />}
+    </button>
+  ) : null;
+
   const muteBtn = voiceOn && state.voiceMode ? (
     <button type="button" className="ab-icon-btn" onClick={toggleMute}
             aria-label={tr(state.muted ? 'ui.unmute' : 'ui.mute')} title={tr(state.muted ? 'ui.unmute' : 'ui.mute')}>
@@ -211,7 +238,7 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
   return (
     <div className="app-shell" lang={lang}>
       <AppHeader title={tr('ui.advisor')} subtitle={tr('ui.advisor_sub')} onBack={onHome} backLabel={tr('ui.back')}
-                 actions={<>{muteBtn}{actions}</>}>
+                 actions={<>{saveBtn}{muteBtn}{actions}</>}>
         {progress ? (
           <ProgressIndicator current={progress.n} total={progress.total}
                              formatLabel={(n, total) => tr('ui.step_of', { n, total })} />
@@ -239,22 +266,22 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
         <div ref={end} className="ab-chat__end" />
       </main>
 
-      {rec ? (
-        <footer className="ab-composer chat-done" ref={dock}>
-          <Button block icon={ArrowRight} onClick={() => update({ screen: 'plan' })}>{tr('ui.your_plan')}</Button>
-        </footer>
-      ) : (
-        <footer className="ab-composer" ref={dock}>
-          {question?.options?.length > 0 && !busy && (
-            <ChipGroup label={question.text}>
-              {question.options.map((o) => (
-                <Chip key={o.value} numeric={numeric} onClick={() => send({ slot: question.slot, value: o.value }, o.label)}>
-                  {o.label}
-                </Chip>
-              ))}
-            </ChipGroup>
-          )}
-          {checkHint && <p className="ab-composer__hint">{tr('ui.voice_check')}</p>}
+      <footer className={`ab-composer ${rec ? 'chat-done' : ''}`} ref={dock}>
+        {!rec && question?.options?.length > 0 && !busy && (
+          <ChipGroup label={question.text}>
+            {question.options.map((o) => (
+              <Chip key={o.value} numeric={numeric} onClick={() => send({ slot: question.slot, value: o.value }, o.label)}>
+                {o.label}
+              </Chip>
+            ))}
+          </ChipGroup>
+        )}
+        {rec && neg.status === 'handoff' && (
+          <Button variant="secondary" block icon={Phone} onClick={() => setSheet(true)}>{tr('ui.request_call')}</Button>
+        )}
+        {rec && <Button block icon={ArrowRight} onClick={() => update({ screen: 'plan' })}>{tr('ui.your_plan')}</Button>}
+        {checkHint && <p className="ab-composer__hint">{tr('ui.voice_check')}</p>}
+        {(!rec || talking) && (
           <form className="ab-composer__row" onSubmit={submit}>
             <label htmlFor="chat-input" className="visually-hidden">{tr('ui.type_message')}</label>
             <input
@@ -283,8 +310,19 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome }) {
               <ArrowUp size={22} strokeWidth={2.2} aria-hidden="true" />
             </button>
           </form>
-        </footer>
-      )}
+        )}
+      </footer>
+
+      <SalesCallbackSheet open={sheet} onClose={() => setSheet(false)} id={state.id} tr={tr} onDone={callRequested} />
+      <PhoneVerifySheet open={saving} onClose={() => setSaving(false)} tr={tr} title={tr('ui.save_progress')}
+                        why={tr('ui.phone_why_save')}
+                        send={(phone) => api.phoneSend(state.id, phone)}
+                        verify={async (code) => {
+                          const out = await api.phoneVerify(state.id, code, false);
+                          update({ phoneVerified: true, phoneSaved: out.phone });
+                          setSaving(false);
+                          toast?.(tr('ui.progress_saved', { phone: out.phone }));
+                        }} />
 
       {/* closing the sheet because recording started must not cancel the recording */}
       <BottomSheet open={mic === 'warn'} onClose={() => setMic((m) => (m === 'warn' ? 'idle' : m))}

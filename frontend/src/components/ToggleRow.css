@@ -22,3 +22,5 @@
 .ab-trow__end { display: flex; align-items: center; gap: 10px; }
 .ab-trow__price { font-size: var(--text-callout); font-weight: var(--weight-semibold); color: var(--color-ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .ab-trow__price.is-on { color: var(--color-ink); }
+
+.ab-trow__proof { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; color: var(--color-ink-2); }

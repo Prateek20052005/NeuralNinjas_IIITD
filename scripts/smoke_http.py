@@ -40,6 +40,8 @@ def main():
         line = next(x for x in q["lines"] if x["product_id"] == extra["id"])
         assert line["quantity"] == extra["quantity"], (extra, line)
     print("extras switched on at suggested quantities:", {x["id"]: x["quantity"] for x in rec["addons"]})
+    code = c.post(f"{BASE}/applications/{app_id}/phone", json={"phone": "9876543210"}).json()["demo_code"]
+    c.post(f"{BASE}/applications/{app_id}/phone/verify", json={"code": code})   # needed to accept (demo-mode code)
     c.post(f"{BASE}/applications/{app_id}/accept")
     c.post(f"{BASE}/applications/{app_id}/consent", json={"purposes": ["kyc"]})
     for doc_type, how in [("gst_certificate", "sideways"), ("udyam_certificate", "shadow"),

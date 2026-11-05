@@ -43,8 +43,12 @@ export const api = {
   send: (id, msg) => call("POST", `/applications/${id}/message`, msg),
   switchProduct: (id, product_id, on) => call("POST", `/applications/${id}/addons`, { product_id, on }),
   plan: (id, choice = {}) => call("POST", `/applications/${id}/plan`, choice),   // tier, contract, setup spread
-  priceRequest: (id) => call("POST", `/applications/${id}/price-request`),
   salesCallback: (id, body) => call("POST", `/applications/${id}/sales-callback`, body),
+  // mobile number with a one-time code: save progress / required to accept; continue on another phone
+  phoneSend: (id, phone) => call("POST", `/applications/${id}/phone`, { phone }),
+  phoneVerify: (id, code, marketing) => call("POST", `/applications/${id}/phone/verify`, { code, marketing }),
+  resumeSend: (phone, lang) => call("POST", "/resume", { phone, lang }),
+  resumeVerify: (phone, code, lang) => call("POST", "/resume/verify", { phone, code, lang }),
   accept: (id) => call("POST", `/applications/${id}/accept`),
   consent: (id, purposes) => call("POST", `/applications/${id}/consent`, { purposes }),
   upload: (id, docType, file) => {
@@ -57,4 +61,7 @@ export const api = {
   status: (id) => call("GET", `/applications/${id}`),
   erase: (id) => call("DELETE", `/applications/${id}`),
   backoffice: (key) => call("GET", "/backoffice/applications", undefined, { "x-admin-key": key }),   // staff only
+  officeStats: (key) => call("GET", "/backoffice/stats", undefined, { "x-admin-key": key }),
+  officeCustomers: (key) => call("GET", "/backoffice/customers", undefined, { "x-admin-key": key }),
+  officeLeads: (key) => call("GET", "/backoffice/leads?limit=60", undefined, { "x-admin-key": key }),
 };

@@ -134,3 +134,28 @@ a { color: var(--color-brand-ink); }
 
 /* Doc names are shared with sentences ("your electricity bill"); start tiles with a capital */
 .ab-tile__name::first-letter { text-transform: uppercase; }
+.welcome-line { display: block; }
+.welcome-line + .welcome-line { margin-top: 2px; }
+
+/* back office: tabs, cards, single-series bars, conversion chance */
+.office-tabs { display: flex; gap: 4px; margin-left: 16px; }
+.office-tab { border: 0; background: none; padding: 8px 12px; border-radius: 999px; font: inherit; font-size: var(--text-callout); color: var(--color-ink-2); cursor: pointer; }
+.office-tab[aria-selected="true"] { background: var(--color-fill); color: var(--color-ink); font-weight: var(--weight-semibold); }
+.office-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 16px; }
+.office-card { display: flex; flex-direction: column; gap: 10px; padding: 18px; }
+.office-card .section-label { margin-top: 6px; }
+.bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.bars li { display: grid; grid-template-columns: minmax(120px, 38%) 1fr 84px; align-items: center; gap: 10px; font-size: var(--text-footnote); }  /* fixed number column: every track the same length, so bars compare */
+.bars__label { color: var(--color-ink); }
+.bars__track { height: 10px; border-radius: 4px; background: var(--color-fill); overflow: hidden; }
+.bars__fill { display: block; height: 100%; min-width: 2px; border-radius: 4px; background: var(--color-info); }
+.bars__value { font-variant-numeric: tabular-nums; color: var(--color-ink); white-space: nowrap; }
+.bars__value small { color: var(--color-ink-2); }
+.chance { display: inline-flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chance__track { width: 56px; height: 8px; border-radius: 4px; background: var(--color-fill); overflow: hidden; }
+.chance__fill { display: block; height: 100%; border-radius: 4px; background: var(--color-info); }
+.why-up { color: var(--color-ink); }
+.why-down { color: var(--color-ink-2); }
+@media (max-width: 900px) { .office-tabs { margin-left: 0; overflow-x: auto; } .office-grid { grid-template-columns: 1fr; } }
+.office-table.compact { box-shadow: none; font-size: var(--text-footnote); }
+.office-table.compact td, .office-table.compact th { padding: 6px 8px; }

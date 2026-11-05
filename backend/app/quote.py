@@ -13,6 +13,12 @@ Prices never leave the catalogue range:
   - 24 months: the catalogue minimum. Acquiring a customer costs ~Rs 15,000, so a longer commitment is worth it.
 The setup fee can be paid at once or spread over 6 or 12 months (same total, no interest, never past the contract).
 A negotiated discount (see negotiate.py) comes off the monthly price before GST, never below the catalogue minimum.
+
+Billing: pay every month, or every 3, 6 or 12 months in advance for a small saving (pay_ahead_saving_pct), again never
+below the catalogue minimum. Welcome offer for first-time customers (pricing_settings.json "welcome"):
+  - setup fee: free for small orders, 30% off for large, 40% off for very large (order size = list monthly price)
+  - 15% off the first 3 months (monthly or quarterly billing) or off the first half-yearly / yearly bill, once.
+    It is a time-limited promotion, so this one may go below the catalogue minimum; everything else may not.
 """
 from __future__ import annotations
 
@@ -21,9 +27,15 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 
 from .catalogue import Business, check_bundle, load_catalogue
+from .negotiate import settings as price_settings
 
 GST_RATE = 0.18  # catalogue prices exclude GST; shown separately so the total is honest
 SETUP_SPREAD_CHOICES = (1, 6, 12)      # 1 = pay the setup fee at once
+BILLING_CHOICES = (1, 3, 6, 12)        # pay every month, quarter, half-year or year
+
+
+def with_gst(amount: int) -> int:
+    return amount + round(amount * GST_RATE)
 
 
 def min_contract(items: dict[str, int]) -> int:
@@ -83,11 +95,17 @@ class Quote:
     floor_total: int = 0                  # the same products at their catalogue minimum: the lowest possible price
     discount: int = 0                     # rupees off the monthly price (excl. GST)
     discount_pct: float = 0.0             # discount as a share of list_total
+    billing_months: int = 1               # pay every 1, 3, 6 or 12 months
+    billing_options: list[dict] = field(default_factory=list)    # [{"months", "saving_pct", "per_month_with_gst", "bill_with_gst"}]
+    bill_with_gst: int = 0                # one regular bill for the chosen billing period
+    setup_discount: int = 0               # welcome offer on the setup fee
+    setup_due: int = 0                    # setup fee after the welcome offer
+    welcome: dict | None = None           # first-time customers: the first-months offer (see module notes)
 
 
 def build_quote(items: dict[str, int], biz: Business, order_date: date | None = None,
                 contract_months: int | None = None, setup_months: int = 1, discount_pct: float = 0.0,
-                _options: bool = True) -> Quote:
+                billing_months: int = 1, first_time: bool = False, _options: bool = True) -> Quote:
     """Price a bundle. items = {product_id: quantity}. Invalid products are reported, not silently priced.
     contract_months: the owner's choice (raised to the bundle's minimum); None = the minimum."""
     cat = load_catalogue()
@@ -113,7 +131,36 @@ def build_quote(items: dict[str, int], biz: Business, order_date: date | None = 
     install = max((l.install_days for l in lines), default=0)
     order_date = order_date or date.today()
     setup_total = sum(l.setup for l in lines)
-    spread = setup_months if setup_months in SETUP_SPREAD_CHOICES and setup_months <= contract and setup_total else 1
+
+    # pay ahead: every 3, 6 or 12 months (only within the contract), a small saving, never below the floor
+    rules = price_settings()
+    term = contract if lines else 1
+
+    def per_month(months: int) -> int:
+        pct = rules["pay_ahead_saving_pct"].get(months, 0) if months > 1 else 0
+        return max(round(monthly * (1 - pct / 100)), min(floor_total, monthly))
+
+    billing_options = [{"months": k, "saving_pct": round(100 * (monthly - per_month(k)) / monthly, 1) if monthly else 0.0,
+                        "per_month_with_gst": with_gst(per_month(k)), "bill_with_gst": with_gst(per_month(k) * k)}
+                       for k in BILLING_CHOICES if k <= max(term, 1)]
+    billing = billing_months if any(o["months"] == billing_months for o in billing_options) else 1
+    pay_month = per_month(billing)
+
+    # welcome offer for first-time customers: setup by order size, and the first months (may go below the floor)
+    welcome, setup_discount = None, 0
+    if first_time and lines:
+        w = rules["welcome"]
+        size = ("very_large" if list_total >= w["very_large_order_from"]
+                else "large" if list_total >= w["large_order_from"] else "small")
+        setup_discount = round(setup_total * w["setup_off_pct"][size] / 100)
+        period = max(w["first_months"], billing)          # first 3 months, or the first half-yearly / yearly bill
+        first = round(pay_month * (1 - w["first_months_pct"] / 100))
+        welcome = {"size": size, "setup_off_pct": w["setup_off_pct"][size], "months_pct": w["first_months_pct"],
+                   "period_months": period, "per_month_with_gst": with_gst(first),
+                   "first_bill_with_gst": with_gst(first * billing),
+                   "saving_with_gst": with_gst(pay_month * period) - with_gst(first * period)}
+    setup_due = setup_total - setup_discount
+    spread = setup_months if setup_months in SETUP_SPREAD_CHOICES and setup_months <= contract and setup_due else 1
     options = [{"months": m, "monthly_with_gst": build_quote(items, biz, order_date, m, discount_pct=discount_pct,
                                                              _options=False).monthly_with_gst}
                for m in contract_options(items)] if _options else []
@@ -129,13 +176,19 @@ def build_quote(items: dict[str, int], biz: Business, order_date: date | None = 
         valid=not problems,
         problems=problems,
         setup_months=spread,
-        setup_monthly=math.ceil(setup_total / spread) if spread > 1 else 0,
+        setup_monthly=math.ceil(setup_due / spread) if spread > 1 else 0,
         min_contract_months=minimum,
         contract_options=options,
         list_total=list_total,
         floor_total=floor_total,
         discount=discount,
         discount_pct=round(100 * discount / list_total, 1) if list_total else 0.0,
+        billing_months=billing,
+        billing_options=billing_options,
+        bill_with_gst=with_gst(pay_month * billing),
+        setup_discount=setup_discount,
+        setup_due=setup_due,
+        welcome=welcome,
     )
 
 

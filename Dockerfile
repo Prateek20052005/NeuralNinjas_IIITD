@@ -1,6 +1,8 @@
 # One container: FastAPI serves the API and the built phone app on the same address.
 # Build:  docker build -t udyam-digital .
-# Run:    docker run --env-file .env -p 7860:7860 udyam-digital      then open http://localhost:7860
+# Run:    docker run --env-file .env -p 7860:7860 -v udyam-state:/app/state udyam-digital
+#         then open http://localhost:7860. The volume keeps saved applications (encrypted with APP_STATE_KEY from .env)
+#         across restarts and rebuilds; without it they last only as long as the container.
 # The Groq key comes from --env-file / the host's secret settings at run time; it is never baked into the image.
 
 # ---- 1. build the phone app ----
@@ -13,7 +15,7 @@ RUN npm run build
 
 # ---- 2. API + local OCR ----
 FROM python:3.13-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=7860 APP_TODAY=2026-07-15
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=7860 APP_TODAY=2026-07-15 APP_STATE_DIR=/app/state
 # OpenCV and ONNX Runtime need these two system libraries on slim images
 RUN apt-get update && apt-get install -y --no-install-recommends libglib2.0-0 libgomp1 \
     && rm -rf /var/lib/apt/lists/*
@@ -26,7 +28,8 @@ COPY backend backend
 COPY data/*.csv data/
 COPY --from=web /web/dist frontend/dist
 # run as a normal user, not root (Hugging Face Spaces also expects uid 1000)
-RUN useradd -m -u 1000 app && chown -R app /app
+RUN useradd -m -u 1000 app && mkdir -p /app/state && chown -R app /app && chmod 700 /app/state
+VOLUME /app/state
 USER app
 EXPOSE 7860
 HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import urllib.request,os; urllib.request.urlopen(f'http://localhost:{os.environ[\"PORT\"]}/api/health')"

@@ -21,6 +21,7 @@ from .flow import (COUNT_NEEDS, Profile, apply_answer, build_recommendation, exp
                    next_slot, question, set_city)
 from ..reference import find_city
 from .llm import LLM, LLMUnavailable
+from ..negotiate import wants_lower_price
 from .parse import internet_choice, kind_of_business
 from .parse import number as _number
 from .parse import yes_no as _yes_no
@@ -76,6 +77,26 @@ Return a JSON object:
 {{"summary": "2-3 sentences on why this package fits their business",
   "reasons": {{"<product id>": "one short sentence for each product id given"}},
   "notes": ["one sentence for each note given, same order"]}}"""
+
+
+AFTER_PLAN_PROMPT = """A small Indian business owner has just seen the internet, phone and digital-tools plan we
+suggested, and sends a message. Return a JSON object: {{"wants_lower_price": true|false, "say": "..."}}
+"wants_lower_price": true only if the owner asks for a discount, a lower or better price, or says it costs too much.
+"say": "" unless the owner asked a question about a product or the plan. If they did, answer only that, ONLY in
+{language}, at most 2 short sentences, product names in English, saying what the product does (from the CATALOGUE).
+Never mention any price, discount, offer or deal, never promise anything, and do NOT ask any question.
+
+CATALOGUE:
+{catalogue}"""
+
+
+def _clean_say(say, lang: str) -> str:
+    """The AI's answer, made safe: no questions (the next question is always ours), no sentence that states a price
+    or talks about discounts (prices and offers come only from our code), in the owner's language, not a stray "ok"."""
+    say = say if isinstance(say, str) else ""
+    sentences = [x.strip() for x in re.findall(r"[^.!?？।]+[.!?？।]*", say) if x.strip()]
+    say = " ".join(x for x in sentences if x[-1] not in "?？" and not PRICE_TALK.search(x) and not wants_lower_price(x))
+    return say if len(say.split()) >= 3 and _in_language(say, lang) else ""
 
 
 @dataclass
@@ -186,12 +207,7 @@ class Advisor:
             elif answering == "city" and find_city(text, known_only=True):
                 msgs += apply_answer(p, answering, text)
                 s.fallbacks.append(f"safety_net:{answering}")
-        say = out.get("say") if isinstance(out.get("say"), str) else ""
-        # questions are ours alone: drop any the AI slipped in, so the owner never gets two at once
-        sentences = [x.strip() for x in re.findall(r"[^.!?？।]+[.!?？।]*", say) if x.strip()]
-        # prices come only from the quote screen: drop any sentence where the AI states one
-        say = " ".join(x for x in sentences if x[-1] not in "?？" and not PRICE_TALK.search(x))
-        say = say if len(say.split()) >= 3 and _in_language(say, p.language) else ""  # a stray "ok" is not an answer
+        say = _clean_say(out.get("say"), p.language)
         # Nothing understood and nothing to say: let the code reply, so the owner hears why the question repeats
         if answering and answering != "city" and not say and not msgs and p.safe_view() == before:
             msgs += apply_answer(p, answering, text)
@@ -236,6 +252,27 @@ class Advisor:
                 setattr(p.needs, flag, val)
                 p.needs_answered.add(flag)
         return msgs
+
+    # ---------- after the plan: questions and price requests ----------
+    def after_plan(self, s: Session, text: str) -> tuple[bool, str]:
+        """Owner writes after seeing the plan. Returns (asks for a lower price?, AI answer to a product question or "").
+        Keywords decide first; the AI only helps with phrasings the keywords miss. It never decides an amount: the
+        steps and discounts come from negotiate.py. Same data rules as the chat: no history, IDs and name removed."""
+        if wants_lower_price(text):
+            return True, ""
+        if not self.llm.available:
+            return False, ""
+        p = s.profile
+        names = (p.business_name or "",)
+        plan = ", ".join(load_catalogue()[pk.product_id].name for pk in s.recommendation.core)
+        context = f"PLAN: {plan}\nOWNER SAYS: {redact_ids(text, names)}"
+        try:
+            out = self.llm.chat_json(AFTER_PLAN_PROMPT.format(language=LANG_NAMES[p.language], catalogue=_catalogue_brief()),
+                                     [{"role": "user", "content": context}], max_tokens=400)
+        except LLMUnavailable as e:
+            s.fallbacks.append(f"after_plan:{e}")
+            return False, ""
+        return out.get("wants_lower_price") is True, _clean_say(out.get("say"), p.language)
 
     # ---------- finish: recommendation + explanation ----------
     def _finish(self, s: Session, msgs: list[str]) -> dict:
@@ -284,7 +321,7 @@ class Advisor:
 def _answer_kind(slot: str | None) -> str | None:
     if slot in ("employees", "sites") or (slot or "")[5:] in COUNT_NEEDS:
         return "number"
-    if slot == "gst_confirm" or (slot or "").startswith("need:"):
+    if slot in ("gst_confirm", "existing") or (slot or "").startswith("need:"):
         return "yes_no"
     return None
 
@@ -326,10 +363,15 @@ def recommendation_view(rec: Recommendation, expl: dict) -> dict:
     q = rec.quote
     return {
         "headline": expl["headline"], "summary": expl.get("summary"), "notes": expl["notes"],
+        "similar": rec.similar,   # past customers most like this business that shaped quantities and extras
         "price_note": expl["price_note"],
         "core": [{"id": pk.product_id, "quantity": pk.quantity, "reason": expl["reasons"][pk.product_id]}
                  for pk in rec.core],
-        "addons": [{"id": pk.product_id, "quantity": pk.quantity, "reason": expl["reasons"][pk.product_id]}
+        "addons": [{"id": pk.product_id, "quantity": pk.quantity, "reason": expl["reasons"][pk.product_id],
+                    # how often similar businesses took it (bundles.py); with = the product in the plan it goes with
+                    "popular": pk.popularity and {"pct": pk.popularity["pct"],
+                                                  "with": load_catalogue()[pk.popularity["with"]].name
+                                                  if pk.popularity["with"] else None}}
                    for pk in rec.addons],
         "quote": quote_view(q),
     }
