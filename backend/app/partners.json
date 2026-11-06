@@ -1,0 +1,6 @@
+{
+  "_about": "Channel partners (local resellers) for the demo. Each shares a link like /?ref=RAJ01 and signs in to the back office with its own key from PARTNER_KEYS in .env. Names are fictional.",
+  "RAJ01": {"name": "Raj Telecom", "city": "Pune"},
+  "SHAH02": {"name": "Shah Mobile & Net", "city": "Ahmedabad"},
+  "MEERA03": {"name": "Meera Digital Services", "city": "Chennai"}
+}

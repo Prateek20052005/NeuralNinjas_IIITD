@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MessageCircle, Share2 } from 'lucide-react';
+import { MessageCircle, Phone, Share2 } from 'lucide-react';
 import { api } from '../api.js';
 import { longDate } from '../i18n.js';
 import { money, PRODUCT_ICONS } from '../lib/ui.js';
@@ -13,6 +13,8 @@ import PriceBreakdown from '../components/PriceBreakdown.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import ToggleRow from '../components/ToggleRow.jsx';
 import PhoneVerifySheet from '../components/PhoneVerifySheet.jsx';
+import SalesCallbackSheet from '../components/SalesCallbackSheet.jsx';
+import TextField from '../components/TextField.jsx';
 
 let catalogueCache = null;
 
@@ -28,11 +30,14 @@ export default function Plan({ state, update, tr, actions, toast }) {
   // price talk happens in the chat (a discount only if the owner insists); this screen just shows the result
   const neg = state.neg || {};
   const [verifying, setVerifying] = useState(false); // mobile number + code, needed to accept
+  const [partner, setPartner] = useState(state.partner || null); // referring partner, if any
+  const [calling, setCalling] = useState(false); // "a specialist can plan this with you" call form
+  const [spend, setSpend] = useState(''); // what the owner pays today, typed to compare (optional)
 
   useEffect(() => {
     if (!catalogueCache) api.catalogue().then((c) => setCatalogue((catalogueCache = c))).catch(() => {});
     api.plan(state.id).then(show).catch(() => {}); // plan choices are extra: the quote works without them
-    api.status(state.id).then((s) => setWho(s.profile)).catch(() => {});
+    api.status(state.id).then((s) => { setWho(s.profile); setPartner(s.partner); }).catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function show(out) {
@@ -103,6 +108,20 @@ export default function Plan({ state, update, tr, actions, toast }) {
     }
   }
 
+  const compare = () => run(async () => {
+    show(await api.plan(state.id, { current_spend: Number(spend.replace(/\D/g, '')) || 0 }));
+  });
+
+  // the plan against what the owner pays today: same within 5%, otherwise the difference
+  function spendLine() {
+    const now = plan?.current_spend;
+    if (!now) return null;
+    const diff = quote.monthly_with_gst - now;
+    const n = quote.lines.length;
+    if (Math.abs(diff) <= now * 0.05) return tr('ui.spend_same', { n });
+    return tr(diff > 0 ? 'ui.spend_more' : 'ui.spend_less', { diff: money(Math.abs(diff)).slice(1), n });
+  }
+
   const name = (pid) => catalogue?.[pid]?.name || quote.lines.find((l) => l.product_id === pid)?.name || pid;
   const unit = (pid) => plan?.unit_prices?.[pid] ?? catalogue?.[pid]?.price ?? 0;
   // in the plan: suggested products that are switched on; extras: every add-on, plus suggestions switched off
@@ -160,6 +179,24 @@ export default function Plan({ state, update, tr, actions, toast }) {
           <h1 className="t-large-title" style={{ fontSize: '1.875rem' }}>{rec.headline?.replace(/[:：]\s*$/, '')}</h1>
           {rec.summary && <p className="lead">{rec.summary}</p>}
         </section>
+
+        {partner && (
+          <Note tone="trust">{tr(partner.assisted ? 'ui.assisted_by' : 'ui.referred_by', { partner: partner.name })}</Note>
+        )}
+
+        {plan?.handoff?.length > 0 && (
+          <Note tone="info" title={tr('ui.handoff_title')}>
+            {plan.handoff.map((r) => <span key={r} className="welcome-line">{tr(`ui.handoff.${r}`)}</span>)}
+            <span className="welcome-line">{tr('ui.handoff_body')}</span>
+            {!plan.callback_requested && (
+              <span className="note-action">
+                <Button variant="secondary" size="sm" icon={Phone} onClick={() => setCalling(true)} disabled={busy}>
+                  {tr('ui.call_me_btn')}
+                </Button>
+              </span>
+            )}
+          </Note>
+        )}
 
         {welcome && (
           <Note tone="ok" title={tr('ui.welcome_title')}>
@@ -292,6 +329,19 @@ export default function Plan({ state, update, tr, actions, toast }) {
           </section>
         )}
 
+        <section className="stack" aria-labelledby="spend-title">
+          <h2 id="spend-title" className="section-label">{tr('ui.spend_title')}</h2>
+          <form className="spend-row" onSubmit={(e) => { e.preventDefault(); compare(); }}>
+            <TextField label={tr('ui.spend_label')} inputMode="numeric" placeholder="₹"
+                       value={spend || (plan?.current_spend ? String(plan.current_spend) : '')}
+                       onChange={(e) => setSpend(e.target.value)} />
+            <Button type="submit" variant="secondary" size="sm" disabled={busy || !spend.replace(/\D/g, '')}>
+              {tr('ui.spend_compare')}
+            </Button>
+          </form>
+          {spendLine() ? <Note>{spendLine()}</Note> : <p className="choice-hint">{tr('ui.spend_hint')}</p>}
+        </section>
+
         <PriceBreakdown title={tr('ui.price_how')} rows={rows} footnote={tr('ui.price_explain')} />
 
         {neg.status !== 'called' && (
@@ -320,6 +370,14 @@ export default function Plan({ state, update, tr, actions, toast }) {
         disabled={busy}
       />
 
+      <SalesCallbackSheet open={calling} onClose={() => setCalling(false)} id={state.id} tr={tr}
+                          reason={plan?.handoff?.[0] || 'leased_line'}
+                          verifiedPhone={state.phoneVerified ? state.phoneSaved : null}
+                          onDone={(message) => {
+                            setCalling(false);
+                            setPlan((p) => ({ ...p, callback_requested: true }));
+                            toast(message);
+                          }} />
       <PhoneVerifySheet open={verifying} onClose={() => setVerifying(false)} tr={tr} why={tr('ui.phone_why_order')}
                         withMarketing verifyLabel={tr('ui.accept')}
                         send={(phone) => api.phoneSend(state.id, phone)} verify={phoneVerified} />

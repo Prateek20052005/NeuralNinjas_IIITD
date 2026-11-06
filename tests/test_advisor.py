@@ -3,6 +3,8 @@ from datetime import date
 
 import pytest
 
+from backend.app.i18n import t
+
 from backend.app.advisor.engine import Advisor
 from backend.app.advisor.flow import Profile, apply_answer, next_slot
 from backend.app.advisor.llm import LLMUnavailable
@@ -121,7 +123,10 @@ def test_ai_extract_is_validated_before_use():
     assert p.gstin_status == "none" and p.city == "Pune"
     assert p.segment is None and p.employees is None          # invalid kind and absurd number rejected
     assert p.needs.backup is True and "teleport" not in p.needs_answered
-    assert out["messages"] == [out["question"]["text"]]   # AI's question and bare "Got it." dropped
+    # AI's question and bare "Got it." dropped; no GST adds what registering would give (handoff.py)
+    assert out["messages"] == [t("en", "msg.no_gst_benefits", products="WhatsApp Business API Starter, Business SMS 10k, "
+                                 "Cloud Telephony / SIP"), out["question"]["text"]]
+    assert out["handoff"] == "gst_help"
     assert out["question"]["slot"] == "existing"                                       # our order, our words
 
 

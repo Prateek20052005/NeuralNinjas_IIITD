@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
-import { ChevronDown, KeyRound, LogOut, Moon, Phone, RefreshCw, Sun } from 'lucide-react';
+import { CircleCheck, ChevronDown, KeyRound, LogOut, Moon, Phone, RefreshCw, Sun } from 'lucide-react';
 import { api } from '../api.js';
 import { money } from '../lib/ui.js';
 import BrandMark from '../components/BrandMark.jsx';
@@ -8,9 +8,10 @@ import Note from '../components/Note.jsx';
 import StatusBadge from '../components/StatusBadge.jsx';
 import TextField from '../components/TextField.jsx';
 
-// Staff-only desktop view (English): statistics, who is buying, the conversion predictor (which leads to call), and
-// the applications the app could not close on its own (KYC reviews, salesperson callbacks: the only place a full
-// phone number is shown). Everything needs the back-office key.
+// Desktop view (English) for staff and channel partners. Staff (BACKOFFICE_KEY): statistics and success metrics, who is
+// buying, the conversion predictor, applications that need a person (KYC reviews, callbacks: the only place a full
+// phone number is shown), installs, and the access log. A partner (its own key) sees only the applications it
+// referred, without documents, KYC evidence, GST or phone numbers. Every view is logged on the server.
 const KEY = 'accel-office-key';
 const BADGE = { PASS: 'approved', RETAKE: 'retake', REVIEW: 'review', REJECT: 'rejected', INCOMPLETE: 'incomplete' };
 const STAGE = {
@@ -18,9 +19,17 @@ const STAGE = {
   price_handoff: 'Wants a lower price', sales_callback_requested: 'Callback requested', phone_verified: 'Mobile verified',
   quote_accepted: 'Plan accepted', consent_given: 'Consent given', document_read: 'Uploading documents',
   kyc_checked: 'KYC checked', installation_booked: 'Installation booked', resumed: 'Continued on another phone',
+  order_signed: 'Order signed', document_fetched: 'Fetched from DigiLocker', product_live: 'Installing',
+  activated: 'Live', documents_erased: 'Live (document details deleted)',
+};
+const NEEDS_PERSON = {
+  price: 'Wants a lower price', leased_line: 'Leased line: site survey', factory: 'Factory: specialist',
+  multi_site: 'Many sites: one network', unclear: 'Chat got stuck', gst_help: 'Help registering for GST',
 };
 const KIND = { micro: 'Shop / service', prof: 'Office / clinic', multi: 'Multi-outlet', mfg: 'Factory', 'not yet': 'Not answered yet' };
-const TABS = [['overview', 'Overview'], ['customers', 'Customers'], ['leads', 'Leads to call'], ['applications', 'Applications']];
+const STAFF_TABS = [['overview', 'Overview'], ['customers', 'Customers'], ['leads', 'Leads to call'],
+  ['applications', 'Applications'], ['access', 'Access log']];
+const PARTNER_TABS = [['applications', 'My referrals']];
 const pct = (x) => `${Math.round(x * 100)}%`;
 
 function readKey() {
@@ -57,6 +66,25 @@ function Chance({ score }) {
   );
 }
 
+function Metrics({ metrics }) {
+  return (
+    <section className="card office-card office-card--wide">
+      <h2 className="t-headline">Success metrics: before the app, pilot target, the app so far</h2>
+      <table className="office-table compact">
+        <thead><tr><th>Metric</th><th>Before (Apr–Jun 2026)</th><th>Target (2-quarter pilot)</th><th>In the app</th><th>How the app moves it</th></tr></thead>
+        <tbody>
+          {metrics.map((m) => (
+            <tr key={m.id}>
+              <td><b>{m.label}</b></td><td>{m.before}</td><td><b>{m.target}</b></td>
+              <td className="t-footnote">{m.app}</td><td className="t-footnote t-secondary">{m.why}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  );
+}
+
 function Overview({ stats, rows }) {
   if (!stats) return <Note>Loading…</Note>;
   const tiles = [
@@ -77,9 +105,10 @@ function Overview({ stats, rows }) {
         {tiles.map(([label, value]) => <div className="stat" key={label}><b>{value}</b><span>{label}</span></div>)}
       </div>
       <div className="office-grid">
+        <Metrics metrics={stats.metrics} />
         <section className="card office-card">
           <h2 className="t-headline">In the app (live)</h2>
-          <p className="t-footnote t-secondary">Applications from the last {72} hours of activity.</p>
+          <p className="t-footnote t-secondary">Leads are kept {stats.retention.lead_hours} hours after their last activity; accepted orders {stats.retention.order_days} days.</p>
           {live[0].count ? <Bars rows={live} of={live[0].count} /> : <Note>No applications yet.</Note>}
         </section>
         <section className="card office-card">
@@ -97,6 +126,28 @@ function Overview({ stats, rows }) {
             { label: 'Agreed to offers and news', count: stats.offers.marketing_ok },
           ]} />
           <p className="t-footnote t-secondary">Setup fees still due on accepted plans: {money(stats.money.setup_due)}</p>
+        </section>
+        <section className="card office-card">
+          <h2 className="t-headline">Handed to a person</h2>
+          <p className="t-footnote t-secondary">The app sells simple plans alone; these need the business team or a field visit.</p>
+          {Object.keys(stats.handoffs).length
+            ? <Bars rows={counts(stats.handoffs, NEEDS_PERSON)} />
+            : <Note>Nothing to hand over right now.</Note>}
+        </section>
+        <section className="card office-card">
+          <h2 className="t-headline">Channel partners</h2>
+          <p className="t-footnote t-secondary">Applications that came through a partner's link keep the partner's commission. Assisted = the partner sat with the owner.</p>
+          {stats.partners.length ? (
+            <table className="office-table compact">
+              <thead><tr><th>Partner</th><th className="num">Applications</th><th className="num">Assisted</th><th className="num">Accepted</th></tr></thead>
+              <tbody>
+                {stats.partners.map((pt) => (
+                  <tr key={pt.code}><td><b>{pt.name}</b> <span className="t-secondary t-mono">{pt.code}</span><br /><span className="t-footnote t-secondary">{pt.city}</span></td>
+                    <td className="num">{pt.applications}</td><td className="num">{pt.assisted}</td><td className="num">{pt.accepted}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          ) : <Note>No partner applications yet. Partner links look like /?ref=RAJ01 (add &assisted=1 when sitting with the owner).</Note>}
         </section>
         <section className="card office-card">
           <h2 className="t-headline">Who is applying</h2>
@@ -153,7 +204,7 @@ function Customers({ customers }) {
       <table className="office-table">
         <thead>
           <tr><th>Ref</th><th>Business</th><th>Plan</th><th className="num">Monthly</th><th>Terms</th><th>Offers</th>
-            <th>Mobile</th><th>KYC</th><th>Accepted</th></tr>
+            <th>Mobile</th><th>KYC</th><th>Live</th><th>Accepted</th></tr>
         </thead>
         <tbody>
           {customers.map((c) => (
@@ -168,7 +219,10 @@ function Customers({ customers }) {
                 .filter(Boolean).join(', ') || '—'}</td>
               <td className="t-footnote"><span className="t-mono">{c.phone || '—'}</span>{c.marketing_consent ? <><br /><span className="t-secondary">OK to send offers</span></> : null}</td>
               <td>{c.kyc ? <StatusBadge status={BADGE[c.kyc]}>{c.kyc}</StatusBadge> : <span className="t-secondary">Pending</span>}</td>
-              <td className="t-footnote">{c.accepted_at ? c.accepted_at.replace('T', ' ').slice(0, 16) : '—'}</td>
+              <td className="t-footnote">{c.live}/{c.products}{c.live === c.products ? ' · active' : ''}</td>
+              <td className="t-footnote">{c.accepted_at ? c.accepted_at.replace('T', ' ').slice(0, 16) : '—'}
+                {c.signed ? <><br /><span className="t-secondary">signed {c.signed}</span></> : null}
+                {c.partner ? <><br /><span className="t-secondary">via {c.partner}</span></> : null}</td>
             </tr>
           ))}
         </tbody>
@@ -217,10 +271,39 @@ function Leads({ leads, error }) {
   );
 }
 
-function Applications({ rows, open, setOpen }) {
+function Products({ r, onInstalled, busy }) {
+  if (!r.products?.length) return null;
+  return (
+    <div className="stack">
+      <h3 className="section-label">Installation</h3>
+      <table className="office-table compact">
+        <thead><tr><th>Product</th><th>Status</th><th>Ready by</th><th aria-label="Action" /></tr></thead>
+        <tbody>
+          {r.products.map((p) => (
+            <tr key={p.product_id}>
+              <td>{p.name}{p.quantity > 1 ? ` ×${p.quantity}` : ''} <span className="t-secondary t-footnote">({p.install_days} days)</span></td>
+              <td>{p.status === 'live' ? <StatusBadge status="approved">Live {p.live_on}</StatusBadge>
+                : p.status === 'installing' ? <StatusBadge status="review">Installing</StatusBadge>
+                  : <StatusBadge status="incomplete">Waiting for KYC</StatusBadge>}</td>
+              <td className="t-footnote">{p.ready_by || '—'}</td>
+              <td>{p.status === 'installing' && (
+                <Button size="sm" variant="secondary" icon={CircleCheck} disabled={busy}
+                        onClick={(e) => { e.stopPropagation(); onInstalled(r.id, p.product_id); }}>Mark live</Button>
+              )}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Applications({ rows, open, setOpen, role, onInstalled, busy }) {
   const stage = (r) => STAGE[r.timeline.findLast((s) => STAGE[s.step])?.step] || '—';
+  const staff = role === 'staff';
   if (!rows.length) {
-    return <Note>No open applications right now. Applications are deleted automatically after 72 hours without activity.</Note>;
+    return <Note>{staff ? 'No open applications right now. Leads are deleted automatically after 72 hours without activity.'
+      : 'No applications from your referral link yet.'}</Note>;
   }
   return (
     <div className="office-scroll">
@@ -228,7 +311,7 @@ function Applications({ rows, open, setOpen }) {
         <thead>
           <tr>
             <th>Ref</th><th>Business</th><th>City</th><th>Kind</th><th className="num">Monthly</th>
-            <th>Stage</th><th>Chance</th><th>KYC</th><th>Callback</th><th aria-label="Details" />
+            <th>Stage</th><th>Chance</th><th>KYC</th><th>Needs a person</th><th aria-label="Details" />
           </tr>
         </thead>
         <tbody>
@@ -239,7 +322,8 @@ function Applications({ rows, open, setOpen }) {
               <Fragment key={r.id}>
                 <tr className={`office-row ${isOpen ? 'is-open' : ''}`} onClick={() => setOpen(isOpen ? null : r.id)}>
                   <td className="t-mono">{r.id.toUpperCase()}</td>
-                  <td><b>{r.business || KIND[r.kind] || '—'}</b><br /><span className="t-footnote t-secondary t-mono">{r.gstin || 'No GST'}</span></td>
+                  <td><b>{r.business || KIND[r.kind] || '—'}</b><br /><span className="t-footnote t-secondary t-mono">{staff ? r.gstin || 'No GST' : ''}</span>
+                    {r.partner ? <span className="t-footnote t-secondary">{staff ? ' · ' : ''}via {r.partner.code}{r.partner.assisted ? ' (assisted)' : ''}</span> : null}</td>
                   <td>{r.city || '—'}</td>
                   <td>{KIND[r.kind] || '—'}</td>
                   <td className="num">{r.monthly ? money(r.monthly) : '—'}</td>
@@ -247,11 +331,13 @@ function Applications({ rows, open, setOpen }) {
                   <td>{r.accepted ? <span className="t-footnote t-secondary">Accepted</span> : <Chance score={r.conversion?.score} />}</td>
                   <td>{r.kyc ? <StatusBadge status={BADGE[r.kyc.decision]}>{r.kyc.decision}</StatusBadge> : <span className="t-secondary">—</span>}</td>
                   <td>
-                    {cb ? (
+                    {r.handoff.length ? <div className="t-footnote">{r.handoff.map((h) => NEEDS_PERSON[h] || h).join(' · ')}</div> : null}
+                    {cb && staff ? (
                       <a href={`tel:+91${cb.phone}`} onClick={(e) => e.stopPropagation()} className="row-gap">
                         <Phone size={15} strokeWidth={2} aria-hidden="true" /> {cb.phone}
                       </a>
-                    ) : '—'}
+                    ) : cb ? <span className="t-mono t-footnote">Call requested · {cb.phone}</span> : null}
+                    {!cb && !r.handoff.length ? '—' : null}
                     {cb?.target_monthly ? <div className="t-footnote t-secondary">wants {money(cb.target_monthly)}/mo</div> : null}
                   </td>
                   <td>
@@ -266,6 +352,9 @@ function Applications({ rows, open, setOpen }) {
                   <tr className="office-detail">
                     <td colSpan={10}>
                       <div className="stack" style={{ paddingTop: 12 }}>
+                        <p className="t-callout"><b>What the owner told us:</b> {r.summary}</p>
+                        {r.esign && <p className="t-footnote t-secondary">Order signed {r.esign.signed_at.replace('T', ' ')} with the mobile code ({r.esign.phone}) · reference <span className="t-mono">{r.esign.reference}</span></p>}
+                        <Products r={r} onInstalled={onInstalled} busy={busy} />
                         {r.conversion && (r.conversion.up.length || r.conversion.down.length) ? (
                           <p className="t-footnote">Chance of activating: {pct(r.conversion.score)}
                             {r.conversion.up.length ? <span className="why-up"> · + {r.conversion.up.join(', ')}</span> : null}
@@ -281,11 +370,11 @@ function Applications({ rows, open, setOpen }) {
                               </li>
                             ))}
                           </ul>
-                        ) : <p className="t-callout t-secondary">No KYC evidence yet.</p>}
+                        ) : staff ? <p className="t-callout t-secondary">No KYC evidence yet.</p> : null}
                         {r.kyc?.lead_id && <p className="t-footnote t-secondary">Matched lead: <span className="t-mono">{r.kyc.lead_id}</span></p>}
                         {cb && (
                           <p className="t-footnote t-secondary">
-                            Callback reference <b className="t-mono">{cb.reference}</b> · requested {cb.requested_at} in {cb.language} ·
+                            Callback reference <b className="t-mono">{cb.reference}</b> · {NEEDS_PERSON[cb.reason] || cb.reason} · requested {cb.requested_at} in {cb.language} ·
                             offered {cb.offered_monthly ? money(cb.offered_monthly) : '—'}/mo
                           </p>
                         )}
@@ -305,6 +394,31 @@ function Applications({ rows, open, setOpen }) {
   );
 }
 
+function AccessLog({ log }) {
+  if (!log) return <Note>Loading…</Note>;
+  return (
+    <div className="stack">
+      <Note tone="info" title="Who opened what">Every back-office view and action is recorded here, including refused keys
+        and partners trying to open staff pages. The log is stored encrypted next to the applications.</Note>
+      <div className="office-scroll">
+        <table className="office-table compact">
+          <thead><tr><th>When</th><th>Who</th><th>What</th><th>Details</th></tr></thead>
+          <tbody>
+            {log.map((e, i) => (
+              <tr key={i}>
+                <td className="t-footnote t-mono">{e.at.replace('T', ' ')}</td>
+                <td>{e.who}</td>
+                <td>{e.denied ? <StatusBadge status="rejected">Refused</StatusBadge> : null} {e.what}</td>
+                <td className="t-footnote t-secondary">{[e.ref, e.product].filter(Boolean).join(' · ')}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export default function BackOffice({ theme, onTheme }) {
   const [key, setKey] = useState(readKey);
   const [draft, setDraft] = useState('');
@@ -317,20 +431,30 @@ export default function BackOffice({ theme, onTheme }) {
   const [error, setError] = useState('');
   const [open, setOpen] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [me, setMe] = useState(null); // { role: 'staff' | 'partner', partner }
+  const [accessLog, setAccessLog] = useState(null);
 
   async function load(k = key) {
     if (!k) return;
     setLoading(true);
     setError('');
     try {
-      const [apps, st, cu] = await Promise.all([api.backoffice(k), api.officeStats(k), api.officeCustomers(k)]);
-      setRows(apps);
-      setStats(st);
-      setCustomers(cu);
+      const who = await api.officeMe(k);
+      setMe(who);
+      if (who.role === 'staff') {
+        const [apps, st, cu] = await Promise.all([api.backoffice(k), api.officeStats(k), api.officeCustomers(k)]);
+        setRows(apps);
+        setStats(st);
+        setCustomers(cu);
+        api.officeLeads(k).then((l) => { setLeads(l); setLeadsError(''); })
+          .catch((e) => setLeadsError(e.message || 'Could not load the leads.'));   // may still be starting up
+        api.officeAccessLog(k).then(setAccessLog).catch(() => setAccessLog([]));
+      } else {
+        setRows(await api.backoffice(k));
+        setTab('applications');
+      }
       saveKey(k);
       setKey(k);
-      api.officeLeads(k).then((l) => { setLeads(l); setLeadsError(''); })
-        .catch((e) => setLeadsError(e.message || 'Could not load the leads.'));   // may still be starting up
     } catch (e) {
       if (e.status === 401) {
         saveKey('');
@@ -342,6 +466,20 @@ export default function BackOffice({ theme, onTheme }) {
     }
   }
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function installed(ref, productId) {
+    setLoading(true);
+    setError('');
+    try {
+      const row = await api.officeInstalled(key, ref, productId);
+      setRows((rs) => rs.map((r) => (r.id === row.id ? row : r)));
+    } catch (e) {
+      setError(e.message || 'Could not mark it live.');
+    } finally {
+      setLoading(false);
+    }
+  }
+  const tabs = me?.role === 'partner' ? PARTNER_TABS : STAFF_TABS;
 
   const themeBtn = (
     <button type="button" className="ab-icon-btn" aria-label={theme === 'dark' ? 'Use light mode' : 'Use dark mode'} onClick={onTheme}>
@@ -371,15 +509,16 @@ export default function BackOffice({ theme, onTheme }) {
         <BrandMark size={28} />
         <span className="t-footnote t-secondary">Back office</span>
         <nav className="office-tabs" role="tablist" aria-label="Back office sections">
-          {TABS.map(([id, label]) => (
+          {tabs.map(([id, label]) => (
             <button key={id} type="button" role="tab" aria-selected={tab === id} className="office-tab" onClick={() => setTab(id)}>
               {label}
             </button>
           ))}
         </nav>
         <span className="grow" />
+        {me?.role === 'partner' && <span className="t-footnote t-secondary">{me.partner.name} · partner</span>}
         <Button size="sm" variant="secondary" icon={RefreshCw} onClick={() => load()} disabled={loading}>Refresh</Button>
-        <Button size="sm" variant="plain" icon={LogOut} onClick={() => { saveKey(''); setKey(''); setRows(null); }}>Sign out</Button>
+        <Button size="sm" variant="plain" icon={LogOut} onClick={() => { saveKey(''); setKey(''); setRows(null); setMe(null); setTab('overview'); }}>Sign out</Button>
         {themeBtn}
       </div>
       <main className="office__main" role="tabpanel">
@@ -387,7 +526,9 @@ export default function BackOffice({ theme, onTheme }) {
         {tab === 'overview' && <Overview stats={stats} rows={rows} />}
         {tab === 'customers' && <Customers customers={customers} />}
         {tab === 'leads' && <Leads leads={leads} error={leadsError} />}
-        {tab === 'applications' && <Applications rows={rows} open={open} setOpen={setOpen} />}
+        {tab === 'applications' && <Applications rows={rows} open={open} setOpen={setOpen} role={me?.role}
+                                                 onInstalled={installed} busy={loading} />}
+        {tab === 'access' && <AccessLog log={accessLog} />}
       </main>
     </div>
   );

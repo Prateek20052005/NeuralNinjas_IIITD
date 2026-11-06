@@ -48,7 +48,8 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
   const [mic, setMic] = useState('idle'); // idle | warn | recording | transcribing
   const [checkHint, setCheckHint] = useState(false);
   const [business, setBusiness] = useState(null); // the GST registry's answer, shown as a card
-  const [sheet, setSheet] = useState(false); // salesperson-call form, offered when the chatbot can't go lower
+  const [sheet, setSheet] = useState(false); // call-me form: price, help with GST, or a chat that isn't working
+  const [sheetReason, setSheetReason] = useState('price');
   const neg = state.neg || {}; // price talk after the plan: pushback | offer | final | handoff | called
   const [saving, setSaving] = useState(false); // "save my progress" sheet
   const recorder = useRef(null);
@@ -117,8 +118,12 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
       }
       if (out.quote) patch.quote = out.quote; // a discount given in the chat shows on the plan screen too
       if (out.negotiation) patch.neg = { status: out.negotiation.status };
+      if (out.handoff && !state.handoffCalled) patch.handoff = out.handoff; // gst_help | unclear: offer a person
       update(patch);
-      if (out.negotiation?.status === 'handoff') setSheet(true);
+      if (out.negotiation?.status === 'handoff') {
+        setSheetReason('price');
+        setSheet(true);
+      }
       if (state.voiceMode && !state.muted) speak(out.messages, lang);
     } catch (e) {
       update({ messages: before.slice(0, -1), question }); // put the question back so they can answer again
@@ -197,8 +202,14 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
 
   function callRequested(message) {
     setSheet(false);
-    update({ messages: [...messages, { from: 'bot', text: message }], neg: { status: 'called' } });
+    const said = [...messages, { from: 'bot', text: message }];
+    if (sheetReason === 'price') update({ messages: said, neg: { status: 'called' } });
+    else update({ messages: said, handoffCalled: true, handoff: null });
   }
+  const askCall = (reason) => {
+    setSheetReason(reason);
+    setSheet(true);
+  };
   const numeric = question?.input === 'number';
 
   function bubble(m, i) {
@@ -246,6 +257,9 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
       </AppHeader>
 
       <main className="ab-chat" aria-live="polite">
+        {state.partner && (
+          <Note tone="trust">{tr(state.partner.assisted ? 'ui.assisted_by' : 'ui.referred_by', { partner: state.partner.name })}</Note>
+        )}
         {messages.map(bubble)}
         {question?.slot === 'gst_confirm' && business?.business_name && !busy && (
           <ChatBubble avatar={false}>
@@ -277,7 +291,12 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
           </ChipGroup>
         )}
         {rec && neg.status === 'handoff' && (
-          <Button variant="secondary" block icon={Phone} onClick={() => setSheet(true)}>{tr('ui.request_call')}</Button>
+          <Button variant="secondary" block icon={Phone} onClick={() => askCall('price')}>{tr('ui.request_call')}</Button>
+        )}
+        {!rec && state.handoff && !busy && (
+          <Button variant="secondary" size="sm" block icon={Phone} onClick={() => askCall(state.handoff)}>
+            {tr(state.handoff === 'gst_help' ? 'ui.gst_help_btn' : 'ui.call_me_btn')}
+          </Button>
         )}
         {rec && <Button block icon={ArrowRight} onClick={() => update({ screen: 'plan' })}>{tr('ui.your_plan')}</Button>}
         {checkHint && <p className="ab-composer__hint">{tr('ui.voice_check')}</p>}
@@ -314,6 +333,7 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
       </footer>
 
       <SalesCallbackSheet open={sheet} onClose={() => setSheet(false)} id={state.id} tr={tr} onDone={callRequested}
+                          reason={sheetReason}
                           verifiedPhone={state.phoneVerified ? state.phoneSaved : null} />
       <PhoneVerifySheet open={saving} onClose={() => setSaving(false)} tr={tr} title={tr('ui.save_progress')}
                         why={tr('ui.phone_why_save')}

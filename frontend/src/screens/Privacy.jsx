@@ -73,7 +73,10 @@ export default function Privacy({ state, update, tr, onErased }) {
           </>
         ) : (
           <>
-            <Note tone="trust">{tr('ui.privacy_auto', { date: shortTime(status.delete_after, lang) })}</Note>
+            <Note tone="trust">
+              {status.retention_days ? tr('ui.privacy_order', { days: status.retention_days })
+                : tr('ui.privacy_auto', { date: shortTime(status.delete_after, lang) })}
+            </Note>
 
             {held.length > 0 && (
               <FieldPreviewList title={tr('ui.privacy_hold')} fields={held.map(([k, v]) => ({

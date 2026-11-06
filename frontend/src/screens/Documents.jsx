@@ -19,6 +19,7 @@ const PREVIEW = {
   signatory_id: ['name', 'valid_till'],
 };
 const MONO = new Set(['gstin', 'udyam_number']);
+const DIGILOCKER = ['gst_certificate', 'udyam_certificate']; // issued certificates the demo can fetch
 const MAX_SIDE = 2000;
 
 // Phone photos are often 4000 px and several MB; the server reads 2000 px just as well. Shrinking here
@@ -87,6 +88,22 @@ export default function Documents({ state, update, tr, actions }) {
     }
   }
 
+  // DigiLocker (demo): the issued certificate instead of a photo; it still goes through every KYC check
+  async function fromDigilocker(type) {
+    setReading((r) => ({ ...r, [type]: true }));
+    setError('');
+    try {
+      const out = await api.digilocker(state.id, type);
+      update({ docs: { ...(state.docs || {}), [type]: out } });
+      setLast(type);
+    } catch (e) {
+      setError(e.message || tr(e.status === 0 ? 'ui.offline' : 'ui.error'));
+    } finally {
+      setReading((r) => ({ ...r, [type]: false }));
+    }
+  }
+  const fetchable = DIGILOCKER.filter((d) => !docs[d]?.ok && !(d === 'gst_certificate' && noGst));
+
   async function saveUdyam() {
     try {
       const out = await api.udyamNumber(state.id, udyam);
@@ -147,6 +164,17 @@ export default function Documents({ state, update, tr, actions }) {
                         t={{ add: tr('ui.add_photo'), reading: tr('ui.reading_short'), read: tr('ui.read_ok'), retake: tr('ui.retake') }} />
           ))}
         </section>
+
+        {fetchable.length > 0 && (
+          <section className="card stack">
+            {fetchable.map((d) => (
+              <Button key={d} variant="secondary" disabled={!!reading[d]} onClick={() => fromDigilocker(d)}>
+                {tr('ui.digilocker_btn')} · {tr(`doc.${d}`)}
+              </Button>
+            ))}
+            <p className="t-footnote t-secondary">{tr('ui.digilocker_hint')}</p>
+          </section>
+        )}
 
         {!docs.udyam_certificate?.ok && (
           <section className="card stack">

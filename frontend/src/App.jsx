@@ -95,8 +95,10 @@ export default function App() {
   async function start(code) {
     setState({ lang: code, screen: 'chat', messages: [], question: null, starting: true });
     try {
-      const out = await api.start(code);
-      setState({ id: out.id, lang: code, screen: 'chat', question: out.question,
+      // a partner's link (/?ref=RAJ01, &assisted=1 when they sit with the owner) keeps their commission
+      const link = new URLSearchParams(window.location.search);
+      const out = await api.start(code, link.get('ref'), link.get('assisted') === '1');
+      setState({ id: out.id, lang: code, screen: 'chat', question: out.question, partner: out.partner || null,
                  messages: out.messages.map((text) => ({ from: 'bot', text })) });
     } catch {
       setState({ lang: code, screen: 'chat', messages: [], question: null, error: true });

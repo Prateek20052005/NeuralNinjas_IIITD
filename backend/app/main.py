@@ -6,14 +6,15 @@ All state is per application id (an unguessable token the phone keeps). See stor
 from __future__ import annotations
 
 import csv
-import hmac
+import hashlib
+import json
 import logging
 import os
 import re
 import threading
 from collections import Counter
 from functools import lru_cache
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from fastapi import FastAPI, File, Header, HTTPException, Request, UploadFile
@@ -37,6 +38,10 @@ from .quote import build_quote, contract_options, price_position, toggle, unit_p
 from .voice import MAX_AUDIO_BYTES, VOICE_LANGUAGES, Transcriber, VoiceUnavailable
 from .store import CONSENT_PURPOSES, Application, Consent, Store, case_clock, masked_fields
 from .otp import OtpError, check as check_code, demo_mode, issue as issue_code
+from . import metrics, tracker
+from .handoff import REASONS as HANDOFF_REASONS, plan_reasons, summary as handoff_summary
+from .kyc.digilocker import FETCHABLE as DIGILOCKER_DOCS, SOURCE as DIGILOCKER_SOURCE, fetch as digilocker_fetch
+from .partners import Viewer, partner_code, partner_view, viewer_for
 from .sms import SmsError, missing_settings as sms_missing, provider as sms_provider, send_code as send_sms
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(name)s %(levelname)s %(message)s")
@@ -98,6 +103,8 @@ if not demo_mode() and sms_missing():   # say it at start-up, not at the first o
 # ---------- request bodies ----------
 class StartBody(BaseModel):
     language: str = "en"
+    ref: str | None = None        # partner referral code from the link (/?ref=RAJ01)
+    assisted: bool = False        # the partner is sitting with the owner (&assisted=1)
 
 
 class MessageBody(BaseModel):
@@ -111,11 +118,13 @@ class PlanBody(BaseModel):
     contract_months: int | None = None
     setup_months: int | None = None       # 1 = pay setup at once, 6 or 12 = spread
     billing_months: int | None = None     # pay every 1, 3, 6 or 12 months
+    current_spend: int | None = None      # what the owner pays today for internet and phones (0 = clear)
 
 
 class CallbackBody(BaseModel):
     phone: str | None = None              # empty: call the number the owner already verified
-    consent: bool                         # "call me about the price of this plan"
+    consent: bool                         # "call me about the price of this plan" / "about my business plan"
+    reason: str = "price"                 # why a person should call (handoff.py)
     target_monthly: int | None = None     # price that would work for the owner, if they said
 
 
@@ -146,6 +155,10 @@ class ResumeCodeBody(BaseModel):
 
 class UdyamBody(BaseModel):
     number: str
+
+
+class InstalledBody(BaseModel):
+    product_id: str
 
 
 class MarketingBody(BaseModel):
@@ -190,6 +203,8 @@ def _plan_view(a: Application) -> dict:
     tiers.sort(key=lambda t: ("basic", "recommended", "full").index(t["id"]))
     return {"quote": quote_view(q), "items": a.items, "tier": a.tier, "tiers": tiers,
             "callback_requested": a.callback is not None,
+            "handoff": plan_reasons(a.session.profile, a.items),   # a specialist should plan this with the owner
+            "current_spend": a.current_spend,
             "unit_prices": {pk.product_id: unit_price(cat[pk.product_id], pos) for pk in rec.core + rec.addons}}
 
 
@@ -214,10 +229,16 @@ def _status(a: Application) -> dict:
         "udyam_number": mask(a.udyam_number),
         "kyc": result_view(a.kyc, a.language) if a.kyc else None,
         "timeline": a.timeline,
+        "partner": {**partner_view(a.partner), "assisted": a.assisted} if a.partner else None,
+        "esign": a.esign,
+        # order tracker: one line per product with its ready-by date (tracker.py)
+        "products": tracker.products(a, a.items) if a.accepted else [],
+        "active": a.accepted and tracker.is_active(a, a.items),
         # privacy page: everything is erased automatically after this much time without activity
         "phone": mask(a.phone), "phone_verified": bool(a.phone_verified_at), "marketing_consent": a.marketing_consent,
         "retention_hours": round(store.retention.total_seconds() / 3600),
-        "delete_after": case_clock(a.last_seen + store.retention).isoformat(timespec="minutes"),
+        "retention_days": round(store.order_retention.total_seconds() / 86400) if a.accepted else None,
+        "delete_after": case_clock(a.last_seen + store.retention_for(a)).isoformat(timespec="minutes"),
     }
 
 
@@ -249,8 +270,12 @@ def catalogue():
 def start(body: StartBody):
     session, out = advisor.start(body.language)
     a = store.create(session)
-    a.mark("chat_started", language=session.profile.language)
-    return {"id": a.id, **out}
+    a.partner = partner_code(body.ref)
+    a.assisted = bool(body.assisted and a.partner)
+    a.mark("chat_started", language=session.profile.language, **({"partner": a.partner, "assisted": a.assisted}
+                                                                 if a.partner else {}))
+    store.save(a.id)
+    return {"id": a.id, **out, "partner": {**partner_view(a.partner), "assisted": a.assisted} if a.partner else None}
 
 
 @app.post("/api/applications/{app_id}/message")
@@ -376,7 +401,9 @@ def sales_callback(app_id: str, body: CallbackBody):
     """The owner wants a lower price than the chatbot may give: a salesperson calls them. The phone number is used
     only for that call, shown only in the back office, masked everywhere else, and erased with the application."""
     a = _app(app_id)
-    if not a.session.recommendation or a.accepted:
+    if body.reason not in HANDOFF_REASONS:
+        raise HTTPException(422, "Unknown reason")
+    if body.reason == "price" and (not a.session.recommendation or a.accepted):
         raise HTTPException(409, "No open quote to change")
     lang, hours = a.language, price_settings()["sales_callback_hours"]
     if not body.consent:
@@ -386,12 +413,15 @@ def sales_callback(app_id: str, body: CallbackBody):
         raise HTTPException(422, t(lang, "msg.phone_invalid"))
     target = body.target_monthly if body.target_monthly and 0 < body.target_monthly < 10_000_000 else None
     q = _quote(a) if a.items else None
-    a.callback = {"phone": phone, "target_monthly": target, "language": lang,
+    price = body.reason == "price"
+    a.callback = {"phone": phone, "target_monthly": target if price else None, "language": lang, "reason": body.reason,
                   "offered_monthly": q["monthly_with_gst"] if q else None, "discount_pct": a.discount_pct,
-                  "consent": t(lang, "ui.callback_consent"), "requested_at": TODAY.isoformat()}
-    a.mark("sales_callback_requested", phone=mask(phone), target_monthly=target)
+                  "consent": t(lang, "ui.callback_consent" if price else "ui.callback_consent_team"),
+                  "requested_at": TODAY.isoformat()}
+    a.mark("sales_callback_requested", phone=mask(phone), target_monthly=target, reason=body.reason)
     ref = a.id[:6].upper()
-    return {"ok": True, "reference": ref, "message": t(lang, "msg.callback_ok", hours=hours, ref=ref)}
+    return {"ok": True, "reference": ref,
+            "message": t(lang, "msg.callback_ok" if price else "msg.callback_ok_team", hours=hours, ref=ref)}
 
 
 @app.post("/api/applications/{app_id}/plan")
@@ -404,6 +434,10 @@ def choose_plan(app_id: str, body: PlanBody):
     if a.accepted and (body.tier or body.contract_months or body.setup_months or body.billing_months):
         raise HTTPException(409, "No open quote to change")
     with a.lock:
+        if body.current_spend is not None:   # owner's own figure, only to compare on this screen
+            if not 0 <= body.current_spend <= 10_000_000:
+                raise HTTPException(422, "Enter a monthly amount in rupees")
+            a.current_spend = body.current_spend or None
         if body.tier:
             tiers = rec.tiers()
             if body.tier not in tiers:
@@ -435,10 +469,25 @@ def accept(app_id: str):
         raise HTTPException(409, t(a.language, "msg.phone_required"))
     a.accepted = True
     q = _quote(a)
+    _esign(a, q)
     a.mark("quote_accepted", monthly=q["monthly_with_gst"], expected_live=q["expected_live"], tier=a.tier,
            contract_months=q["contract_months"], setup_months=q["setup_months"], discount_pct=q["discount_pct"],
            billing_months=q["billing_months"], first_time=bool(q["welcome"]), setup_due=q["setup_due"])
     return _status(a)
+
+
+def _esign(a: Application, q: dict) -> None:
+    """E-sign (demo): the order terms are signed with the mobile code the owner just verified. We keep a fingerprint
+    (SHA-256) of exactly what was agreed, so any later change to the terms is visible. In production: Aadhaar e-sign
+    through a licensed e-sign provider."""
+    at = case_clock().isoformat(timespec="seconds")
+    terms = {"items": a.items, "monthly_with_gst": q["monthly_with_gst"], "contract_months": q["contract_months"],
+             "setup_due": q["setup_due"], "billing_months": q["billing_months"], "discount_pct": q["discount_pct"],
+             "phone": a.phone, "signed_at": at}
+    digest = hashlib.sha256(json.dumps(terms, sort_keys=True).encode()).hexdigest()
+    a.esign = {"method": "mobile_code_demo", "signed_at": at, "phone": mask(a.phone), "fingerprint": digest,
+               "reference": digest[:12].upper()}
+    a.mark("order_signed", reference=a.esign["reference"])
 
 
 # ---------- consent and KYC ----------
@@ -495,6 +544,23 @@ def upload(app_id: str, doc_type: str, file: UploadFile = File(...)):
     a.mark("document_read", doc=doc_type, ok=ok, seconds=doc.seconds)
     return {"doc_type": doc_type, "ok": ok, "message": msg, "fields": masked_fields(doc),
             "straightened": bool(doc.tilt)}
+
+
+@app.post("/api/applications/{app_id}/documents/{doc_type}/digilocker")
+def from_digilocker(app_id: str, doc_type: str):
+    """DigiLocker (demo): the issued GST or Udyam certificate instead of a photo (kyc/digilocker.py)."""
+    a = _app(app_id)
+    _require_consent(a)
+    if doc_type not in DIGILOCKER_DOCS:
+        raise HTTPException(404, "This document can't be fetched from DigiLocker")
+    doc = digilocker_fetch(doc_type, a.session.profile.gstin, a.udyam_number)
+    if not doc:
+        raise HTTPException(404, t(a.language, "msg.digilocker_none"))
+    a.docs[doc_type] = doc
+    a.kyc = None
+    ok, msg = _doc_check(doc_type, doc, a.language)
+    a.mark("document_fetched", doc=doc_type, source="digilocker")
+    return {"doc_type": doc_type, "ok": ok, "message": msg, "fields": masked_fields(doc), "digilocker": True}
 
 
 @app.post("/api/applications/{app_id}/udyam-number")
@@ -644,11 +710,22 @@ def erase(app_id: str):
     return {"deleted": True, "message": t(lang, "privacy.deleted")}
 
 
-# ---------- back office (needs BACKOFFICE_KEY in .env; off when unset) ----------
-def _staff(x_admin_key: str | None) -> None:
-    key = os.getenv("BACKOFFICE_KEY")
-    if not key or not x_admin_key or not hmac.compare_digest(x_admin_key, key):
+# ---------- back office: staff (BACKOFFICE_KEY) and partners (PARTNER_KEYS); every view is logged ----------
+def _viewer(key: str | None, what: str, staff_only: bool = False, **info) -> Viewer:
+    v = viewer_for(key)
+    if not v:
+        if key:
+            store.audit("unknown key", what, denied=True)
         raise HTTPException(401, "back office key required")
+    if staff_only and v.role != "staff":
+        store.audit(v.name, what, denied=True, **info)
+        raise HTTPException(403, "Partners can see only the applications they referred")
+    store.audit(v.name, what, **info)
+    return v
+
+
+def _staff(x_admin_key: str | None, what: str = "back office") -> Viewer:
+    return _viewer(x_admin_key, what, staff_only=True)
 
 
 def _score(a: Application) -> dict | None:
@@ -660,25 +737,87 @@ def _score(a: Application) -> dict | None:
         return None
 
 
+def _ready_by(a: Application) -> date | None:
+    booked = tracker.booked_on(a)
+    days = max((load_catalogue()[pid].install_days for pid in a.items), default=0)
+    return booked + timedelta(days=days) if booked else None
+
+
+def _handoff(a: Application) -> list[str]:
+    """Why a person should get involved: the plan's needs, plus what the owner asked a call about."""
+    out = plan_reasons(a.session.profile, a.items) if a.session.recommendation else []
+    if a.callback and a.callback.get("reason", "price") not in out:
+        out.append(a.callback.get("reason", "price"))
+    if getattr(a.session, "unclear", 0) >= 3 and "unclear" not in out:
+        out.append("unclear")
+    return out
+
+
+def _row(a: Application, v: Viewer) -> dict:
+    """One application for the back office. Partners never see documents, KYC evidence, GST or phone numbers."""
+    p = a.session.profile
+    quote = _quote(a) if a.items else None
+    staff = v.role == "staff"
+    cb = a.callback
+    return {"id": a.id[:6], "business": p.business_name or p.business_type, "city": p.city,
+            "kind": p.segment, "gstin": mask(p.gstin) if staff else None, "accepted": a.accepted,
+            "monthly": quote["monthly_with_gst"] if quote else None,
+            "documents": {k: masked_fields(d) for k, d in a.docs.items()} if staff else {},
+            "kyc": (result_view(a.kyc, "en", back_office=True) if staff else {"decision": a.kyc.decision})
+            if a.kyc else None,
+            "price": {"asks": a.price_asks, "discount_pct": a.discount_pct, "tier": a.tier,
+                      "billing_months": a.billing_months, "first_time": _first_time(a)},
+            "phone": mask(a.phone), "marketing_consent": a.marketing_consent,
+            "conversion": None if a.accepted else _score(a),
+            # leads the chatbot could not close: the full number is shown to staff only, so sales can call
+            "sales_callback": {**cb, "phone": cb["phone"] if staff else mask(cb["phone"]),
+                               "reason": cb.get("reason", "price"), "reference": a.id[:6].upper()} if cb else None,
+            "handoff": _handoff(a),
+            "summary": handoff_summary(a, quote),   # built from the answers: no ID numbers, no transcript
+            "partner": {**partner_view(a.partner), "assisted": a.assisted} if a.partner else None,
+            "esign": a.esign, "products": tracker.products(a, a.items) if a.accepted else [],
+            "active": a.accepted and tracker.is_active(a, a.items),
+            "timeline": a.timeline}
+
+
+@app.get("/api/backoffice/me")
+def backoffice_me(x_admin_key: str | None = Header(default=None)):
+    v = _viewer(x_admin_key, "signed in")
+    return {"role": v.role, "partner": partner_view(v.partner)}
+
+
 @app.get("/api/backoffice/applications")
 def backoffice(x_admin_key: str | None = Header(default=None)):
-    _staff(x_admin_key)
-    out = []
-    for a in store.all():
-        p = a.session.profile
-        out.append({"id": a.id[:6], "business": p.business_name or p.business_type, "city": p.city,
-                    "kind": p.segment, "gstin": mask(p.gstin), "accepted": a.accepted,
-                    "monthly": _quote(a)["monthly_with_gst"] if a.items else None,
-                    "documents": {k: masked_fields(d) for k, d in a.docs.items()},
-                    "kyc": result_view(a.kyc, "en", back_office=True) if a.kyc else None,
-                    "price": {"asks": a.price_asks, "discount_pct": a.discount_pct, "tier": a.tier,
-                              "billing_months": a.billing_months, "first_time": _first_time(a)},
-                    "phone": mask(a.phone), "marketing_consent": a.marketing_consent,
-                    "conversion": None if a.accepted else _score(a),
-                    # leads the chatbot could not close: the full number is shown here only, so sales can call
-                    "sales_callback": {**a.callback, "reference": a.id[:6].upper()} if a.callback else None,
-                    "timeline": a.timeline})
-    return sorted(out, key=lambda x: x["sales_callback"] is None)   # calls to make come first
+    v = _viewer(x_admin_key, "applications")
+    apps = [a for a in store.all() if v.role == "staff" or a.partner == v.partner]
+    out = [_row(a, v) for a in apps]
+    # calls to make first, then plans that need a specialist, then the rest (live orders last)
+    return sorted(out, key=lambda x: (x["sales_callback"] is None, not x["handoff"], x["active"]))
+
+
+@app.post("/api/backoffice/applications/{ref}/installed")
+def mark_installed(ref: str, body: InstalledBody, x_admin_key: str | None = Header(default=None)):
+    """A technician or partner marks one product live. When all are live the order is active, billing starts, and the
+    details read from the documents are deleted (only the KYC result is kept)."""
+    v = _viewer(x_admin_key, "marked a product live", ref=ref.upper()[:6], product=body.product_id)
+    a = next((x for x in store.all() if x.id[:6].upper() == ref.upper()[:6]), None)
+    if not a or (v.role == "partner" and a.partner != v.partner):
+        raise HTTPException(404, "No such order")
+    if body.product_id not in a.items or not a.accepted:
+        raise HTTPException(422, "That product is not in this order")
+    if not tracker.booked_on(a):
+        raise HTTPException(409, "Installation is not booked yet: the documents have not passed")
+    with a.lock:
+        if body.product_id not in a.installed:
+            a.installed[body.product_id] = case_clock().date().isoformat()
+            a.mark("product_live", product=body.product_id)
+            if tracker.is_active(a, a.items):
+                a.mark("activated")
+                if a.docs:
+                    a.docs = {}
+                    a.mark("documents_erased")
+    store.save(a.id)
+    return _row(a, v)
 
 
 HISTORY_STAGES = ["Lead", "Contacted", "Needs assessed", "Quote accepted", "KYC complete", "Activated"]
@@ -700,7 +839,7 @@ def _history() -> dict:
 @app.get("/api/backoffice/stats")
 def backoffice_stats(x_admin_key: str | None = Header(default=None)):
     """Live numbers from the app's applications, the old funnel for comparison, and how good the predictor is."""
-    _staff(x_admin_key)
+    _staff(x_admin_key, "statistics")
     apps = store.all()
     steps = [{s["step"] for s in a.timeline} for a in apps]
     accepted = [a for a in apps if a.accepted]
@@ -710,8 +849,10 @@ def backoffice_stats(x_admin_key: str | None = Header(default=None)):
               ("Accepted the plan", len(accepted)),
               ("Gave consent", sum("consent_given" in s for s in steps)),
               ("KYC passed", sum(1 for a in apps if a.kyc and a.kyc.decision == "PASS")),
-              ("Installation booked", sum("installation_booked" in s for s in steps))]
+              ("Installation booked", sum("installation_booked" in s for s in steps)),
+              ("Live (activated)", sum("activated" in s for s in steps))]
     monthly = sum(q["monthly_with_gst"] for q in quotes)
+    partners = Counter(a.partner for a in apps if a.partner)
     return {
         "funnel": [{"stage": k, "count": n} for k, n in funnel],
         "money": {"monthly_with_gst": monthly, "average_monthly": round(monthly / len(quotes)) if quotes else 0,
@@ -723,6 +864,14 @@ def backoffice_stats(x_admin_key: str | None = Header(default=None)):
         "kyc": dict(Counter(a.kyc.decision for a in apps if a.kyc)),
         "languages": dict(Counter(LANGUAGES.get(a.language, a.language) for a in apps)),
         "kinds": dict(Counter(a.session.profile.segment or "not yet" for a in apps)),
+        "handoffs": dict(Counter(r for a in apps for r in _handoff(a))),
+        "partners": [{**partner_view(code), "applications": n,
+                      "accepted": sum(1 for a in accepted if a.partner == code),
+                      "assisted": sum(1 for a in apps if a.partner == code and a.assisted)}
+                     for code, n in partners.most_common()],
+        "metrics": metrics.view(apps, tracker.booked_on, _ready_by),
+        "retention": {"lead_hours": round(store.retention.total_seconds() / 3600),
+                      "order_days": round(store.order_retention.total_seconds() / 86400)},
         "history": _history(),
         "predictor": predictor_model().metrics if predictor_ready.is_set() else None,
         "sells_together": top_rules(2),   # strongest 'bought together' rules per kind of business (bundles.py)
@@ -732,13 +881,14 @@ def backoffice_stats(x_admin_key: str | None = Header(default=None)):
 @app.get("/api/backoffice/customers")
 def backoffice_customers(x_admin_key: str | None = Header(default=None)):
     """Owners who accepted a plan: what they bought and on what terms (phone masked; marketing only if they agreed)."""
-    _staff(x_admin_key)
+    _staff(x_admin_key, "customers")
     out = []
     for a in store.all():
         if not a.accepted:
             continue
         p, q = a.session.profile, _quote(a)
         when = next((s["at"] for s in a.timeline if s["step"] == "quote_accepted"), None)
+        live = tracker.products(a, a.items)
         out.append({"ref": a.id[:6].upper(), "business": p.business_name or p.business_type, "city": p.city,
                     "kind": p.segment, "language": LANGUAGES.get(a.language, a.language),
                     "plan": [f"{l['name']} ×{l['quantity']}" if l["quantity"] > 1 else l["name"] for l in q["lines"]],
@@ -746,6 +896,8 @@ def backoffice_customers(x_admin_key: str | None = Header(default=None)):
                     "billing_months": q["billing_months"], "setup_due": q["setup_due"],
                     "discount_pct": q["discount_pct"], "welcome": bool(q["welcome"]), "tier": a.tier,
                     "phone": mask(a.phone), "marketing_consent": a.marketing_consent,
+                    "partner": a.partner, "signed": (a.esign or {}).get("reference"),
+                    "live": sum(x["status"] == "live" for x in live), "products": len(live),
                     "kyc": a.kyc.decision if a.kyc else None, "accepted_at": when})
     return sorted(out, key=lambda c: c["accepted_at"] or "", reverse=True)
 
@@ -753,10 +905,17 @@ def backoffice_customers(x_admin_key: str | None = Header(default=None)):
 @app.get("/api/backoffice/leads")
 def backoffice_leads(limit: int = 50, x_admin_key: str | None = Header(default=None)):
     """Conversion predictor: past leads that dropped for a reason the app now answers, best chance first."""
-    _staff(x_admin_key)
+    _staff(x_admin_key, "leads to call")
     if not predictor_ready.is_set():
         raise HTTPException(503, "The conversion predictor is still starting up. Try again in a few seconds.")
     return {"model": predictor_model().metrics, "leads": leads_to_call(max(1, min(limit, 200)))}
+
+
+@app.get("/api/backoffice/access-log")
+def backoffice_access_log(limit: int = 200, x_admin_key: str | None = Header(default=None)):
+    """Who opened what in the back office, newest first (staff only)."""
+    _staff(x_admin_key, "access log")
+    return store.audit_log(max(1, min(limit, 1000)))
 
 
 # ---------- the built phone app (frontend/dist), served from the same address ----------

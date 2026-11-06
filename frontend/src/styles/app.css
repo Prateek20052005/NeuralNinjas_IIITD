@@ -136,12 +136,22 @@ a { color: var(--color-brand-ink); }
 .ab-tile__name::first-letter { text-transform: uppercase; }
 .welcome-line { display: block; }
 .welcome-line + .welcome-line { margin-top: 2px; }
+.note-action { display: block; margin-top: 10px; }
+/* plan screen: what the owner pays today, next to its Compare button */
+.spend-row { display: flex; gap: 8px; align-items: flex-end; }
+.spend-row > :first-child { flex: 1; min-width: 0; }
+/* tracker: one row per product */
+.svc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.svc-list li { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
+.svc-list .svc-name { font-weight: 600; }
+.svc-list .svc-detail { display: block; }
 
 /* back office: tabs, cards, single-series bars, conversion chance */
 .office-tabs { display: flex; gap: 4px; margin-left: 16px; }
 .office-tab { border: 0; background: none; padding: 8px 12px; border-radius: 999px; font: inherit; font-size: var(--text-callout); color: var(--color-ink-2); cursor: pointer; }
 .office-tab[aria-selected="true"] { background: var(--color-fill); color: var(--color-ink); font-weight: var(--weight-semibold); }
 .office-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 16px; }
+.office-card--wide { grid-column: 1 / -1; }
 .office-card { display: flex; flex-direction: column; gap: 10px; padding: 18px; }
 .office-card .section-label { margin-top: 6px; }
 .bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }

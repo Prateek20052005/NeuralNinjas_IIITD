@@ -22,6 +22,7 @@ from .flow import (COUNT_NEEDS, Profile, apply_answer, build_recommendation, exp
 from ..reference import find_city
 from .llm import LLM, LLMUnavailable
 from ..negotiate import wants_lower_price
+from ..handoff import UNCLEAR_AFTER
 from .parse import current_tools_choice, internet_choice, kind_of_business
 from .parse import number as _number
 from .parse import yes_no as _yes_no
@@ -30,6 +31,7 @@ log = logging.getLogger("advisor")
 # rupee words and short forms in all 7 languages (Hindi/Marathi, Gujarati, Tamil, Telugu, Kannada)
 PRICE_TALK = re.compile(r"₹|\brs\.?\s*\d|\brupees?\b|रुपय|रुपए|रुपये|रु\.?\s*\d|રૂપિય|રૂ\.?\s*\d|ரூபாய|ரூ\.?\s*\d"
                         r"|రూపాయ|రూ\.?\s*\d|ರೂಪಾಯ|ರೂ\.?\s*\d|\d+\s*/\s*(month|mo)\b|per month", re.I)
+GST_SHOWCASE = ("P15", "P14", "P12")   # products owners can add once they register for GST (requires_gstin)
 NEED_HINTS = {
     "billing_pos": "GST billing / UPI & card payments", "whatsapp": "reach customers on WhatsApp",
     "sms": "bulk SMS", "cctv": "security cameras", "guest_wifi": "Wi-Fi for customers", "website": "website",
@@ -106,6 +108,7 @@ class Session:
     explanation: dict | None = None
     ai_used: bool = False
     fallbacks: list[str] = field(default_factory=list)
+    unclear: int = 0          # the same question not understood this many times in a row (handoff.py)
 
 
 class Advisor:
@@ -128,6 +131,7 @@ class Advisor:
     def handle(self, s: Session, text: str | None = None, slot: str | None = None, value=None) -> dict:
         """One owner turn: either a tapped option (slot + value) or free text."""
         msgs: list[str] = []
+        before_slot, had_gst_answer = next_slot(s.profile), s.profile.gstin_status is not None
         if slot is not None:  # button tap: same in both modes, no AI needed
             if slot == next_slot(s.profile):   # a tap on an old question (double tap, stale screen) changes nothing
                 msgs += apply_answer(s.profile, slot, value)
@@ -144,14 +148,26 @@ class Advisor:
                     msgs += apply_answer(s.profile, current, text)
 
         nxt = next_slot(s.profile)
+        handoff = None
+        if not had_gst_answer and s.profile.gstin_status == "none":   # no GST: what registering would add, and help
+            msgs.append(t(s.profile.language, "msg.no_gst_benefits", products=", ".join(
+                load_catalogue()[pid].name for pid in GST_SHOWCASE)))
+            handoff = "gst_help"
+        # the same question again and again: offer a person instead of a loop
+        s.unclear = getattr(s, "unclear", 0) + 1 if nxt and nxt == before_slot and slot is None else 0
+        if s.unclear >= UNCLEAR_AFTER:
+            if s.unclear == UNCLEAR_AFTER:
+                msgs.append(t(s.profile.language, "msg.handoff_unclear"))
+            handoff = "unclear"
         q = question(s.profile, nxt) if nxt else None  # the next question is always ours: fixed order and wording
         if reply and not (q and _same_text(reply, q["text"])):  # AI's answer to the owner's question, never an echo
             msgs.append(reply)
         if q is None:
-            return self._finish(s, msgs)
+            return {**self._finish(s, msgs), **({"handoff": handoff} if handoff else {})}
         if not (msgs and msgs[-1] == q["text"]):  # an unclear answer already repeated the question
             msgs.append(q["text"])
-        return {"messages": msgs, "question": q, "mode": self.mode, "profile": s.profile.safe_view()}
+        return {"messages": msgs, "question": q, "mode": self.mode, "profile": s.profile.safe_view(),
+                **({"handoff": handoff} if handoff else {})}
 
     # ---------- AI turn ----------
     def _prefill_ids(self, s: Session, text: str) -> list[str]:

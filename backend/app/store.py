@@ -8,6 +8,10 @@ Privacy (DPDP Act 2023) by design:
 - Document photos are read in memory and never written to disk; only the parsed fields are kept.
 - KYC needs recorded consent first, for named purposes, with the consent text version and time.
 - Applications (and their saved files) are deleted after RETENTION_HOURS without activity, or at once when the owner asks.
+  Accepted orders are customers, not leads: they are kept for ORDER_RETENTION_DAYS without activity (so the tracker
+  never disappears during installation), and the details read from their documents are deleted once every service is
+  live (only the KYC result is kept).
+- Every back-office view is written to an access log (who, when, what), kept encrypted next to the applications.
 - The chat transcript is not kept: only the answers needed for the plan.
 - Logs and screens only ever show masked identifiers; the mobile number is masked everywhere but the sales call list.
 A real deployment would move this to an encrypted database; the rules stay the same.
@@ -71,6 +75,11 @@ class Application:
     discount_pct: float = 0.0                                   # negotiated on the plan screen (negotiate.py)
     price_asks: int = 0                                         # times the owner asked for a lower price
     callback: dict | None = None                                # salesperson call: phone kept only for that call
+    partner: str | None = None                                  # referring partner's code (partners.py), if any
+    assisted: bool = False                                      # a partner is sitting with the owner
+    current_spend: int | None = None                            # owner's own figure, to compare on the plan screen
+    esign: dict | None = None                                   # order signed with the mobile code (e-sign demo)
+    installed: dict[str, str] = field(default_factory=dict)     # product -> date it went live (technician marks it)
     phone: str | None = None                                    # verified mobile (OTP): resume + order updates
     phone_verified_at: str | None = None
     marketing_consent: bool = False                             # separate, unticked by default
@@ -113,6 +122,8 @@ class Store:
     def __init__(self, retention_hours: float | None = None, state_dir: str | None = None, key: str | None = None):
         hours = retention_hours if retention_hours is not None else float(os.getenv("RETENTION_HOURS", "72"))
         self.retention = timedelta(hours=hours)
+        self.order_retention = timedelta(days=float(os.getenv("ORDER_RETENTION_DAYS", "365")))
+        self._audit: list[dict] = []                # back-office access log (newest last)
         self._apps: dict[str, Application] = {}
         self._lock = threading.Lock()
         self._save_lock = threading.Lock()          # saves take turns: two quick taps must not interleave writes
@@ -149,8 +160,38 @@ class Store:
             os.chmod(tmp, 0o600)
             os.replace(tmp, self._file(app_id))   # all or nothing: a crash never leaves half a file
 
+    def retention_for(self, app: Application) -> timedelta:
+        """Leads are deleted after RETENTION_HOURS without activity; accepted orders after ORDER_RETENTION_DAYS."""
+        return self.order_retention if app.accepted else self.retention
+
+    # ---------- back-office access log ----------
+    AUDIT_KEEP = 5000
+
+    def audit(self, who: str, what: str, **info) -> None:
+        entry = {"at": case_clock().isoformat(timespec="seconds"), "who": who, "what": what, **info}
+        with self._lock:
+            self._audit = (self._audit + [entry])[-self.AUDIT_KEEP:]
+            data = self._box.encrypt(pickle.dumps(self._audit)) if self._box else None
+        log.info("back office: %s %s %s", who, what, info or "")
+        if data:
+            with self._save_lock:
+                tmp = self._dir / f"access-log.{secrets.token_hex(4)}.tmp"
+                tmp.write_bytes(data)
+                os.chmod(tmp, 0o600)
+                os.replace(tmp, self._dir / "access-log.enc")
+
+    def audit_log(self, limit: int = 200) -> list[dict]:
+        with self._lock:
+            return list(reversed(self._audit[-limit:]))
+
     def _load(self) -> None:
         loaded = 0
+        audit = self._dir / "access-log.enc"
+        if audit.exists():
+            try:
+                self._audit = pickle.loads(self._box.decrypt(audit.read_bytes()))
+            except Exception as e:
+                log.warning("access log could not be read (%s); starting a new one", type(e).__name__)
         for f in self._dir.glob("*.app"):
             try:
                 # files are only ever written by save(); the signature check stops anything else from being read
@@ -199,15 +240,15 @@ class Store:
         return gone
 
     def purge_expired(self) -> int:
-        cutoff = _now() - self.retention
+        now = _now()
         with self._lock:
-            old = [k for k, a in self._apps.items() if a.last_seen < cutoff]
+            old = [k for k, a in self._apps.items() if a.last_seen < now - self.retention_for(a)]
             for k in old:
                 del self._apps[k]
         for k in old:
             self._forget(k)
         if old:
-            log.info("purged %d applications idle for more than %s", len(old), self.retention)
+            log.info("purged %d applications past their retention period", len(old))
         with self._lock:   # "continue a saved application" codes: dropped once expired and out of their send hour
             for phone in [p for p, r in self.resume_codes.items() if otp_stale(r)]:
                 del self.resume_codes[phone]

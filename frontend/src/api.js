@@ -39,7 +39,8 @@ export const api = {
   },
   consentText: (lang) => call("GET", `/consent/${lang}`),
   catalogue: () => call("GET", "/catalogue"),
-  start: (language) => call("POST", "/applications", { language }),
+  // ref: a partner's referral code from the link (/?ref=RAJ01); assisted: the partner is sitting with the owner
+  start: (language, ref = null, assisted = false) => call("POST", "/applications", { language, ref, assisted }),
   send: (id, msg) => call("POST", `/applications/${id}/message`, msg),
   switchProduct: (id, product_id, on) => call("POST", `/applications/${id}/addons`, { product_id, on }),
   plan: (id, choice = {}) => call("POST", `/applications/${id}/plan`, choice),   // tier, contract, setup spread
@@ -56,6 +57,7 @@ export const api = {
     form.append("file", file);
     return call("POST", `/applications/${id}/documents/${docType}`, form);
   },
+  digilocker: (id, docType) => call("POST", `/applications/${id}/documents/${docType}/digilocker`),   // demo
   udyamNumber: (id, number) => call("POST", `/applications/${id}/udyam-number`, { number }),
   checkKyc: (id) => call("POST", `/applications/${id}/kyc`),
   status: (id) => call("GET", `/applications/${id}`),
@@ -65,4 +67,8 @@ export const api = {
   officeStats: (key) => call("GET", "/backoffice/stats", undefined, { "x-admin-key": key }),
   officeCustomers: (key) => call("GET", "/backoffice/customers", undefined, { "x-admin-key": key }),
   officeLeads: (key) => call("GET", "/backoffice/leads?limit=60", undefined, { "x-admin-key": key }),
+  officeMe: (key) => call("GET", "/backoffice/me", undefined, { "x-admin-key": key }),          // staff or partner
+  officeAccessLog: (key) => call("GET", "/backoffice/access-log", undefined, { "x-admin-key": key }),
+  officeInstalled: (key, ref, productId) =>
+    call("POST", `/backoffice/applications/${ref}/installed`, { product_id: productId }, { "x-admin-key": key }),
 };
