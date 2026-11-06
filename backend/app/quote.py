@@ -89,7 +89,7 @@ class Quote:
     valid: bool
     problems: list[str] = field(default_factory=list)
     setup_months: int = 1                 # 1 = setup fee paid at once
-    setup_monthly: int = 0                # instalment when spread
+    setup_monthly: int = 0                # instalment when spread (incl. GST)
     min_contract_months: int = 1
     contract_options: list[dict] = field(default_factory=list)   # [{"months", "monthly_with_gst"}]
     list_total: int = 0                   # monthly price before any negotiated discount (excl. GST)
@@ -100,7 +100,9 @@ class Quote:
     billing_options: list[dict] = field(default_factory=list)    # [{"months", "saving_pct", "per_month_with_gst", "bill_with_gst"}]
     bill_with_gst: int = 0                # one regular bill for the chosen billing period
     setup_discount: int = 0               # welcome offer on the setup fee
-    setup_due: int = 0                    # setup fee after the welcome offer
+    setup_due: int = 0                    # setup fee after the welcome offer (excl. GST)
+    setup_gst: int = 0                    # GST on the setup fee: it is a service too, taxed at 18%
+    setup_due_with_gst: int = 0           # what the owner pays for setup
     welcome: dict | None = None           # first-time customers: the first-months offer (see module notes)
 
 
@@ -181,7 +183,7 @@ def build_quote(items: dict[str, int], biz: Business, order_date: date | None = 
         valid=not problems,
         problems=problems,
         setup_months=spread,
-        setup_monthly=math.ceil(setup_due / spread) if spread > 1 else 0,
+        setup_monthly=math.ceil(with_gst(setup_due) / spread) if spread > 1 else 0,
         min_contract_months=minimum,
         contract_options=options,
         list_total=list_total,
@@ -193,6 +195,8 @@ def build_quote(items: dict[str, int], biz: Business, order_date: date | None = 
         bill_with_gst=with_gst(pay_month * billing),
         setup_discount=setup_discount,
         setup_due=setup_due,
+        setup_gst=with_gst(setup_due) - setup_due,
+        setup_due_with_gst=with_gst(setup_due),
         welcome=welcome,
     )
 

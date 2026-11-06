@@ -14,7 +14,7 @@ from ..catalogue import Business, load_catalogue
 from ..customers import is_existing_customer
 from ..i18n import t
 from ..kyc.lookups import find_gstin_in_text, lookup_gstin, mask
-from ..recommend import NEED_PRODUCT, Needs, Recommendation, recommend
+from ..recommend import FALLBACKS, NEED_PRODUCT, Needs, Recommendation, recommend
 from ..reference import canonical_city, city_tier, find_city
 from .parse import current_tools_choice, internet_choice, kind_of_business, number, yes_no
 
@@ -66,9 +66,17 @@ class Profile:
 
 
 def _needs_internet_line(p: Profile, need: str) -> bool:
-    """Mobile-only owners are not asked about products that only work with an internet line."""
-    pid = NEED_PRODUCT.get(need)
-    return p.needs.internet is False and bool(pid and load_catalogue()[pid].requires_one_of)
+    """Mobile-only owners are not asked about products that only work with an internet line, and owners without an
+    active GST registration are not asked about products that need one and have no stand-in (WhatsApp Business,
+    phone lines, toll-free number, machine sensors): their answer could not be used."""
+    pid = {**NEED_PRODUCT, "machines": "P24"}.get(need)
+    if not pid:
+        return False
+    cat = load_catalogue()
+    if p.needs.internet is False and cat[pid].requires_one_of:
+        return True
+    gst_only = cat[pid].requires_gstin and all(cat[alt].requires_gstin for alt in FALLBACKS.get(pid, []))
+    return p.gstin_status in ("none", "inactive") and gst_only   # not asked yet: keep the full question count
 
 
 def next_slot(p: Profile) -> str | None:

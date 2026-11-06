@@ -115,10 +115,22 @@ def kind_of_business(text) -> str | None:
     for kind, stems in KIND_WORDS.items():
         if any((stem in s) if INDIC_RE.search(stem) else re.search(rf"(?<![a-z]){re.escape(stem)}", s)
                for stem in stems):
-            n = number(text)
-            if kind in ("micro", "prof") and n and n >= 3 and any(w in s for w in SHOP_WORDS):
+            n = shop_count(text)
+            if kind in ("micro", "prof") and n and n >= 3:
                 return "multi"   # "we have 4 shops"
             return kind
+    return None
+
+
+def shop_count(text) -> int | None:
+    """The number written next to a shop word: "4 shops", "kapdon ki 6 dukaanein", "एक ही दुकान" (1). A staff count
+    in the same message ("one shop, 4 staff", "medicine shop, four of us work here") is not a shop count."""
+    tokens = [w.strip(".,!?।:;()\"'") for w in str(text).lower().split()]
+    for i, w in enumerate(tokens):
+        if any(stem in w for stem in SHOP_WORDS):
+            for j in (i - 1, i - 2):   # "4 shops", "ek hi dukan"
+                if j >= 0 and (n := number(tokens[j])) is not None:
+                    return n
     return None
 
 

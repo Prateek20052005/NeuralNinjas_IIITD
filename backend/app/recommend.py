@@ -235,7 +235,9 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
     # 1. Internet line (everything else hangs off it) and mobile lines
     if not mobile_only:
         add(_connectivity(biz, needs), core, must=True)
-    add("P07" if biz.segment == "micro" else "P08", core, must=True)
+    # shops and offices: the 299-399 line (offices split ~50/50 in past sales, and owners asked for the cheaper one);
+    # chains and factories: the 599-799 line with roaming, which every one of them bought
+    add("P07" if biz.segment in ("micro", "prof") else "P08", core, must=True)
 
     # 2. What the owner asked for, then segment defaults for things not discussed
     defaults = SEGMENT_DEFAULTS[biz.segment]
@@ -245,8 +247,11 @@ def recommend(biz: Business, needs: Needs | None = None, order_date=None) -> Rec
         wanted = getattr(needs, flag)
         if wanted is True or (wanted is None and flag in core_defaults):
             add(pid, core, must=wanted is True)
+    def allowed(pid):   # an extra the owner never asked about is left out quietly if they can't have it
+        return any(check_product(x, biz).ok for x in [pid, *FALLBACKS.get(pid, [])])
+
     for flag in addon_defaults:
-        if getattr(needs, flag) is None and not needs_line(NEED_PRODUCT[flag]):
+        if getattr(needs, flag) is None and not needs_line(NEED_PRODUCT[flag]) and allowed(NEED_PRODUCT[flag]):
             add(NEED_PRODUCT[flag], addons)
     if needs.machines:
         add("P24", core, must=True)

@@ -5,7 +5,7 @@ tests for phone photos and failures. Everything below can be re-run with one com
 
 | What | Command | Result (4 Nov 2026) |
 |---|---|---|
-| Unit and API tests (rules, quotes, KYC answer key, consent, privacy, failures, negotiation, voice) | `.venv/Scripts/python -m pytest -q` | 417 passed |
+| Unit and API tests (rules, quotes, KYC answer key, consent, privacy, failures, negotiation, voice, partners, tracker) | `.venv/Scripts/python -m pytest -q` (or in Docker, see README) | 448 passed (7 Nov) |
 | 26 owner personas in 7 languages, AI switched off (backup mode) | `python scripts/eval_advisor.py scripted` | 26 / 26 |
 | 11 hardest personas with the real AI (Groq, free tier) | `python scripts/eval_advisor.py ai <names>` | 11 / 11, ~4.1K tokens per chat (2 Nov, before the new languages) |
 | Phone-like photos of 12 KYC documents | `python scripts/stress_kyc.py K03 K07 K10` | see below |

@@ -75,8 +75,10 @@ CATALOGUE:
 EXPLAIN_PROMPT = """You explain a recommended telecom bundle to a small Indian business owner.
 Write ONLY in {language}. Keep product names in English. Simple, warm, specific to their business.
 Do NOT mention any price, rupee amount or number of months; the screen shows those.
+"in_plan" products are in the package. "optional_extras" are NOT in it: the owner may switch them on later.
+The summary describes ONLY the in_plan products; never say or imply that an optional extra is included.
 Return a JSON object:
-{{"summary": "2-3 sentences on why this package fits their business",
+{{"summary": "2-3 sentences on why this package fits their business (in_plan products only)",
   "reasons": {{"<product id>": "one short sentence for each product id given"}},
   "notes": ["one sentence for each note given, same order"]}}"""
 
@@ -310,8 +312,9 @@ class Advisor:
         p, cat = s.profile, load_catalogue()
         payload = {
             "business": {k: v for k, v in p.ai_view().items() if k != "language"},
-            "products": {pk.product_id: f"{cat[pk.product_id].name} x{pk.quantity}: {pk.reason}"
-                         for pk in rec.core + rec.addons},
+            "in_plan": {pk.product_id: f"{cat[pk.product_id].name} x{pk.quantity}: {pk.reason}" for pk in rec.core},
+            "optional_extras": {pk.product_id: f"{cat[pk.product_id].name} x{pk.quantity}: {pk.reason}"
+                                for pk in rec.addons},
             "notes": rec.notes,
         }
         try:
@@ -333,7 +336,9 @@ class Advisor:
                              for pid, text in fallback["reasons"].items()}
         merged["notes"] = [n if ok(n) else f for n, f in zip(notes, fallback["notes"])] \
             if len(notes) == len(fallback["notes"]) else fallback["notes"]
-        if ok(out.get("summary")):
+        # a summary that names an extra the owner hasn't switched on would disagree with the price: keep ours
+        extras = [cat[pk.product_id].name.lower() for pk in rec.addons]
+        if ok(out.get("summary")) and not any(name in out["summary"].lower() for name in extras):
             merged["summary"] = out["summary"].strip()
         return merged
 

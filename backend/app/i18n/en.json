@@ -391,5 +391,8 @@
   "ui.next.ACTIVE": "All your services are live. The details read from your documents have been deleted; we keep only the verification result.",
   "ui.digilocker_btn": "Get it from DigiLocker (demo)",
   "ui.digilocker_hint": "Demo: we fetch the certificate from the government record instead of a photo. The real DigiLocker asks you to sign in and agree first.",
-  "ui.privacy_order": "Your order is kept while you are a customer and deleted {days} days after your last activity. The details read from your documents are deleted once all your services are live."
+  "ui.privacy_order": "Your order is kept while you are a customer and deleted {days} days after your last activity. The details read from your documents are deleted once all your services are live.",
+  "msg.cannot_switch_off_last": "This can't be switched off: it's the last mobile line in your plan. To change your plan, tell me in the chat.",
+  "ui.setup_gst": "GST 18% on setup",
+  "ui.setup_to_pay": "Setup to pay (incl. GST)"
 }

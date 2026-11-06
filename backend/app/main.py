@@ -341,7 +341,9 @@ def switch_addon(app_id: str, body: AddonBody):
         # refuse rather than quote a bundle that can't work; a plan that has an internet line keeps one
         # (mobile-only plans are chosen in the chat, so their extras can still be switched)
         lost_line = INTERNET_LINES & set(a.items) and not INTERNET_LINES & set(items)
-        if lost_line or not items or not q.valid:
+        if not items or (not INTERNET_LINES & set(items) and not {"P07", "P08"} & set(items)):
+            raise HTTPException(422, t(lang, "msg.cannot_switch_off_last"))   # a mobile-only plan's last line
+        if lost_line or not q.valid:
             raise HTTPException(422, t(lang, "msg.cannot_switch_off"))
         notes = [t(lang, "msg.also_removed", product=cat[pid].name, needs=cat[body.product_id].name)
                  for pid in a.items if pid not in items and pid != body.product_id]

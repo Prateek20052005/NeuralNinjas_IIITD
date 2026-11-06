@@ -73,20 +73,21 @@ def run_scripted(lang, answers):
 
 
 def test_scripted_flow_gst_prefills_city_and_finishes():
-    s, out = run_scripted("en", ["37IHKXV5167L1ZS", "yes", "prof", "13", "1", "business broadband", "fibre", "yes", "no", "yes"])
+    s, out = run_scripted("en", ["37IHKXV5167L1ZS", "yes", "prof", "13", "1", "business broadband", "fibre", "no", "yes"])
     assert s.profile.city == "Visakhapatnam" and s.profile.gstin_status == "inactive"
     ids = {x["id"] for x in out["recommendation"]["core"]}
-    assert "P12" not in ids and "P09" in ids                     # telephony needs active GST; failover wanted
+    assert "P12" not in ids and "P09" in ids                     # telephony needs active GST (not asked); failover wanted
+    assert "need:phone_system" not in s.profile.needs_answered
     assert out["recommendation"]["quote"]["valid"]
 
 
 @pytest.mark.parametrize("lang", ["hi", "mr"])
 def test_scripted_flow_in_hindi_and_marathi(lang):
-    s, out = run_scripted(lang, ["none", "no", "micro", "Pune", "दो", "1", "घर वाला ब्रॉडबैंड", "fibre", "हो", "हो", "नाही"])  # wants WhatsApp, no GST
+    s, out = run_scripted(lang, ["none", "no", "micro", "Pune", "दो", "1", "घर वाला ब्रॉडबैंड", "fibre", "हो", "नाही"])  # billing yes, cameras no
     rec = out["recommendation"]
     assert all(ord(c) < 128 or "ऀ" <= c <= "ॿ" or not c.isalpha() for c in rec["headline"])
     assert any("ऀ" <= c <= "ॿ" for c in rec["core"][0]["reason"])  # reasons translated
-    assert any("GST" in n for n in rec["notes"])                              # WhatsApp needs GST (if offered)
+    assert "whatsapp" not in s.profile.needs_answered and not rec["notes"]  # no GST: WhatsApp isn't asked or noted
 
 
 def test_three_sites_turns_shop_into_multi_site():
@@ -154,8 +155,8 @@ def test_plain_short_answers_skip_the_ai():
     adv.handle(s, text="just one")                       # sites
     adv.handle(s, text="home broadband")                 # what they use today
     adv.handle(s, text="fibre")                          # internet
-    adv.handle(s, text="nahi")                           # phone system
-    assert s.profile.sites == 1 and s.profile.needs.phone_system is False and not s.fallbacks
+    adv.handle(s, text="nahi")                           # backup (no GST: phone lines aren't asked)
+    assert s.profile.sites == 1 and s.profile.needs.backup is False and not s.fallbacks
 
 
 def test_ai_failure_falls_back_to_scripted_without_error():
@@ -173,19 +174,19 @@ def test_safety_net_records_plain_answers_the_ai_missed():
     s, _ = adv.start("en")
     for a in p_answers:
         adv.handle(s, text=a)
-    assert next_slot(s.profile) == "need:phone_system"
+    assert next_slot(s.profile) == "need:backup"              # no GST: phone lines (GST only) aren't asked
     adv.llm = FakeLLM({"extract": {}, "say": "Do you keep client files?"})
     adv.handle(s, text="haan ji, hamein chahiye bilkul")      # long enough to go to the AI, which misses it
-    assert s.profile.needs.phone_system is True and "safety_net:need:phone_system" in s.fallbacks
+    assert s.profile.needs.backup is True and "safety_net:need:backup" in s.fallbacks
 
 
 def test_ai_explanation_cannot_drop_products_or_notes():
-    answers = ["none", "no", "micro", "Pune", "3", "1", "home", "fibre", "yes", "yes", "no"]
+    answers = ["none", "no", "prof", "Pune", "25", "1", "home", "fibre", "yes", "no"]   # 1 Gbps needs GST: a note
     adv = Advisor(llm=NoLLM(), order_date=TODAY)
     s, _ = adv.start("en")
     for a in answers[:-1]:
         adv.handle(s, text=a)
-    adv.llm = FakeLLM({"summary": "Great fit.", "reasons": {"P01": "Fast fibre."}, "notes": []})
+    adv.llm = FakeLLM({"summary": "Great fit.", "reasons": {"P02": "Fast fibre."}, "notes": []})
     out = adv.handle(s, text="no")                     # plain "no": parser handles it, AI only explains
     rec = out["recommendation"]
     assert rec["summary"] == "Great fit."
@@ -225,7 +226,7 @@ def test_unclear_answer_repeats_the_question_only_once():
     for a in ["none", "no", "prof", "Pune", "8", "1", "home", "fibre"]:
         adv.handle(s, text=a)
     out = adv.handle(s, text="what is that?")
-    assert out["messages"] == ["Please answer yes or no.", "Do you need business phone lines with a welcome menu for callers?"]
+    assert out["messages"] == ["Please answer yes or no.", t("en", "q.need.backup")]
 
 
 def test_typed_answers_work_without_ai():
@@ -338,7 +339,7 @@ def test_scripted_flow_in_new_languages(lang):
     p, rec = s.profile, out["recommendation"]
     assert (p.segment, p.employees, p.sites, p.gstin_status) == ("micro", 3, 1, "none")
     assert p.current_tools == {"gu": "mobile", "ta": "home", "te": "mobile", "kn": "none"}[lang]
-    assert p.needs.billing_pos is True and p.needs.whatsapp is False
+    assert p.needs.billing_pos is True and p.needs.whatsapp is None and p.needs.cctv is False   # no GST: no WhatsApp question
     assert script_share(rec["headline"], lang)[0] > 0                         # headline in the owner's script
     assert all(script_share(x["reason"], lang)[0] > 0 for x in rec["core"])    # reasons translated
     assert rec["quote"]["valid"]

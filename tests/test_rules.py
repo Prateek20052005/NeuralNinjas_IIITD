@@ -179,7 +179,7 @@ def test_longer_contract_is_cheaper_and_24_months_is_the_catalogue_minimum():
 
 def test_setup_fee_spread_keeps_the_total_and_stays_within_the_contract():
     q = build_quote({"P01": 1, "P19": 1, "P23": 1}, biz("micro"), TODAY, setup_months=12)
-    assert q.setup_total == 2500 + 1800 and q.setup_months == 12 and q.setup_monthly == 359   # ceil(4300 / 12)
+    assert q.setup_total == 2500 + 1800 and q.setup_months == 12 and q.setup_monthly == 423   # ceil(4300 x 1.18 / 12)
     q = build_quote({"P01": 1, "P19": 1}, biz("micro"), TODAY, setup_months=7)             # not an offered choice
     assert q.setup_months == 1 and q.setup_monthly == 0
     q = build_quote({"P01": 1, "P19": 1}, biz("micro"), TODAY, contract_months=12, setup_months=24)

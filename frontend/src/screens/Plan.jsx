@@ -94,7 +94,8 @@ export default function Plan({ state, update, tr, actions, toast }) {
   async function share() {
     const text = tr('ui.share_text', {
       items: quote.lines.map((l) => (l.quantity > 1 ? `${l.name} ×${l.quantity}` : l.name)).join(', '),
-      total: money(quote.monthly_with_gst).slice(1), setup: money(quote.setup_total).slice(1), months: quote.contract_months,
+      // what the owner will really pay for setup: after the welcome offer, with GST
+      total: money(quote.monthly_with_gst).slice(1), setup: money(setupDue).slice(1), months: quote.contract_months,
     });
     try {
       if (navigator.share) {
@@ -131,7 +132,7 @@ export default function Plan({ state, update, tr, actions, toast }) {
   const dearest = contracts.length ? Math.max(...contracts.map((c) => c.monthly_with_gst)) : 0;
   const spreads = [1, 6, 12].filter((m) => m <= quote.contract_months);
   const welcome = quote.welcome; // first-time customers only
-  const setupDue = quote.setup_due ?? quote.setup_total;
+  const setupDue = quote.setup_due_with_gst ?? quote.setup_due ?? quote.setup_total; // incl. GST
   const billing = quote.billing_options || [];
   const live = longDate(quote.expected_live, lang);
 
@@ -152,6 +153,8 @@ export default function Plan({ state, update, tr, actions, toast }) {
     { label: tr('ui.setup_once'), value: money(quote.setup_total), kind: 'sub',
       note: quote.setup_months > 1 ? tr('ui.setup_line', { amount: money(quote.setup_monthly).slice(1), n: quote.setup_months }) : '' },
     ...(quote.setup_discount > 0 ? [{ label: tr('ui.setup_discount'), value: `−${money(quote.setup_discount)}`, kind: 'save' }] : []),
+    ...(quote.setup_gst > 0 ? [{ label: tr('ui.setup_gst'), value: money(quote.setup_gst) },
+                               { label: tr('ui.setup_to_pay'), value: money(setupDue), kind: 'total' }] : []),
     { label: tr('ui.contract_title'), value: tr('ui.months', { n: quote.contract_months }) },
   ];
 
@@ -359,7 +362,7 @@ export default function Plan({ state, update, tr, actions, toast }) {
         meta={[
           quote.setup_months > 1
             ? tr('ui.setup_line', { amount: money(quote.setup_monthly).slice(1), n: quote.setup_months })
-            : `${tr('ui.setup_once')}: ${money(setupDue)}`,
+            : `${tr('ui.setup_to_pay')}: ${money(setupDue)}`,
           tr('ui.contract', { n: quote.contract_months }),
           ...(quote.billing_months > 1
             ? [tr('ui.billing_bill', { total: money(quote.bill_with_gst).slice(1), n: quote.billing_months })] : []),

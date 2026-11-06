@@ -2,7 +2,7 @@
  {
   "name": "kirana_indore_en",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -33,19 +33,17 @@
    "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes, lots of customers pay by UPI",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: yes please",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: not needed",
    "BOT: Here is what I suggest for your shop in Indore:"
   ],
-  "seconds": 0.6,
+  "seconds": 0.5,
   "tokens": 0
  },
  {
   "name": "medical_lucknow_hi",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -77,8 +75,6 @@
    "YOU [internet]: fibre",
    "BOT: क्या आप टैबलेट पर GST बिलिंग और UPI/कार्ड पेमेंट चाहेंगे?",
    "YOU [need:billing_pos]: हाँ, UPI से पेमेंट लेते हैं",
-   "BOT: क्या आप WhatsApp पर अपने ग्राहकों तक अपना कैटलॉग पहुँचाना चाहते हैं?",
-   "YOU [need:whatsapp]: नहीं",
    "BOT: क्या आप ऐसे सुरक्षा कैमरे चाहेंगे जिन्हें फ़ोन पर देख सकें?",
    "YOU [need:cctv]: हाँ चाहिए",
    "BOT: Lucknow में आपकी दुकान के लिए मेरा सुझाव:"
@@ -89,7 +85,7 @@
  {
   "name": "salon_nashik_mr",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -120,8 +116,6 @@
    "YOU [internet]: fibre",
    "BOT: टॅबलेटवर GST बिलिंग आणि UPI/कार्ड पेमेंट हवे आहे का?",
    "YOU [need:billing_pos]: हो",
-   "BOT: WhatsApp वर ग्राहकांपर्यंत तुमचा कॅटलॉग पोहोचवायचा आहे का?",
-   "YOU [need:whatsapp]: हो",
    "BOT: फोनवर पाहता येतील असे सुरक्षा कॅमेरे हवे आहेत का?",
    "YOU [need:cctv]: नाही",
    "BOT: Nashik मधील तुमच्या दुकानासाठी माझी सूचना:"
@@ -132,7 +126,7 @@
  {
   "name": "textile_surat_gu",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
@@ -162,8 +156,6 @@
    "YOU [current]: no",
    "BOT: તમારા વ્યવસાયને કયું ઇન્ટરનેટ કનેક્શન જોઈએ છે?",
    "YOU [internet]: ફાઇબર છે",
-   "BOT: ચાલુ રહેવાનો સમય અને વીજળીનો વપરાશ જોવા માટે તમે કેટલા મશીનો પર નજર રાખવા માંગો છો? (ન હોય તો 0)",
-   "YOU [need:machines]: પાંચ",
    "BOT: તમે ડિલિવરી અથવા કંપનીના કેટલા વાહનો ટ્રૅક કરવા માંગો છો? (ન હોય તો 0)",
    "YOU [need:vehicles]: બે",
    "BOT: શું તમને તમારા ઓફિસ નેટવર્ક માટે હેકર્સ સામે મજબૂત સુરક્ષા જોઈએ છે?",
@@ -176,11 +168,11 @@
  {
   "name": "clinic_chennai_ta",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 3,
+   "P07": 2,
    "P16": 5,
    "P17": 1,
    "P20": 5,
@@ -208,8 +200,6 @@
    "YOU [current]: no",
    "BOT: உங்கள் வணிகத்துக்கு எந்த இணைய இணைப்பு தேவை?",
    "YOU [internet]: ஃபைபர் இருக்கு",
-   "BOT: அழைப்பவர்களுக்கு வரவேற்பு மெனுவுடன் கூடிய வணிக போன் லைன்கள் தேவையா?",
-   "YOU [need:phone_system]: வேண்டாம்",
    "BOT: ஒருபோதும் இழக்கக்கூடாத வாடிக்கையாளர் கோப்புகள் உங்களிடம் உள்ளதா?",
    "YOU [need:backup]: ஆமா, வேணும்",
    "BOT: சில மணி நேரம் இணையம் நின்றால் உங்கள் வணிகத்துக்கு இழப்பு ஏற்படுமா?",
@@ -222,7 +212,7 @@
  {
   "name": "kirana_mobile_only_te",
   "ok": true,
-  "turns": 10,
+  "turns": 9,
   "problems": [],
   "items": {
    "P07": 1
@@ -252,8 +242,6 @@
    "BOT: సరే, మొబైల్ లైన్లు మాత్రమే. ఇంటర్నెట్‌ను తర్వాత ఎప్పుడైనా జోడించవచ్చు.",
    "BOT: టాబ్లెట్‌లో UPI మరియు కార్డ్ చెల్లింపులతో GST బిల్లింగ్ కావాలా?",
    "YOU [need:billing_pos]: వద్దు",
-   "BOT: WhatsApp‌లో మీ కేటలాగ్‌తో కస్టమర్లను చేరుకోవాలనుకుంటున్నారా?",
-   "YOU [need:whatsapp]: లేదు",
    "BOT: Hyderabad లోని మీ దుకాణం కోసం నా సూచన:"
   ],
   "seconds": 0.0,
@@ -262,7 +250,7 @@
  {
   "name": "medical_no_fibre_kn",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P04": 1,
@@ -295,8 +283,6 @@
    "BOT: ಸರಿ. 5G AirFiber ಗೆ ವೈರ್ ಬೇಕಿಲ್ಲ, ಸಾಮಾನ್ಯವಾಗಿ ಸುಮಾರು 2 ದಿನಗಳಲ್ಲಿ ಸೆಟಪ್ ಆಗುತ್ತದೆ.",
    "BOT: ಟ್ಯಾಬ್ಲೆಟ್‌ನಲ್ಲಿ UPI ಮತ್ತು ಕಾರ್ಡ್ ಪಾವತಿಗಳೊಂದಿಗೆ GST ಬಿಲ್ಲಿಂಗ್ ಬೇಕೇ?",
    "YOU [need:billing_pos]: ಹೌದು ಬೇಕು",
-   "BOT: WhatsApp ನಲ್ಲಿ ನಿಮ್ಮ ಕ್ಯಾಟಲಾಗ್ ಮೂಲಕ ಗ್ರಾಹಕರನ್ನು ತಲುಪಲು ಬಯಸುವಿರಾ?",
-   "YOU [need:whatsapp]: ಬೇಡ",
    "BOT: ಫೋನ್‌ನಲ್ಲಿ ನೋಡಬಹುದಾದ ಭದ್ರತಾ ಕ್ಯಾಮೆರಾಗಳು ಬೇಕೇ?",
    "YOU [need:cctv]: ಹೌದು",
    "BOT: Bengaluru ನಗರದಲ್ಲಿರುವ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ನನ್ನ ಸಲಹೆ:"
@@ -307,7 +293,7 @@
  {
   "name": "bakery_tanglish_kovai",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -338,8 +324,6 @@
    "YOU [internet]: fibre irukku",
    "BOT: டேப்லெட்டில் UPI மற்றும் கார்டு பணம் செலுத்துதலுடன் GST பில்லிங் வேண்டுமா?",
    "YOU [need:billing_pos]: aama venum",
-   "BOT: WhatsApp-இல் உங்கள் கேட்லாக் மூலம் வாடிக்கையாளர்களை அணுக விரும்புகிறீர்களா?",
-   "YOU [need:whatsapp]: vendam",
    "BOT: போனில் பார்க்கக்கூடிய பாதுகாப்பு கேமராக்கள் வேண்டுமா?",
    "YOU [need:cctv]: illa",
    "BOT: Coimbatore நகரில் உள்ள உங்கள் கடைக்கு எனது பரிந்துரை:"
@@ -350,7 +334,7 @@
  {
   "name": "tailor_kannada_latin_mysuru",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -381,8 +365,6 @@
    "BOT: ಪರವಾಗಿಲ್ಲ. ಅಳವಡಿಕೆಗೆ ಮೊದಲು ನಮ್ಮ ತಂಡ ಇದನ್ನು ಪರಿಶೀಲಿಸುತ್ತದೆ; ಫೈಬರ್ ತಲುಪದಿದ್ದರೆ, ಅದರ ಬದಲು 5G AirFiber ಅಳವಡಿಸುತ್ತೇವೆ.",
    "BOT: ಟ್ಯಾಬ್ಲೆಟ್‌ನಲ್ಲಿ UPI ಮತ್ತು ಕಾರ್ಡ್ ಪಾವತಿಗಳೊಂದಿಗೆ GST ಬಿಲ್ಲಿಂಗ್ ಬೇಕೇ?",
    "YOU [need:billing_pos]: beda",
-   "BOT: WhatsApp ನಲ್ಲಿ ನಿಮ್ಮ ಕ್ಯಾಟಲಾಗ್ ಮೂಲಕ ಗ್ರಾಹಕರನ್ನು ತಲುಪಲು ಬಯಸುವಿರಾ?",
-   "YOU [need:whatsapp]: haudu",
    "BOT: ಫೋನ್‌ನಲ್ಲಿ ನೋಡಬಹುದಾದ ಭದ್ರತಾ ಕ್ಯಾಮೆರಾಗಳು ಬೇಕೇ?",
    "YOU [need:cctv]: beda",
    "BOT: Mysuru ನಗರದಲ್ಲಿರುವ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ನನ್ನ ಸಲಹೆ:"
@@ -393,7 +375,7 @@
  {
   "name": "parlour_hinglish",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -424,8 +406,6 @@
    "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: haan UPI chahiye",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: haan",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: nahi",
    "BOT: Here is what I suggest for your shop in Jaipur:"
@@ -440,7 +420,7 @@
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 3,
+   "P07": 2,
    "P16": 8,
    "P17": 1,
    "P20": 7,
@@ -472,7 +452,7 @@
    "YOU [need:failover]: no",
    "BOT: Here is what I suggest for your office in Pune:"
   ],
-  "seconds": 0.3,
+  "seconds": 0.2,
   "tokens": 0
  },
  {
@@ -519,7 +499,7 @@
  {
   "name": "gst_not_ours",
   "ok": true,
-  "turns": 13,
+  "turns": 12,
   "problems": [],
   "items": {
    "P01": 1,
@@ -556,8 +536,6 @@
    "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: yes",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: no",
    "BOT: Here is what I suggest for your shop in Chandigarh:"
@@ -568,7 +546,7 @@
  {
   "name": "cancelled_gst_store",
   "ok": true,
-  "turns": 10,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 1,
@@ -596,8 +574,6 @@
    "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: no",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: yes",
    "BOT: Here is what I suggest for your shop in Bengaluru:"
@@ -608,7 +584,7 @@
  {
   "name": "suspended_gst_factory",
   "ok": true,
-  "turns": 10,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 1,
@@ -635,8 +611,6 @@
    "YOU [current]: no",
    "BOT: What internet connection does your business need?",
    "YOU [internet]: fibre",
-   "BOT: How many machines would you like to monitor for uptime and power use? (0 if none)",
-   "YOU [need:machines]: 12",
    "BOT: How many delivery or company vehicles would you like to track? (0 if none)",
    "YOU [need:vehicles]: 3",
    "BOT: Do you need strong protection against hackers for your office network?",
@@ -649,7 +623,7 @@
  {
   "name": "typo_gstin_then_none",
   "ok": true,
-  "turns": 12,
+  "turns": 11,
   "problems": [],
   "items": {
    "P01": 1,
@@ -683,8 +657,6 @@
    "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: no",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: no",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: no",
    "BOT: Here is what I suggest for your shop in Surat:"
@@ -695,7 +667,7 @@
  {
   "name": "restaurant_chain_hyd",
   "ok": true,
-  "turns": 11,
+  "turns": 9,
   "problems": [],
   "items": {
    "P02": 4,
@@ -726,12 +698,8 @@
    "YOU [current]: no",
    "BOT: What internet connection does your business need?",
    "YOU [internet]: fibre",
-   "BOT: Do you want to manage the internet at all your sites from one place?",
-   "YOU [need:central_management]: yes",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: yes in all outlets",
-   "BOT: Would a free 1800 number for customers help?",
-   "YOU [need:toll_free]: yes for orders",
    "BOT: Here is what I suggest for your business with several outlets in Hyderabad:"
   ],
   "seconds": 0.0,
@@ -740,7 +708,7 @@
  {
   "name": "retail_chain_jaipur_hinglish",
   "ok": true,
-  "turns": 11,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 6,
@@ -771,12 +739,8 @@
    "YOU [current]: no",
    "BOT: आपके बिज़नेस को कौन-सा इंटरनेट कनेक्शन चाहिए?",
    "YOU [internet]: fibre",
-   "BOT: क्या आप अपनी सभी जगहों का इंटरनेट एक ही जगह से संभालना चाहते हैं?",
-   "YOU [need:central_management]: haan",
    "BOT: क्या आप ऐसे सुरक्षा कैमरे चाहेंगे जिन्हें फ़ोन पर देख सकें?",
    "YOU [need:cctv]: haan",
-   "BOT: क्या ग्राहकों के लिए मुफ़्त 1800 नंबर से मदद मिलेगी?",
-   "YOU [need:toll_free]: nahi",
    "BOT: Jaipur में आपके बिज़नेस के लिए मेरा सुझाव:"
   ],
   "seconds": 0.0,
@@ -785,7 +749,7 @@
  {
   "name": "autoparts_ludhiana",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
@@ -816,8 +780,6 @@
    "YOU [current]: no",
    "BOT: What internet connection does your business need?",
    "YOU [internet]: fibre",
-   "BOT: How many machines would you like to monitor for uptime and power use? (0 if none)",
-   "YOU [need:machines]: 6 CNC machines",
    "BOT: How many delivery or company vehicles would you like to track? (0 if none)",
    "YOU [need:vehicles]: 3 trucks",
    "BOT: Do you need strong protection against hackers for your office network?",
@@ -830,7 +792,7 @@
  {
   "name": "textile_surat_mr",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 2,
@@ -860,8 +822,6 @@
    "YOU [current]: no",
    "BOT: तुमच्या व्यवसायाला कोणते इंटरनेट कनेक्शन हवे आहे?",
    "YOU [internet]: fibre",
-   "BOT: किती मशीनचे चालू राहणे आणि वीज वापर पाहायचा आहे? (एकही नसेल तर 0)",
-   "YOU [need:machines]: १०",
    "BOT: किती डिलिव्हरी किंवा कंपनीच्या गाड्या ट्रॅक करायच्या आहेत? (एकही नसेल तर 0)",
    "YOU [need:vehicles]: ०",
    "BOT: ऑफिस नेटवर्कसाठी हॅकर्सपासून मजबूत सुरक्षा हवी आहे का?",
@@ -874,7 +834,7 @@
  {
   "name": "asks_question_midway",
   "ok": true,
-  "turns": 13,
+  "turns": 11,
   "problems": [],
   "items": {
    "P01": 1,
@@ -905,11 +865,6 @@
    "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: what does the WhatsApp product do?",
-   "BOT: Please answer yes or no.",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: ok yes",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: is CCTV recording stored online?",
    "BOT: Please answer yes or no.",
@@ -923,7 +878,7 @@
  {
   "name": "micro_becomes_multi",
   "ok": true,
-  "turns": 11,
+  "turns": 9,
   "problems": [],
   "items": {
    "P01": 4,
@@ -955,12 +910,8 @@
    "YOU [current]: no",
    "BOT: What internet connection does your business need?",
    "YOU [internet]: fibre",
-   "BOT: Do you want to manage the internet at all your sites from one place?",
-   "YOU [need:central_management]: yes",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: yes",
-   "BOT: Would a free 1800 number for customers help?",
-   "YOU [need:toll_free]: no",
    "BOT: Here is what I suggest for your business with several outlets in Nagpur:"
   ],
   "seconds": 0.0,
@@ -969,11 +920,11 @@
  {
   "name": "all_in_first_message",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 3,
+   "P07": 2,
    "P16": 10,
    "P17": 1,
    "P20": 6,
@@ -1001,8 +952,6 @@
    "YOU [current]: no",
    "BOT: What internet connection does your business need?",
    "YOU [internet]: fibre",
-   "BOT: Do you need business phone lines with a welcome menu for callers?",
-   "YOU [need:phone_system]: no",
    "BOT: Do you keep client files that must never be lost?",
    "YOU [need:backup]: yes",
    "BOT: Would it hurt your business if the internet went down for a few hours?",
@@ -1015,7 +964,7 @@
  {
   "name": "unknown_small_town",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P01": 1,
@@ -1047,8 +996,6 @@
    "YOU [internet]: fibre",
    "BOT: Would you like GST billing with UPI and card payments on a tablet?",
    "YOU [need:billing_pos]: yes",
-   "BOT: Do you want to reach customers on WhatsApp with your catalogue?",
-   "YOU [need:whatsapp]: no",
    "BOT: Would you like security cameras you can watch on your phone?",
    "YOU [need:cctv]: yes",
    "BOT: Here is what I suggest for your shop in Sangli:"
@@ -1059,11 +1006,11 @@
  {
   "name": "noise_and_odd_numbers",
   "ok": true,
-  "turns": 16,
+  "turns": 14,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 2,
+   "P07": 3,
    "P16": 9,
    "P17": 1,
    "P20": 9
@@ -1102,11 +1049,6 @@
    "YOU [current]: no",
    "BOT: What internet connection does your business need?",
    "YOU [internet]: fibre",
-   "BOT: Do you need business phone lines with a welcome menu for callers?",
-   "YOU [need:phone_system]: maybe",
-   "BOT: Please answer yes or no.",
-   "BOT: Do you need business phone lines with a welcome menu for callers?",
-   "YOU [need:phone_system]: no",
    "BOT: Do you keep client files that must never be lost?",
    "YOU [need:backup]: yes",
    "BOT: Would it hurt your business if the internet went down for a few hours?",
@@ -1119,11 +1061,11 @@
  {
   "name": "coaching_patna_hi",
   "ok": true,
-  "turns": 11,
+  "turns": 10,
   "problems": [],
   "items": {
    "P02": 1,
-   "P08": 3,
+   "P07": 2,
    "P16": 10,
    "P20": 5,
    "P09": 1
@@ -1150,8 +1092,6 @@
    "YOU [current]: no",
    "BOT: आपके बिज़नेस को कौन-सा इंटरनेट कनेक्शन चाहिए?",
    "YOU [internet]: fibre",
-   "BOT: क्या आपको कॉल करने वालों के लिए वेलकम मेन्यू वाली बिज़नेस फ़ोन लाइनें चाहिए?",
-   "YOU [need:phone_system]: हाँ",
    "BOT: क्या आपके पास ग्राहकों की ऐसी फ़ाइलें हैं जो कभी खोनी नहीं चाहिए?",
    "YOU [need:backup]: नहीं",
    "BOT: अगर कुछ घंटे इंटरनेट बंद रहे तो क्या आपके बिज़नेस का नुकसान होगा?",
