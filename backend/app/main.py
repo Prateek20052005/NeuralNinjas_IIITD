@@ -310,6 +310,7 @@ def voice_answer(app_id: str, file: UploadFile = File(...)):
     if a.session.profile.gstin_status is None:   # the GST number is always typed, never spoken
         raise HTTPException(409, t(lang, "msg.voice_type_gst"))
     data = file.file.read(MAX_AUDIO_BYTES + 1)
+    log.info("voice upload bytes=%d type=%s", len(data), file.content_type)   # size and type only, never the audio
     try:
         if len(data) > MAX_AUDIO_BYTES:
             raise HTTPException(413, t(lang, "msg.voice_too_long"))

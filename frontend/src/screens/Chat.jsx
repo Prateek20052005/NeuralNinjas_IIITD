@@ -166,10 +166,18 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
     r.ondataavailable = (e) => e.data.size && chunks.push(e.data);
     r.onstop = async () => {
       clearTimeout(timer.current);
-      stream.getTracks().forEach((t) => t.stop()); // microphone light goes off straight away
       setMic('transcribing');
+      // iPhone Safari delivers the last piece of audio just after "stop": wait for it before sending
+      await new Promise((ok) => setTimeout(ok, 300));
+      stream.getTracks().forEach((t) => t.stop()); // then the microphone light goes off
+      const audio = new Blob(chunks, { type: r.mimeType || 'audio/webm' });
+      if (audio.size < 1000) { // nothing recorded: say so instead of sending an empty file
+        setErrorText(tr('msg.voice_failed'));
+        setMic('idle');
+        return;
+      }
       try {
-        const out = await api.voice(state.id, new Blob(chunks, { type: r.mimeType || 'audio/webm' }));
+        const out = await api.voice(state.id, audio);
         setText(out.text); // the owner checks and corrects it, then taps send
         setCheckHint(true);
         if (!state.voiceMode) update({ voiceMode: true });
@@ -180,7 +188,7 @@ export default function Chat({ state, update, tr, actions, onRetry, onHome, toas
       }
     };
     recorder.current = r;
-    r.start();
+    r.start(250); // audio arrives in small pieces while recording (needed on iPhone Safari)
     setMic('recording');
     timer.current = setTimeout(() => r.state === 'recording' && r.stop(), MAX_RECORDING_MS);
   }
