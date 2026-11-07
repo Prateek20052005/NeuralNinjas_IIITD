@@ -1,208 +1,250 @@
-# Udyam Digital: a small business goes digital in one sitting
+<div align="center">
 
-**Team NeuralNinjas (IIITD) · YTL Hackathon 2026 · Enterprise Track A**
+<img src="docs/images/banner.png" alt="Udyam Digital: a small business goes digital in one sitting" width="100%">
 
-Udyam Digital is a phone web app for **Accel Business**, the case's fictional telecom operator. A shop, clinic or
-small factory owner chats with an AI advisor in their own language. They get a bundle of internet, phone and digital
-services at one clear monthly price, verify their business with instant KYC, and track installation. They never
-wait for a salesperson's visit or a PDF quote.
+# Udyam Digital
 
-| Today (sales-led, Apr–Jun 2026 data) | With the app |
+**A small business discovers, buys and activates its internet, phone and digital-tools bundle in one sitting:<br>on a phone, in its own language.**
+
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white) ![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?logo=fastapi&logoColor=white) ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black) ![Docker](https://img.shields.io/badge/Docker-one%20container-2496ED?logo=docker&logoColor=white) ![Tests](https://img.shields.io/badge/tests-448%20passing-2EA44F) ![Languages](https://img.shields.io/badge/languages-7-D32F2F)
+
+YTL Hackathon 2026 · Enterprise Track A · **Team NeuralNinjas (IIITD)**
+
+[See it working](#see-it-working) · [Run it](#run-it-in-2-minutes) · [How it works](#how-it-works) · [Privacy](#privacy-by-design) · [Tests](#tested)
+
+</div>
+
+---
+
+## The problem
+
+Accel Business, the case's telecom operator, sells to small businesses through a field sales force built for large companies. In the quarter's data:
+
+<table>
+<tr>
+<td align="center" width="25%"><h2>7.4%</h2>of 5,000 leads became customers</td>
+<td align="center" width="25%"><h2>17.6 days</h2>from first contact to going live</td>
+<td align="center" width="25%"><h2>₹15,053</h2>spent to win each customer</td>
+<td align="center" width="25%"><h2>3 calls</h2>per customer chasing their order</td>
+</tr>
+</table>
+
+**Udyam Digital replaces the sales visit, the 3–5 day PDF quote and the paperwork with one chat on the owner's phone.** It recommends the right bundle, shows one honest monthly price, verifies the business instantly and tracks installation. People still step in where they add value.
+
+---
+
+## See it working
+
+<table>
+<tr>
+<td width="40%" align="center">
+<img src="docs/images/journey.gif" alt="The owner's journey: language, chat, plan, bargaining, documents, tracker" width="330">
+</td>
+<td width="60%">
+
+### One owner, start to finish
+
+1. **Pick a language.** English, हिंदी, मराठी, ગુજરાતી, தமிழ், తెలుగు or ಕನ್ನಡ.
+2. **Chat for two minutes.** One GST number fills in the business name and city from the registry. Owners can type, tap or speak (English and Hindi).
+3. **Get a plan with one clear price.** GST is shown, every product has a reason, and extras are ranked by what similar businesses bought.
+4. **Bargain if you like.** The first ask shows cheaper ways to pay; insisting gets 5%, then 10%, then a salesperson. Never below the catalogue minimum.
+5. **Verify instantly.** Verify a mobile number, give consent, then fetch certificates from DigiLocker or snap photos. They're checked against the GST and Udyam registries in seconds.
+6. **Track the order.** Every product shows its own ready-by date, so nobody calls support.
+
+</td>
+</tr>
+</table>
+
+### The owner's screens
+
+<table>
+<tr>
+<td align="center"><img src="docs/images/chat.png" width="200"><br><sub><b>AI advisor</b><br>GST lookup fills in the business</sub></td>
+<td align="center"><img src="docs/images/chat_hindi.png" width="200"><br><sub><b>7 languages</b><br>here, a kirana owner in Hindi</sub></td>
+<td align="center"><img src="docs/images/plan.png" width="200"><br><sub><b>One clear price</b><br>tiers, offer, GST shown</sub></td>
+<td align="center"><img src="docs/images/plan_extras.png" width="200"><br><sub><b>Smart extras</b><br>"25% of similar businesses chose this"</sub></td>
+</tr>
+<tr>
+<td align="center"><img src="docs/images/negotiate.png" width="200"><br><sub><b>Fair bargaining</b><br>limits set by us, never the AI</sub></td>
+<td align="center"><img src="docs/images/documents.png" width="200"><br><sub><b>Smart KYC</b><br>DigiLocker or photos, read on our server</sub></td>
+<td align="center"><img src="docs/images/tracker.png" width="200"><br><sub><b>Tracker</b><br>a ready-by date per product</sub></td>
+<td align="center"><img src="docs/images/home.png" width="200"><br><sub><b>Start screen</b><br>or continue on another phone</sub></td>
+</tr>
+</table>
+
+### The back office, for staff and partners
+
+<img src="docs/images/office_overview.png" alt="Back office overview with success metrics" width="100%">
+
+<table>
+<tr>
+<td align="center" width="50%"><img src="docs/images/office_applications.png" width="100%"><br><sub><b>Applications:</b> who needs a person and why, a summary of the owner's answers, and per-product installs with "Mark live"</sub></td>
+<td align="center" width="50%"><img src="docs/images/office_leads.png" width="100%"><br><sub><b>Leads to call:</b> old leads ranked by a model whose top 10% activate 2.7× more often</sub></td>
+</tr>
+</table>
+
+---
+
+## What we built
+
+| The case asked for | What Udyam Digital does |
 |---|---|
-| A sales visit to discover needs, then 3–5 days for a PDF quote | A 2-minute chat and an instant, itemised price |
-| KYC papers collected in person or by email | Document photos read on the spot, checked against GST and Udyam registries |
-| 17.6 days from lead to activation, 3 status calls per customer | A tracker with a ready-by date for each product |
-| 7.4% of leads activate; about Rs 15,000 to win each customer | Target: 15%+ and under Rs 6,000 (see [success metrics](#success-metrics)) |
+| **AI advisor** that recommends a bundle in plain language | A chat in 7 languages with voice. The AI understands free text; a **rules engine** picks products from the 25-product catalogue and checks every rule (city tier, team size, GST, dependencies). Extras are ranked with **Apriori** rules and **look-alike customers**. |
+| **Quote and checkout** with one transparent price | Itemised price with GST, three tiers, cheaper longer contracts, setup spread over months, pay-ahead savings, a welcome offer for new customers, and bargaining with a hard floor. |
+| **Smart KYC** with extraction, validation, lookups and consent | Consent first. Local OCR straightens and reads photos, then **30+ checks** run against the GST and Udyam registries. It matches all **12/12** sample applicants in our answer key. DigiLocker demo; owners without GST need only an address proof and ID. |
+| **Tracker** instead of calling support | A timeline from order to "all services live", with a ready-by date for each product from its install time. |
+| *Stretch:* voice, back office, which leads to call | All three: voice in English and Hindi; a back office with hand-offs and success metrics; a conversion predictor (AUC 0.754). |
 
-All businesses, people, documents and numbers come from the synthetic hackathon dataset. "Accel Business" is fictional.
-
----
-
-## Run it
-
-You need **Docker**. Nothing else.
-
-```bash
-cp .env.example .env          # then fill in the values below
-docker build -t udyam-digital .
-docker run --env-file .env -p 7860:7860 -v udyam-state:/app/state udyam-digital
-```
-
-Open **http://localhost:7860**. On a phone on the same Wi-Fi, use `http://<your-computer-ip>:7860`.
-
-| Setting in `.env` | Needed? | What it does |
-|---|---|---|
-| `GROQ_API_KEY` | Optional | Turns on the AI advisor (free key from console.groq.com). Without it the advisor runs in guided mode with the same questions, rules and prices. |
-| `APP_STATE_KEY` | Recommended | Encrypts saved applications so progress survives a restart. Make one with `python3 -c "import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode())"` |
-| `BACKOFFICE_KEY` | For the back office | Any secret word; opens the staff view at `/#/office` |
-| `PARTNER_KEYS` | Optional | Logins for channel partners, e.g. `RAJ01=some-key` |
-| `OTP_MODE` | Leave as `demo` | Shows the mobile verification code on screen. `sms` sends real texts (MSG91 or Twilio, see `.env.example`). |
-
-`docs/DEPLOY.md` explains how to host it free on Hugging Face Spaces.
-
----
-
-## A 5-minute demo
-
-1. **Chat.** Pick a language (English, हिंदी, मराठी, ગુજરાતી, தமிழ், తెలుగు, ಕನ್ನಡ). When asked for a GST number, type
-   `27XUIXG0767D1ZP`. The app finds *Ganesh Woodcraft, Nagpur* in the GST registry and fills in the name and city.
-   Answer a few questions by tapping or typing (or by voice in English and Hindi).
-2. **Plan.** See the recommended bundle with a reason for each product. You can:
-   - switch extras on and off;
-   - pick Basic / Recommended / Full;
-   - choose 12 or 24 months for a lower price, or pay 3, 6 or 12 months ahead;
-   - compare the price with what you pay today.
-
-   First-time customers get a welcome offer on setup. Because this is a factory, the plan offers a call from a specialist.
-3. **Negotiate.** Back in the chat, type "this is too expensive". The first answer shows cheaper ways to pay (no
-   discount yet). Insist and you get 5%, then 10%, then a salesperson's call. The limits come from
-   `backend/app/pricing_settings.json`.
-4. **Accept.** Verify a mobile number. In demo mode the code is shown on screen. The order is signed with that
-   code (e-sign demo).
-5. **Consent and KYC.** Agree to the purposes listed on the consent screen. Then either:
-   - upload `data/kyc_documents/K03_*.png` (four photos); or
-   - use **Get it from DigiLocker (demo)** for the GST and Udyam certificates, and upload only the address proof and ID.
-
-   The decision is instant: PASS. Try `K01` (cancelled GST), `K04` (blurred photo) or `K11` (old electricity bill)
-   to see each kind of problem caught.
-6. **Tracker.** Each product has its own ready-by date: SIMs 1 day, fibre 5, firewall 10.
-7. **Back office.** Open `http://localhost:7860/#/office` and enter your `BACKOFFICE_KEY`. You'll see:
-   - the success-metrics table and the live funnel;
-   - leads to call first, ranked by the conversion predictor;
-   - applications that need a person;
-   - **Mark live** for each product, and the access log.
-8. **Partner.** Start a chat from `http://localhost:7860/?ref=RAJ01&assisted=1`. The owner sees "Raj Telecom is
-   helping you". Sign in to the back office with Raj Telecom's `PARTNER_KEYS` key and you see only that referral,
-   with no documents or ID numbers.
-
----
-
-## What the case asked for, and where it is
-
-| Case requirement | What we built | Code |
-|---|---|---|
-| **AI advisor**: asks about the business and recommends a bundle in plain language | Chat in 7 languages, voice in English and Hindi. The AI understands free text; a rules engine picks products and checks every catalogue rule. Extras are ranked by what similar past customers bought. | `backend/app/advisor/`, `recommend.py`, `bundles.py`, `similar.py`, `voice.py` |
-| **Quote and checkout**: one transparent monthly price, add-ons the owner can toggle | Itemised price with GST shown separately, including on the setup fee. Three tiers, contract-length pricing, setup spread over 6 or 12 months, pay-ahead billing, welcome offer, chat negotiation with a hard floor. | `quote.py`, `negotiate.py`, `frontend/src/screens/Plan.jsx` |
-| **Smart KYC**: document upload with extraction and validation, mock GSTIN/Udyam lookups, a clear consent screen | Local OCR (photos never leave our server). Straightens tilted photos, repairs common OCR misreads, runs 30+ checks against the registries. Owners without GST need only address proof and ID. DigiLocker demo. Matches all 12 applicants in our answer key. | `backend/app/kyc/`, `Consent.jsx`, `Documents.jsx` |
-| **Tracker**: an order status the owner can check instead of calling support | Timeline from accepted → signed → consent → documents → verified → installation → all live. Each product has its own ready-by date. | `tracker.py`, `Tracker.jsx` |
-| *Stretch:* voice or WhatsApp front end | Voice answers in English and Hindi. The owner checks the text before sending, and the GST number is always typed, never spoken. | `voice.py`, `Chat.jsx` |
-| *Stretch:* back office for leads the advisor could not close | Callbacks and hand-offs (price, leased lines, factories, 5+ sites, a chat that keeps failing, help with GST registration), each with a summary of the owner's answers. | `handoff.py`, `BackOffice.jsx` |
-| *Stretch:* propensity score for which leads to call | Logistic regression on the 5,000 past leads: AUC 0.754 on leads it never saw, top 10% activate 2.7× more often than average. Language is left out on purpose, for fairness. | `predictor.py` |
-
-### The five key questions
-- **Which segments, which bundles:** micro shops get a cheap entry plan (fibre, or 5G AirFiber where fibre can't reach, plus one or
-  two mobile lines); offices get email and security, with backup as an extra; chains and factories go to a specialist. The defaults come from what
-  the 368 activated customers bought.
-- **Discovery without a salesperson:** the chat, in the owner's language, with tap-to-answer options.
-- **Near-instant, DPDP-compliant KYC:** registry lookups, local OCR, consent first, masking, short retention (see [Privacy](#privacy-and-security)).
-- **Field force and partners:** partner referral links keep the partner's commission, and assisted mode supports a
-  partner sitting with the owner. Partners get a limited back-office login. Hard cases go to the business team
-  instead of competing with it.
-- **Success metrics:** see the next section.
-
-### Success metrics
-Shown live in the back office (`metrics.py`). "Before" is computed from `smb_leads.csv`.
-
-| Metric | Before | Pilot target (2 quarters) |
-|---|---|---|
-| Lead → activation | 7.4% | 15% or more |
-| Days from first contact to live | 17.6 | under 5 (fibre and AirFiber plans) |
-| Cost to win a customer | ~Rs 15,100 | under Rs 6,000 on app-led sales |
-| Status calls from the customer | 3.0 | under 0.5 |
-| Customers leaving within 6 months | 15.2% | 20–30% lower |
+**People stay in the loop.** Leased lines, factories, 5+ sites, price asks beyond 10%, a chat that keeps failing, and help registering for GST all go to the business team, with the owner's answers attached. **Channel partners** get referral links (`/?ref=RAJ01`) that keep their commission, an assisted mode for sitting with the owner, and a login that shows only their own referrals.
 
 ---
 
 ## How it works
 
-```
- Phone web app (React)  ──────►  FastAPI backend (one Docker container)
-  chat · plan · consent           ├─ advisor/      conversation: fixed questions, AI reads free text
-  documents · tracker             ├─ recommend.py  rules engine: eligible bundle from the 25-product catalogue
-  back office (/#/office)         ├─ quote.py      prices, GST, contracts, offers, floor
-                                  ├─ kyc/          local OCR → field parsing → registry checks → decision
-                                  ├─ tracker.py    per-product install dates
-                                  ├─ predictor.py  which leads to call first
-                                  └─ store.py      encrypted applications, retention, access log
-                                          │
-                          Groq (chat AI + speech-to-text): only the current message, ID numbers removed
+```mermaid
+flowchart LR
+    owner["Owner's phone<br/>7 languages · voice"] --> api
+    partner["Partner link<br/>?ref=RAJ01"] --> api
+    office["Back office<br/>staff · partners"] --> api
+    subgraph api["FastAPI backend · one Docker container"]
+        direction TB
+        advisor["Conversation<br/>fixed questions"] --> rules["Rules engine<br/>valid bundle"] --> quote["Quote engine<br/>GST · offers · floor"]
+        kyc["Smart KYC<br/>local OCR · 30+ checks"] --> tracker["Tracker<br/>per-product dates"]
+        insight["Insight<br/>Apriori · look-alikes · predictor"]
+    end
+    api --> data[("Catalogue · 5,000 leads<br/>GST + Udyam registries")]
+    api --> store[("Encrypted store<br/>applications · access log")]
+    advisor -. "current message only,<br/>ID numbers removed" .-> groq["Groq AI<br/>chat + speech-to-text"]
 ```
 
-**The AI talks, the rules decide.** The AI only (1) pulls facts out of what the owner types and (2) explains
-the finished bundle in the owner's language. The questions, the products, the quantities and every price come from
-deterministic code checked against the catalogue (city tier, minimum staff and sites, GST requirement, product
-dependencies). A recommendation can't break a rule, and the same answers always give the same plan. If the AI
-is down or rate-limited, the chat carries on in guided mode.
+> **The AI talks, the rules decide.** The AI only reads what the owner types and explains the plan. Questions, products, quantities and every rupee come from deterministic code, so a plan can never break a catalogue rule, and the same answers always give the same plan. If the AI is down, the chat carries on in guided mode.
+
+**Stack:** FastAPI · React + Vite · RapidOCR (ONNX) + OpenCV · NumPy · Groq (`gpt-oss-120b`, Whisper) · Fernet encryption · Docker
 
 ---
 
-## Privacy and security
+## Run it in 2 minutes
 
-Designed for India's Digital Personal Data Protection Act, 2023:
+You only need **Docker**.
 
-- **Consent first.** KYC starts only after the owner ticks named purposes. The consent text version and time are
-  recorded. Offers and news are a separate opt-in, unticked by default and switchable off at any time.
-- **Data minimisation.**
-  - The AI gets only the current message, with GST, Udyam, PAN, phone, Aadhaar and email numbers and the business
-    name removed. It never sees the chat history.
-  - The chat transcript is never stored.
-  - Owners are told an AI reads their replies, and voice recordings are never stored.
-- **Photos never leave our server.** OCR runs locally. Each photo is read in memory and discarded; only the fields
-  needed are kept.
-- **Masking.** ID numbers are masked on every screen and in every log (`27XUI******D1ZP`).
-- **Encryption.** Saved applications and the access log are encrypted and signed (Fernet: AES plus HMAC).
-- **Retention.**
-  - Unfinished applications are deleted 72 hours after the last activity.
-  - Accepted orders are kept for 365 days.
-  - Document details are deleted as soon as every service is live; only the KYC result is kept.
-  - Owners can delete everything at any time.
-- **Least privilege.** Partners see only their own referrals, never documents, KYC evidence, GST or phone numbers.
-  Every back-office view, including refused logins, is recorded in the access log.
+```bash
+git clone https://github.com/Prateek20052005/NeuralNinjas_IIITD.git
+cd NeuralNinjas_IIITD
+cp .env.example .env            # Windows: copy .env.example .env  (then fill in the keys below)
+docker build -t udyam-digital .
+docker run --env-file .env -p 7860:7860 -v udyam-state:/app/state udyam-digital
+```
+
+Open **http://localhost:7860**. The back office is at **http://localhost:7860/#/office**.
+
+<details>
+<summary><b>Settings in <code>.env</code></b></summary>
+
+| Setting | Needed? | What it does |
+|---|---|---|
+| `GROQ_API_KEY` | Optional | Turns on the AI and voice (free key from console.groq.com). Without it, the advisor runs in guided mode with the same rules and prices. |
+| `APP_STATE_KEY` | Recommended | Encrypts saved applications so progress survives restarts. Make one: `python3 -c "import base64,os;print(base64.urlsafe_b64encode(os.urandom(32)).decode())"` |
+| `BACKOFFICE_KEY` | For the back office | Any secret word; opens `/#/office` |
+| `PARTNER_KEYS` | Optional | Partner logins, e.g. `RAJ01=some-key` |
+| `OTP_MODE` | Keep `demo` | Shows the mobile code on screen. `sms` sends real texts via MSG91 or Twilio. |
+
+</details>
+
+<details>
+<summary><b>Open it on a phone</b></summary>
+
+- **Same Wi-Fi:** `http://<your-computer-ip>:7860`. Everything works except voice, which needs `https`.
+- **Anywhere, with voice:** start a free Cloudflare tunnel and open the `https://….trycloudflare.com` link it prints:
+  ```bash
+  docker run -d --name udyam-tunnel cloudflare/cloudflared:latest tunnel --no-autoupdate --url http://host.docker.internal:7860
+  docker logs udyam-tunnel
+  ```
+  Anyone with that link can use the app while the tunnel runs.
+- **Free public hosting:** see [docs/DEPLOY.md](docs/DEPLOY.md) (Hugging Face Spaces).
+
+</details>
+
+<details>
+<summary><b>Try it yourself: sample data</b></summary>
+
+All businesses and documents are fictional, from the hackathon dataset.
+
+| Try | Type or upload | You'll see |
+|---|---|---|
+| A furniture maker | GST `27XUIXG0767D1ZP` | Ganesh Woodcraft, Nagpur; a factory plan with a specialist offered |
+| A kirana in Hindi | GST `27TFYXA1689M1ZO` | Amrit General Store, Mumbai; welcome offer, free setup |
+| Documents that pass | `data/kyc_documents/K03_*.png` | PASS, installation booked |
+| Documents with problems | `K01` (cancelled GST), `K04` (blurred), `K11` (bill too old) | REJECT / RETAKE with the reason |
+| Bargaining | type "this is too expensive", then insist | cheaper options, then 5%, then 10%, then a salesperson |
+| A partner | open `/?ref=RAJ01&assisted=1` | "Raj Telecom is helping you"; the partner sees only their referrals |
+
+</details>
 
 ---
 
-## Tests
+## Privacy by design
 
-All tests run inside Docker, because the pinned OCR runtime has no wheel for macOS:
+Built for India's **DPDP Act, 2023**:
+
+| Principle | How the app does it |
+|---|---|
+| **Consent first** | KYC starts only after the owner ticks named purposes; version and time are recorded. Offers are a separate, unticked opt-in. |
+| **Minimum data to the AI** | Only the current message, with GST, Udyam, PAN, phone, Aadhaar, email and the business name removed. No chat history is stored or sent. |
+| **Documents stay with us** | Photos are read by OCR on our own server, in memory, then discarded. Voice recordings are never stored. |
+| **Masked and encrypted** | ID numbers are masked on every screen and log (`27XUI******D1ZP`). Data is encrypted and signed at rest. |
+| **Kept only as long as needed** | Unfinished applications: 72 hours. Orders: 365 days. Document details: deleted once services are live. Owners can delete everything anytime. |
+| **Least privilege, audited** | Partners never see documents or ID numbers; every back-office view, including refused logins, is logged. |
+
+---
+
+## Tested
+
+| What | Result |
+|---|---|
+| Unit and API tests: rules, quotes, KYC, consent, privacy, bargaining, voice, partners, tracker | **448 passing** |
+| Owner personas in 7 languages, typed in their own words | **26 / 26** finish with a valid plan |
+| KYC applicants K01–K12 against our answer key | **12 / 12** |
 
 ```bash
 docker run --rm -v "$PWD":/src -w /src --user root udyam-digital \
   sh -c "pip install -q pytest httpx; python -m pytest -q -p no:cacheprovider"
 ```
 
-| What | Result |
-|---|---|
-| Unit and API tests: rules, quotes, KYC answer key, consent, privacy, negotiation, voice, partners, tracker | 448 passed |
-| 26 owner personas in 7 languages, typed in their own words (`python scripts/eval_advisor.py scripted`) | 26 / 26 |
-| 12 KYC applicants (K01–K12) against our answer key (`tests/kyc_answer_key.csv`) | 12 / 12 |
+More in [docs/TESTING.md](docs/TESTING.md).
 
-`docs/TESTING.md` lists what each test covers and what the tests found and fixed.
+<details>
+<summary><b>Project layout</b></summary>
+
+```
+backend/app/        FastAPI app and all business logic
+  advisor/          chat flow, free-text parsing in 7 languages, AI calls
+  kyc/              OCR, document parsing, registry lookups, checks, DigiLocker demo
+  i18n/             every screen and chat text in 7 languages
+  recommend.py      rules engine          quote.py      prices, GST, offers, floor
+  bundles.py        Apriori extras        similar.py    look-alike customers
+  predictor.py      which leads to call   handoff.py    when a person steps in
+  tracker.py        per-product dates     store.py      encryption, retention, access log
+frontend/           React + Vite phone app and back office
+data/               the hackathon dataset: catalogue, 5,000 leads, mock registries, 47 KYC images
+tests/              pytest suite and the KYC answer key
+scripts/            persona evaluation, KYC stress tests, end-to-end smoke test
+docs/               hosting, testing, README images
+```
+
+</details>
+
+<details>
+<summary><b>Limits of the prototype</b></summary>
+
+- KYC lookups, DigiLocker and e-sign run against the hackathon's mock registries; production would use DigiLocker, a licensed KYC vendor and Aadhaar e-sign.
+- Real SMS works through MSG91 or Twilio, but Indian SMS needs a DLT-registered template; the demo shows codes on screen.
+- No payment is taken in the app.
+- Voice is on for English and Hindi; the other five languages are translated but not yet tested with speech.
+
+</details>
 
 ---
 
-## Project layout
-
-```
-backend/app/           FastAPI app (main.py) and all business logic
-  advisor/             chat flow, free-text parsing in 7 languages, AI calls
-  kyc/                 OCR, document parsing, registry lookups, checks, DigiLocker demo
-  i18n/                every screen and chat text in 7 languages
-  pricing_settings.json  discount limits, welcome offer, pay-ahead savings
-  partners.json        demo channel partners
-frontend/              React + Vite phone app (served by the backend after the Docker build)
-data/                  the hackathon dataset: catalogue, 5,000 leads, mock registries, 47 KYC images
-tests/                 pytest suite and the KYC answer key
-scripts/               persona evaluation, KYC stress tests, end-to-end smoke test
-analysis/              results from the scripts
-docs/                  DEPLOY.md (hosting), TESTING.md (test details)
-accel-business-ui/     the design kit the app's screens were built from
-```
-
-## Limits of the prototype
-
-- KYC lookups, DigiLocker and e-sign run against the mock registries. Production would use DigiLocker, a licensed
-  KYC vendor and Aadhaar e-sign.
-- Real SMS codes work through MSG91 or Twilio, but Indian SMS needs a DLT-registered template. Judging uses demo mode.
-- Payment is not taken in the app.
-- Voice is on for English and Hindi only. The other 5 languages are translated but not yet tested with speech.
-- The non-English texts were written by the team and still need a review by native speakers.
+<div align="center">
+<sub>All businesses, people and documents are fictional, from the YTL Hackathon 2026 dataset. "Accel Business" is the case's fictional operator.</sub>
+</div>
