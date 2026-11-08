@@ -50,9 +50,11 @@ def test_wrong_document_in_a_slot_asks_for_a_retake():
     assert res.decision == "RETAKE" and "address_proof_wrong_document" in res.codes
 
 
-def test_certificate_for_a_different_gstin_than_the_chat_goes_to_review():
+def test_certificate_for_a_different_gstin_than_the_chat_asks_for_the_right_one():
     res = assess(docs_for("K03"), KycContext(TODAY, claimed_gstin="24XORXG9365M1Z3"))
-    assert res.decision == "REVIEW" and res.codes == ["gstin_differs_from_application"]
+    assert res.decision == "RETAKE" and res.codes == ["gstin_differs_from_application"]
+    issue = res.issues[0]
+    assert issue.doc == "gst_certificate" and issue.params == {"claimed": "24XOR******M1Z3", "found": "27XUI******D1ZP"}
 
 
 def test_expired_id_and_old_bill_are_retakes_not_rejections():

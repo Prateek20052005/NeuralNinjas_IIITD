@@ -144,8 +144,10 @@ def assess(docs: dict[str, ParsedDoc | None], ctx: KycContext) -> KycResult:
                     add("gstin_state_mismatch", "REJECT", "gst_certificate",
                         f"State code {gstin[:2]} is {state}, registry state is {r.state}")
         if gstin and ctx.claimed_gstin and gstin != ctx.claimed_gstin:
-            add("gstin_differs_from_application", "REVIEW", "gst_certificate",
-                f"Owner typed {mask(ctx.claimed_gstin)} in the chat, certificate shows {mask(gstin)}")
+            # the plan was made for the business the owner named in the chat: the certificate must be that one
+            add("gstin_differs_from_application", "RETAKE", "gst_certificate",
+                f"Owner typed {mask(ctx.claimed_gstin)} in the chat, certificate shows {mask(gstin)}",
+                claimed=mask(ctx.claimed_gstin), found=mask(gstin))
     trade = reg.trade_name if reg else (gst_doc.fields.get("trade_name") if gst_doc else None)
 
     # ---- 3. Udyam certificate (or typed number) vs the Udyam registry

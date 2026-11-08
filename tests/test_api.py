@@ -267,3 +267,21 @@ def test_sales_call_uses_the_verified_number_unless_another_is_given(client):
     assert client.post(cb, json={"phone": "9123456780", "consent": True}).status_code == 200
     assert main.store.get(app_id).callback["phone"] == "9123456780"               # the owner chose another one
     assert client.delete(f"/api/applications/{app_id}").json()["deleted"]
+
+
+def test_gst_certificate_of_another_business_is_caught_at_upload_and_at_the_check(client):
+    app_id, _ = chat_to_quote(client)                        # the chat gave 27XUIXG0767D1ZP (Ganesh Woodcraft, K03)
+    verify_phone(client, app_id)
+    client.post(f"/api/applications/{app_id}/accept")
+    client.post(f"/api/applications/{app_id}/consent", json={"purposes": ["kyc"]})
+    r = upload(client, app_id, "gst_certificate", applicant="K08").json()    # someone else's certificate
+    assert not r["ok"] and "27XUI******D1ZP" in r["message"] and "you gave" in r["message"]
+    status = client.get(f"/api/applications/{app_id}").json()
+    assert status["documents"]["gst_certificate"]["ok"] is False             # still flagged after a reload
+    for t in ("udyam_certificate", "address_proof", "signatory_id"):
+        upload(client, app_id, t)
+    res = client.post(f"/api/applications/{app_id}/kyc").json()
+    assert res["decision"] != "PASS"
+    assert any("you gave" in i["message"] for i in res["issues"])
+    assert upload(client, app_id, "gst_certificate").json()["ok"]             # the right certificate fixes it
+    assert client.post(f"/api/applications/{app_id}/kyc").json()["decision"] == "PASS"

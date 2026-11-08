@@ -30,7 +30,7 @@ from .bundles import top_rules
 from .i18n import LANGUAGES, _strings, t
 from .kyc.checks import Issue, KycContext, assess, required_documents
 from .kyc.documents import DOC_TYPES, read_document
-from .kyc.lookups import clean_id, mask
+from .kyc.lookups import GSTIN_RE, clean_id, gstin_checksum_ok, mask
 from .kyc.messages import owner_message, result_view
 from .kyc.ocr import NotAnImage
 from .negotiate import clean_phone, negotiation_step, room_pct, rupees, settings as price_settings
@@ -224,7 +224,7 @@ def _status(a: Application) -> dict:
         "documents": {t_: {"uploaded": t_ in a.docs, "required": t_ in required_documents(_gst_registered(a)),
                            # the owner's own details, masked like everywhere else (shown on the privacy page)
                            "fields": masked_fields(a.docs[t_]) if t_ in a.docs else {},
-                           **(dict(zip(("ok", "message"), _doc_check(t_, a.docs[t_], a.language))) if t_ in a.docs else {})}
+                           **(dict(zip(("ok", "message"), _doc_check(t_, a.docs[t_], a.language, p.gstin))) if t_ in a.docs else {})}
                       for t_ in DOC_TYPES},
         "udyam_number": mask(a.udyam_number),
         "kyc": result_view(a.kyc, a.language) if a.kyc else None,
@@ -516,12 +516,18 @@ def _require_consent(a: Application) -> None:
         raise HTTPException(403, t(a.language, "consent.required"))
 
 
-def _doc_check(doc_type: str, doc, lang: str) -> tuple[bool, str]:
-    """Was this photo good enough? Same answer right after upload and later in the status (after a reload)."""
+def _doc_check(doc_type: str, doc, lang: str, claimed_gstin: str | None = None) -> tuple[bool, str]:
+    """Was this photo good enough, and is it for the right business? Same answer right after upload and later in the
+    status (after a reload). claimed_gstin = the GST number the owner gave in the chat, if any."""
     if doc.wrong_type and not doc.blurred:
         return False, owner_message(Issue(f"{doc_type}_wrong_document", "RETAKE", doc_type, ""), lang)
     if doc.blurred or not doc.fields or doc.unread:
         return False, owner_message(Issue(f"{doc_type}_unreadable", "RETAKE", doc_type, ""), lang)
+    found = clean_id(doc.fields.get("gstin") or "")
+    if (doc_type == "gst_certificate" and claimed_gstin and found and found != claimed_gstin
+            and GSTIN_RE.match(found) and gstin_checksum_ok(found)):   # a misread number is the full check's job
+        return False, owner_message(Issue("gstin_differs_from_application", "RETAKE", doc_type, "",
+                                          {"claimed": mask(claimed_gstin), "found": mask(found)}), lang)
     return True, t(lang, "kyc.doc_ok", doc=t(lang, f"doc.{doc_type}"))
 
 
@@ -543,7 +549,7 @@ def upload(app_id: str, doc_type: str, file: UploadFile = File(...)):
         del data   # the photo is never stored: only the fields read from it are kept
     a.docs[doc_type] = doc
     a.kyc = None   # documents changed: decision must be made again
-    ok, msg = _doc_check(doc_type, doc, a.language)
+    ok, msg = _doc_check(doc_type, doc, a.language, a.session.profile.gstin)
     a.mark("document_read", doc=doc_type, ok=ok, seconds=doc.seconds)
     return {"doc_type": doc_type, "ok": ok, "message": msg, "fields": masked_fields(doc),
             "straightened": bool(doc.tilt)}
@@ -561,7 +567,7 @@ def from_digilocker(app_id: str, doc_type: str):
         raise HTTPException(404, t(a.language, "msg.digilocker_none"))
     a.docs[doc_type] = doc
     a.kyc = None
-    ok, msg = _doc_check(doc_type, doc, a.language)
+    ok, msg = _doc_check(doc_type, doc, a.language, a.session.profile.gstin)
     a.mark("document_fetched", doc=doc_type, source="digilocker")
     return {"doc_type": doc_type, "ok": ok, "message": msg, "fields": masked_fields(doc), "digilocker": True}
 

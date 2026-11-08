@@ -394,5 +394,6 @@
   "ui.privacy_order": "Your order is kept while you are a customer and deleted {days} days after your last activity. The details read from your documents are deleted once all your services are live.",
   "msg.cannot_switch_off_last": "This can't be switched off: it's the last mobile line in your plan. To change your plan, tell me in the chat.",
   "ui.setup_gst": "GST 18% on setup",
-  "ui.setup_to_pay": "Setup to pay (incl. GST)"
+  "ui.setup_to_pay": "Setup to pay (incl. GST)",
+  "kyc.gstin_differs_from_application": "This {doc} is for GST number {found}, but you gave {claimed} in the chat. Please upload the certificate for the same business."
 }
